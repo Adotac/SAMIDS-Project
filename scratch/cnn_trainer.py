@@ -49,7 +49,7 @@ class cnn_train:
 
 
         network = [
-            Convolutional((1, img_sizeX, img_sizeY), 3, len(training_data)),
+            Convolutional((200, 200, 1), 3, 2),
             Sigmoid(),
             Reshape((5, 26, 26), (5 * 26 * 26, 1)),
             Dense(5 * 26 * 26, 100),
@@ -57,6 +57,7 @@ class cnn_train:
             Dense(100, 2),
             Sigmoid()
         ]
+        print(network[0])
 
         Y = np.reshape([[0]], (1, 1, 1))
         train(network, mse, mse_prime, training_data, Y, epochs=3, learning_rate=0.1)
@@ -66,22 +67,22 @@ class cnn_train:
         cv2.waitKey()
         cv2.destroyAllWindows()
 
-        print(training_data[0].shape)
+        print(training_data[0])
         # print(len(testing_data))
 
         # decision boundary plot
-        points = []
-        for x in np.linspace(0, 1, 20):
-            for y in np.linspace(0, 1, 20):
-                z = predict(network, [[x], [y]])
-                points.append([x, y, z[0, 0]])
-
-        points = np.array(points)
-
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(points[:, 0], points[:, 1], points[:, 2], c=points[:, 2], cmap="winter")
-        plt.show()
+        # points = []
+        # for x in np.linspace(0, 1, 20):
+        #     for y in np.linspace(0, 1, 20):
+        #         z = predict(network, [[x], [y]])
+        #         points.append([x, y, z[0, 0]])
+        #
+        # points = np.array(points)
+        #
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111, projection="3d")
+        # ax.scatter(points[:, 0], points[:, 1], points[:, 2], c=points[:, 2], cmap="winter")
+        # plt.show()
 
 
 def main():

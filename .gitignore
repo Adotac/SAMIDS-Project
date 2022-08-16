@@ -2,10 +2,12 @@
 .idea
 /venv
 /__pycache__
+/dataset
 
 *.gz
 *.zip
 *.rar
+*.tgz
 *.png
 *.jpg
 *.bmp
