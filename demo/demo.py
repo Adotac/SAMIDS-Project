@@ -8,12 +8,17 @@ import pickle
 import csv
 import numpy as np
 import threading
-
+from pathlib import Path
 from time import time
 import time
 
-CamScaleW = 645
-CamScaleH = 810
+CamScaleW = 1072
+CamScaleH = 762
+
+OUTPUT_PATH = Path(__file__).parent
+ASSETS_PATH = OUTPUT_PATH / Path("./assets")
+def relative_to_assets(path: str) -> Path:
+    return ASSETS_PATH / Path(path)
 
 class App:
 
@@ -27,20 +32,178 @@ class App:
         self.window = window
         self.window.title(window_title)
         self.window.geometry(str(CamScaleW) + "x" + str(CamScaleH))
+        self.window.configure(bg = "#3E4541")
         self.window.resizable(width=False, height=True)
         self.video_source = video_source
         self.ok = False
 
+        self.canvas = tk.Canvas(
+            window,
+            bg="#3E4541",
+            height=CamScaleH,
+            width=CamScaleW,
+            bd=0,
+            highlightthickness=0,
+            relief="ridge"
+        )
+
+        self.canvas.place(x=0, y=0)
+        self.canvas.create_rectangle(
+            0.0,
+            0.0,
+            1072.0,
+            51.0,
+            fill="#E9A91C",
+            outline="")
+
+        self.canvas.create_text(
+            36.0,
+            13.0,
+            anchor="nw",
+            text="SAMIDS",
+            fill="#FFFFFF",
+            font=("Inter Bold", 20 * -1)
+        )
+
+
         # open video source (by default this will try to open the computer webcam)
         self.vid = VideoCapture(self.video_source).start()
         time.sleep(1.0)
-        # Create a canvas that can fit the above video source size
-        self.canvas = tk.Canvas(window, width=640, height=480)
-        self.canvas.grid(row=0, column=0, columnspan=2)
 
-        self.timeDate = tk.Label(window, font=('Montserrat', 18, 'bold'), bg='#c4c4c4')
-        self.timeDate.grid(row=1, column=0, columnspan=2, sticky='ew', ipady=15)
-        self.TimeDate()
+        image_image_1 = tk.PhotoImage(
+            file=relative_to_assets("image_1.png"))
+        image_1 = self.canvas.create_image(
+            335.0,
+            513.0,
+            image=image_image_1
+        )
+        self.canvas.create_text(
+            326.0,
+            483.0,
+            anchor="nw",
+            text="\n12:05:01 PM \n09-01-2022",
+            fill="#130000",
+            font=("Inter Bold", 16 * -1)
+        )
+
+        self.canvas.create_text(
+            88.0,
+            494.0,
+            anchor="nw",
+            text="5:12:01\nBLD_A",
+            fill="#000000",
+            font=("Inter Bold", 16 * -1)
+        )
+
+        image_image_3 = tk.PhotoImage(
+            file=relative_to_assets("image_3.png"))
+        image_3 = self.canvas.create_image(
+            848.0,
+            407.0,
+            image=image_image_3
+        )
+
+        button_image_1 = tk.PhotoImage(
+            file=relative_to_assets("button_1.png"))
+        button_1 = tk.Button(
+            image=button_image_1,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_1 clicked"),
+            relief="flat"
+        )
+        button_1.place(
+            x=48.0,
+            y=582.0,
+            width=278.0,
+            height=61.0
+        )
+
+        button_image_2 = tk.PhotoImage(
+            file=relative_to_assets("button_2.png"))
+        button_2 = tk.Button(
+            image=button_image_2,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_2 clicked"),
+            relief="flat"
+        )
+        button_2.place(
+            x=48.0,
+            y=659.0,
+            width=278.0,
+            height=61.0
+        )
+
+        button_image_3 = tk.PhotoImage(
+            file=relative_to_assets("button_3.png"))
+        button_3 = tk.Button(
+            image=button_image_3,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_3 clicked"),
+            relief="flat"
+        )
+        button_3.place(
+            x=336.0,
+            y=659.0,
+            width=287.0,
+            height=61.0
+        )
+
+        button_image_4 = tk.PhotoImage(
+            file=relative_to_assets("button_4.png"))
+        button_4 = tk.Button(
+            image=button_image_4,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_4 clicked"),
+            relief="flat"
+        )
+        button_4.place(
+            x=785.0,
+            y=5.0,
+            width=247.0,
+            height=39.0
+        )
+
+        button_image_5 = tk.PhotoImage(
+            file=relative_to_assets("button_5.png"))
+        button_5 = tk.Button(
+            image=button_image_5,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_5 clicked"),
+            relief="flat"
+        )
+        button_5.place(
+            x=564.0,
+            y=581.0,
+            width=59.0,
+            height=62.0
+        )
+
+        entry_image_1 = tk.PhotoImage(
+            file=relative_to_assets("entry_1.png"))
+        entry_bg_1 = self.canvas.create_image(
+            450.0,
+            612.0,
+            image=entry_image_1
+        )
+        entry_1 = tk.Entry(
+            bd=0,
+            bg="#FFFFFF",
+            highlightthickness=0
+        )
+        entry_1.place(
+            x=356.0,
+            y=581.0,
+            width=188.0,
+            height=60.0
+        )
+        # self.timeDate = tk.Label(window, font=('Montserrat', 18, 'bold'), bg='#c4c4c4')
+        # self.timeDate.grid(row=1, column=0, columnspan=2, sticky='ew', ipady=15)
+        # self.TimeDate()
 
         # # A combo box to choose what class you're trying to check attendance to
         # self.id_label = tk.Label(window, text='Class Schedule', font=('Montserrat', 12, 'bold'))
@@ -59,12 +222,12 @@ class App:
         # self.eID.grid(row=5, column=0, columnspan=2, ipadx=110, ipady=5, )
 
         # Button that lets the user take a snapshot
-        self.attend = tk.Button(window, text="Log Attendance", state='disabled', fg='white', bg='#0034D1')
-        self.attend.grid(row=6, column=0, sticky='e', ipadx=75, ipady=5, pady=10, padx=5)
-
-        # quit button
-        self.btn_quit = tk.Button(window, text='Exit', fg='white', bg='#0034D1', command=quit)
-        self.btn_quit.grid(row=6, column=1, sticky='w', ipadx=25, ipady=5, pady=10, padx=5)
+        # self.attend = tk.Button(window, text="Log Attendance", state='disabled', fg='white', bg='#0034D1')
+        # self.attend.grid(row=6, column=0, sticky='e', ipadx=75, ipady=5, pady=10, padx=5)
+        #
+        # # quit button
+        # self.btn_quit = tk.Button(window, text='Exit', fg='white', bg='#0034D1', command=quit)
+        # self.btn_quit.grid(row=6, column=1, sticky='w', ipadx=25, ipady=5, pady=10, padx=5)
 
         # After it is called once, the update method will be automatically called every delay milliseconds
         self.delay = 10
@@ -84,8 +247,10 @@ class App:
         cv2.putText(frame, f'FPS: ' + formatFps, (20, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
         if ret:
-            self.photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-            self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+            img_cam = PIL.Image.fromarray(frame)
+            img_cam = img_cam.resize((575, 379))
+            self.photo = PIL.ImageTk.PhotoImage(image=img_cam)
+            self.canvas.create_image(335.0, 283.0, image=self.photo, anchor=tk.CENTER)
 
         # print(self.vid.pf)
 
@@ -139,7 +304,7 @@ class VideoCapture:
     # added by Bohol, Christopher
     def edge_detection(self, frame):
 
-        path = r"dataset\cascades\haarcascade_frontalface_alt_tree.xml"
+        path = r"haarcascade_frontalface_alt_tree.xml"
         face_cascade = cv2.CascadeClassifier(path)
 
         # added and edited by Gadiane, James Christian
