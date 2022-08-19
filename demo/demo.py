@@ -12,6 +12,8 @@ from pathlib import Path
 from time import time
 import time
 
+import web_api
+api = web_api.API()
 CamScaleW = 1072
 CamScaleH = 762
 
@@ -36,6 +38,8 @@ class App:
         self.window.resizable(width=False, height=True)
         self.video_source = video_source
         self.ok = False
+
+        self.selectedCode = "11003"
 
         self.canvas = tk.Canvas(
             window,
@@ -77,14 +81,17 @@ class App:
             513.0,
             image=image_image_1
         )
+
+        self.timeDate = self.TimeDate()
         self.canvas.create_text(
             326.0,
             483.0,
             anchor="nw",
-            text="\n12:05:01 PM \n09-01-2022",
+            text=self.timeDate,
             fill="#130000",
             font=("Inter Bold", 16 * -1)
         )
+
 
         self.canvas.create_text(
             88.0,
@@ -173,7 +180,7 @@ class App:
             image=button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_5 clicked"),
+            command=self.CheckAttendance,
             relief="flat"
         )
         button_5.place(
@@ -190,12 +197,12 @@ class App:
             612.0,
             image=entry_image_1
         )
-        entry_1 = tk.Entry(
+        self.eID = tk.Entry(
             bd=0,
             bg="#FFFFFF",
             highlightthickness=0
         )
-        entry_1.place(
+        self.eID.place(
             x=356.0,
             y=581.0,
             width=188.0,
@@ -234,6 +241,8 @@ class App:
         self.update()
         window.mainloop()
 
+
+
     def update(self):
         start_time = time.time()
 
@@ -253,13 +262,136 @@ class App:
             self.canvas.create_image(335.0, 283.0, image=self.photo, anchor=tk.CENTER)
 
         # print(self.vid.pf)
-
+        self.timeDate = self.TimeDate()
         self.window.after(self.delay, self.update)
 
+        # function to be called that checks the empID input when attendance button is clicked
+
+    def CheckAttendance(self):
+        def processAttendance():
+            # get id input
+            inputID = self.eID.get()
+            print(inputID)
+
+            if self.vid.pf:
+                if api.check_if_account_exists(inputID):
+                    print("from face detection -- " + self.vid.name)
+                    if api.crosscheck_face_name_to_db(inputID, self.vid.name):
+                        # get the time with 12hr format HH:MM AM/PM
+                        _time = time.strftime("%I:%M %p")
+                        print("Time: ")
+                        print(_time)
+                        # get the class schedule from cbox
+                        # sched_index = self.cb.current()
+                        sched_index = 0
+
+                        print("RFID exists!")
+                        remark = remarks(sched_index)
+                        addAttendance(remark, sched_index, inputID)
+                    else:
+                        messagebox.showerror("ERROR!", "RFID and Face entry doesn't match!")
+                else:
+                    messagebox.showerror("ERROR!", "Invalid RFID")
+                    print("Cannot recognize RFID input")
+            else:
+                messagebox.showerror("Anti-Spoofing ERROR!", "Spoofing detected!")
+            return
+
+        def remarks(index):
+            # get the index of sch_time in class_schedule
+
+            # split the sch_time by spaces
+            sch_time = ["03:30 pm", "04:30 pm"]
+
+            start = sch_time[0]
+            print(start)
+            end = sch_time[1]
+            print(end)
+
+            # convert the start and end time to 24hr format
+            start = time.strptime(start, "%I:%M %p")
+            start = time.strftime("%H:%M", start)
+            print(start)
+
+            end = time.strptime(end, "%I:%M %p")
+            end = time.strftime("%H:%M", end)
+            print(end)
+
+            _time = time.strftime("%H:%M")
+            # print(_time)
+
+            # split the start and end time by :
+            startS = start.split(':')
+            # print(startS)
+
+            endS = end.split(':')
+            # print(endS)
+
+            # split the time by :
+            timeX = _time.split(':')
+            # print(timeX)
+
+            # convert the start and end time to int
+            startInts = [int(i) for i in startS]
+            print(startInts)
+
+            endInts = [int(i) for i in endS]
+            print(endInts)
+
+            # convert the time to int
+            timeS = [int(i) for i in timeX]
+            print(timeS)
+
+            add = startInts[1] + 15  # 15 minutes late
+            print(add)
+
+            if (timeS[0] > startInts[0]) and (timeS[1] >= endInts[1]):
+                remark = "Absent"
+                print(remark)
+                return remark
+            if timeS[0] < startInts[0]:
+                remark = "Early"
+                print(remark)
+                return remark
+            if timeS[0] == startInts[0]:
+                if (timeS[1] >= startInts[1]) and (timeS[1] <= add):
+                    remark = "Present"
+                    print(remark)
+                    return remark
+                elif timeS[1] >= add:
+                    remark = "Late"
+                    print(remark)
+                    return remark
+            else:
+                remark = "Absent"
+                print(remark)
+                return remark
+
+        def addAttendance(remark, index, id):
+            data = {
+                'remarks': remark,
+                'classcode': self.selectedCode,
+                'date': strftime('%d/%m/%Y'),
+                'time': strftime('%I:%M %p'),
+                'uid': int(id)
+            }
+            print(data)
+            response = api.add_attendance(body=data)
+            print(response.json())
+            # try:
+            #     if response['success']:
+            #         print("adding attendance success!!")
+            # except:
+            #     print("adding attendance failed")
+            #     print("API Error!")
+
+        proc_thread = threading.Thread(target=processAttendance)
+        proc_thread.start()
+
     def TimeDate(self):
-        time_string = strftime('%I:%M:%S %p\n%A, %x')  # time format
-        self.timeDate.config(text=time_string)
-        self.timeDate.after(1000, self.TimeDate)  # time delay of 1000 milliseconds
+        return strftime('%I:%M:%S %p\n%A, %x')  # time format
+        # self.timeDate.config(text=time_string)
+        # self.timeDate.after(1000, self.TimeDate)  # time delay of 1000 milliseconds
 
 
 class VideoCapture:
@@ -333,40 +465,62 @@ class VideoCapture:
             print(x, y, w, h)
 
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), stroke)
-            # roi_gray = gray_frame[y:y+h, x:x+w] #cropping the face
+            roi_gray = gray_frame[y:y+h, x:x+w] #cropping the face
             HSV_frame = HSV_cv[y:y + h, x:x + w]
             YCbCr_frame = YCbCr_cv[y:y + h, x:x + w]
 
+            id_1, conf1 = recognizer.predict(roi_gray)
             id_2, conf2 = recognizer.predict(HSV_frame)
             id_3, conf3 = recognizer.predict(YCbCr_frame)
 
-            if conf2 >= 50 and conf2 <= 80:
+            if conf1 >= 45 and conf1 <= 80:
                 # print("HSV!!")
                 if (y < 100 or w < 210) or (x >= 230 or w >= 259):
                     self.name = "Position head properly"
                     color = (128, 0, 128)
                     cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
                     cv2.rectangle(frame, point, (x + w, y + h), color, stroke)
+                    self.pf = False
                 else:
                     self.name = labels[id_2]
                     color = (255, 255, 255)
                     cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
+                    self.pf = True
 
                 # color = (255, 255, 255)
                 # cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
                 continue
-            if conf3 >= 60 and conf3 <= 80:
+            if conf2 >= 45 and conf2 <= 80:
+                # print("HSV!!")
+                if (y < 100 or w < 210) or (x >= 230 or w >= 259):
+                    self.name = "Position head properly"
+                    color = (128, 0, 128)
+                    cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
+                    cv2.rectangle(frame, point, (x + w, y + h), color, stroke)
+                    self.pf = False
+                else:
+                    self.name = labels[id_2]
+                    color = (255, 255, 255)
+                    cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
+                    self.pf = True
+
+                # color = (255, 255, 255)
+                # cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
+                continue
+            if conf3 >= 45 and conf3 <= 80:
                 # print("YCbCr!!")
-                self.name = "False"
-                color = (0, 0, 255)
+                self.name = labels[id_3]
+                color = (0, 255, 0)
                 cv2.putText(frame, self.name, point, font, fScale, color, stroke, cv2.LINE_AA)
                 cv2.rectangle(frame, point, (x + w, y + h), color, stroke)
+                self.pf = True
                 # continue
             else:
                 name = "False"
                 color = (0, 0, 255)
                 cv2.putText(frame, name, point, font, fScale, color, stroke, cv2.LINE_AA)
                 cv2.rectangle(frame, point, (x + w, y + h), color, stroke)
+                self.pf = False
             # drawing rectangle around the face
 
     # Release the video source when the object is destroyed
