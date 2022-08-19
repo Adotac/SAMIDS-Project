@@ -18,18 +18,13 @@ CamScaleW = 1072
 CamScaleH = 762
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path("./assets")
+ASSETS_PATH = OUTPUT_PATH / Path("./assets/attendance")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-class App:
+class AttendanceApp:
 
     def __init__(self, window, window_title, video_source=0):
-        def updateLbl(*_):
-            if self.eID.get():  # empty string is false
-                self.attend["state"] = "normal"
-            else:
-                self.attend["state"] = "disable"
 
         self.window = window
         self.window.title(window_title)
@@ -82,12 +77,11 @@ class App:
             image=image_image_1
         )
 
-        self.timeDate = self.TimeDate()
-        self.canvas.create_text(
+        self.timeDate = self.canvas.create_text(
             326.0,
             483.0,
             anchor="nw",
-            text=self.timeDate,
+            text=strftime('%I:%M:%S %p\n%A, %x'),
             fill="#130000",
             font=("Inter Bold", 16 * -1)
         )
@@ -109,6 +103,29 @@ class App:
             407.0,
             image=image_image_3
         )
+
+        self.att_log = self.canvas.create_text(
+            958.0,
+            157.0,
+            anchor="ne",
+            text=api.printLog(),
+            fill="#000000",
+            font=("Inter Bold", 16 * -1),
+            width=348
+        )
+        # self.att_log = tk.Entry(
+        #     bd=0,
+        #     bg="#FFFFFF",
+        #     highlightthickness=0,
+        #     font=("Inter Bold", 16 * -1)
+        # )
+        # self.att_log.place(
+        #     x=848.0,
+        #     y=407.0,
+        #     width=188.0,
+        #     height=60.0
+        # )
+
 
         button_image_1 = tk.PhotoImage(
             file=relative_to_assets("button_1.png"))
@@ -164,7 +181,7 @@ class App:
             image=button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_4 clicked"),
+            command=self.transition,
             relief="flat"
         )
         button_4.place(
@@ -239,9 +256,10 @@ class App:
         # After it is called once, the update method will be automatically called every delay milliseconds
         self.delay = 10
         self.update()
+        print("False")
         window.mainloop()
 
-
+        print("End")
 
     def update(self):
         start_time = time.time()
@@ -262,7 +280,7 @@ class App:
             self.canvas.create_image(335.0, 283.0, image=self.photo, anchor=tk.CENTER)
 
         # print(self.vid.pf)
-        self.timeDate = self.TimeDate()
+        self.TimeDate()
         self.window.after(self.delay, self.update)
 
         # function to be called that checks the empID input when attendance button is clicked
@@ -377,6 +395,7 @@ class App:
             }
             print(data)
             response = api.add_attendance(body=data)
+            self.LogAttendance()
             print(response.json())
             # try:
             #     if response['success']:
@@ -389,9 +408,20 @@ class App:
         proc_thread.start()
 
     def TimeDate(self):
-        return strftime('%I:%M:%S %p\n%A, %x')  # time format
-        # self.timeDate.config(text=time_string)
+        time_string = strftime('%I:%M:%S %p\n%A, %x')  # time format
+        self.canvas.itemconfig(self.timeDate, text=time_string)
         # self.timeDate.after(1000, self.TimeDate)  # time delay of 1000 milliseconds
+    def LogAttendance(self):
+        log_string = api.printLog()  # time format
+        self.canvas.itemconfig(self.att_log, text=log_string)
+
+    def transition(self):
+        self.window.destroy()
+        print("True")
+        self.window = None
+        self.Tflag1 = True
+        self.Tflag2 = False
+        # IntrusionApp(tk.Tk(), 'Intrusion System')
 
 
 class VideoCapture:
@@ -530,10 +560,3 @@ class VideoCapture:
             cv2.destroyAllWindows()
 
 
-def main():
-    # Create a window and pass it to the Application object
-    App(tk.Tk(), 'Attendance System')
-
-
-if __name__ == "__main__":
-    main()

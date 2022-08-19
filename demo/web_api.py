@@ -24,7 +24,21 @@ class API():
         return requests.post(url=self.url + "attendance/add", json=body, headers=self.head, auth=None)
 
     def get_all_attendance(self):
-        return requests.get(url=self.url + "accounts/get/all", headers=self.head, auth=None)
+        return requests.get(url=self.url + "attendance/get/all", headers=self.head, auth=None)
+
+    def printLog(self):
+        response = self.get_all_attendance()
+        data = response.json()
+        # print(data)
+        tempStr = ""
+        for i in data['data']:
+            tempStr += str(i['uid']) + '\t| '
+            tempStr += i['classcode'] + ' |\t'
+            tempStr += i['time']
+            # tempStr += i['date']
+            tempStr += "\n\n"
+
+        return tempStr
 
     def check_if_account_exists(self, id):
         response = self.get_account(str(id))
