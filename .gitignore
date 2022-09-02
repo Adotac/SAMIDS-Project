@@ -2,13 +2,15 @@
 .idea
 /venv
 /__pycache__
+/demo/__pycache__
 /dataset
+
+/demo/custom/images/*
+!demo/custom/images/person/
+
 
 *.gz
 *.zip
 *.rar
 *.tgz
-*.png
-*.jpg
-*.bmp
 *.tar
