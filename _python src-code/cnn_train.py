@@ -4,7 +4,7 @@ import  matplotlib.pyplot as plt
 
 from conv import Conv
 from maxpool import Max_Pool
-from softmax import Softmax
+from activation import Softmax
 
 def cnn_forward(img, label):
     out_p = Conv.forward( (img/255) - 0.5 )

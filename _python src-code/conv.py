@@ -1,10 +1,31 @@
 import numpy as np
+import math
+import
 
-class Conv:
-    def __init__(self, num_kernel, kernel_size):
-        self.num_kernel = num_kernel
+class Conv3D:
+    def __init__(self,
+                 num_kernel, kernel_size,
+                 in_channels: int,
+                 out_channels:int,
+                 stride=1,
+                 padding=1,
+                 dilation=1,
+
+
+                 activation='relu'):
+        self.num_kernel = num_kernel # filter length
         self.kernel_size = kernel_size
         self.conv_filter = np.random.randn(num_kernel, kernel_size, kernel_size)/(kernel_size, * kernel_size)
+
+        self.filters = False
+        self.stride = stride
+        self.activation=activation
+        self.padding=padding
+        self.output=[]
+        self.output_activated = []
+        self.d1z=[]
+
+    def set_input
 
     def image_region(self, img):
         h, w = img.shape
