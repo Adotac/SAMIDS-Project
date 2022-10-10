@@ -1,19 +1,4 @@
-<<<<<<< HEAD
-﻿<Window x:Class="SAMIDS_csharp.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SAMIDS_csharp"
-        mc:Ignorable="d"
-        Title="SAMIDS" Height="900" Width="1290">
-    <Grid>
-        <Rectangle HorizontalAlignment="Left" Stroke="Black" Width="241"/>
-
-    </Grid>
-</Window>
-=======
-﻿<Window x:Class="SAMIDS_csharp.MainWindow"
+<Window x:Class="SAMIDS_csharp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -50,4 +35,3 @@
         </Grid>
     </Grid>
 </Window>
->>>>>>> f8e771b (Intruston system GUI update)
