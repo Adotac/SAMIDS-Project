@@ -8,4 +8,10 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Numpy" Version="3.10.1.30" />
+    <PackageReference Include="Onvif.IP.Camera.Viewer" Version="11.2.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
+  </ItemGroup>
+
 </Project>

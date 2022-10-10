@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SAMIDS_csharp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1200" Width="1920">
+        Title="SAMIDS" Height="900" Width="1290">
     <Grid>
         <Rectangle HorizontalAlignment="Left" Stroke="Black" Width="241"/>
 
