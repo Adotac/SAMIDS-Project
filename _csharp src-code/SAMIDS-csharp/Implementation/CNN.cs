@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Numpy;
+using OpenCvSharp;
 
 namespace SAMIDS_csharp.Implementation
 {
@@ -46,10 +47,12 @@ namespace SAMIDS_csharp.Implementation
             
         }
 
-        
-        private NDarray labels() { // one_hot_labels // erase comment later
-        
-        }
+        // find out first the data type of image using eiither opencv or emgu or other libraries
+        //private NDarray labels(OpenCvSharp.Mat img) { // one_hot_labels // erase comment later
+        //    //Cv2.ImRead()
+        //    //Cv2.Resize(img, 0, img.shape);
+        //    //Cv2.CreateFrameSource_Video
+        //}
     }
 
 

@@ -17,6 +17,7 @@ using System.IO;
 using System.Text;
 
 using SAMIDS_csharp.Implementation;
+using SAMIDS_csharp.camera_testing;
 
 namespace SAMIDS_csharp
 {
@@ -30,8 +31,10 @@ namespace SAMIDS_csharp
 
         public MainWindow()
         {
+            Camera_test NewWindowB = new Camera_test();
+            NewWindowB.Show();
+
             InitializeComponent();
-            
         }
 
         // Test function for CNN don't delete!!
