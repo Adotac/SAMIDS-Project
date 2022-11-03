@@ -1,6 +1,8 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace SAMIDS_csharp.camera_testing
@@ -17,6 +19,15 @@ namespace SAMIDS_csharp.camera_testing
             bi.StreamSource = ms;
             bi.EndInit();
             return bi;
+        }
+
+        public static BitmapSource BitmapToBitmapSource(this Bitmap bitmap)
+        {
+            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                          bitmap.GetHbitmap(),
+                          IntPtr.Zero,
+                          Int32Rect.Empty,
+                          BitmapSizeOptions.FromEmptyOptions());
         }
     }
 }

@@ -22,11 +22,8 @@
     <PackageReference Include="AForge.Video" Version="2.2.5" />
     <PackageReference Include="AForge.Video.DirectShow" Version="2.2.5" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
-    <PackageReference Include="Emgu.CV" Version="4.5.5.4823" />
-    <PackageReference Include="Nager.VideoStream" Version="1.2.0" />
     <PackageReference Include="Numpy" Version="3.10.1.30" />
     <PackageReference Include="NumSharp.Bitmap" Version="0.30.0" />
-    <PackageReference Include="Onvif.IP.Camera.Viewer" Version="11.2.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
   </ItemGroup>
 

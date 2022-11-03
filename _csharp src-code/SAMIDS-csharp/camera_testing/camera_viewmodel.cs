@@ -6,14 +6,11 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
-using forms = System.Windows.Forms;
+using System.Threading;
+using System.ComponentModel;
 
-using Nager.VideoStream;
 using AForge.Video;
 using AForge.Video.DirectShow;
-//using GalaSoft.MvvmLight;
-//using GalaSoft.MvvmLight.CommandWpf;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -22,11 +19,12 @@ namespace SAMIDS_csharp.camera_testing
 {
     internal class camera_viewmodel : ObservableObject, IDisposable
     {
+        Camera_test Form = Application.Current.Windows[1] as Camera_test; // to access camera test window xaml elements
         #region Private fields
 
         private FilterInfo _currentDevice;
 
-        private BitmapImage _image;
+        private BitmapSource _image;
         private string _ipCameraUrl;
 
         private bool _isDesktopSource;
@@ -59,7 +57,7 @@ namespace SAMIDS_csharp.camera_testing
 
         public ObservableCollection<FilterInfo> VideoDevices { get; set; }
 
-        public BitmapImage Image
+        public BitmapSource Image
         {
             get { return _image; }
             set { this._image = value; }
@@ -92,7 +90,10 @@ namespace SAMIDS_csharp.camera_testing
         public FilterInfo CurrentDevice
         {
             get { return _currentDevice; }
-            set { this._currentDevice = value; }
+            set { 
+                this._currentDevice = value;
+                this.OnPropertyChanged("CurrentDevice");
+            }
         }
         public ICommand StartSourceCommand { get; private set; }
 
@@ -176,9 +177,10 @@ namespace SAMIDS_csharp.camera_testing
                 //}
                 using (var bitmap = (Bitmap)eventArgs.Frame.Clone())
                 {
-                    var bi = bitmap.ToBitmapImage();
+                    var bi = bitmap.BitmapToBitmapSource();
                     bi.Freeze();
-                    Dispatcher.CurrentDispatcher.Invoke(() => Image = bi);
+                    //Application.Current.Dispatcher.Invoke(() => Image = bi);
+                    Application.Current.Dispatcher.BeginInvoke(new ThreadStart(delegate { Form.cam_screen.Source = bi; Image = bi; }));
                 }
             }
             catch (Exception exc)
@@ -194,13 +196,16 @@ namespace SAMIDS_csharp.camera_testing
             if (_videoSource != null && _videoSource.IsRunning)
             {
                 _videoSource.SignalToStop();
-                _videoSource.NewFrame -= video_NewFrame;
+                _videoSource.NewFrame -= new NewFrameEventHandler(video_NewFrame);
             }
             Image = null;
         }
 
         private void SaveSnapshot()
         {
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(Image)); // try catch error here
+
             var dialog = new SaveFileDialog();
             dialog.FileName = "Snapshot1";
             dialog.DefaultExt = ".png";
@@ -209,8 +214,7 @@ namespace SAMIDS_csharp.camera_testing
             {
                 return;
             }
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(Image));
+
             using (var filestream = new FileStream(dialog.FileName, FileMode.Create))
             {
                 encoder.Save(filestream);
@@ -225,5 +229,21 @@ namespace SAMIDS_csharp.camera_testing
             }
             //_writer?.Dispose();
         }
+
+        #region INotifyPropertyChanged members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = this.PropertyChanged;
+            if (handler != null)
+            {
+                var e = new PropertyChangedEventArgs(propertyName);
+                handler(this, e);
+            }
+        }
+
+        #endregion
     }
 }
