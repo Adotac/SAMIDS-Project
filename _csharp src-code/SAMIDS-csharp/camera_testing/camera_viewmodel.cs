@@ -196,7 +196,7 @@ namespace SAMIDS_csharp.camera_testing
             if (_videoSource != null && _videoSource.IsRunning)
             {
                 _videoSource.SignalToStop();
-                _videoSource.NewFrame -= new NewFrameEventHandler(video_NewFrame);
+                _videoSource.NewFrame -= video_NewFrame;
             }
             Image = null;
         }

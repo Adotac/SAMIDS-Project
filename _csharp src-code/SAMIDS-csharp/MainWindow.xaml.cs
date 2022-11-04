@@ -31,8 +31,8 @@ namespace SAMIDS_csharp
 
         public MainWindow()
         {
-            Camera_test NewWindowB = new Camera_test();
-            NewWindowB.Show();
+           // Camera_test NewWindowB = new Camera_test();
+           // NewWindowB.Show();
 
             InitializeComponent();
         }
@@ -60,6 +60,14 @@ namespace SAMIDS_csharp
             };
         }
         private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            AttendanceScreen attendanceScreen = new AttendanceScreen();
+            // this.Visibility = Visibility.Hidden;
+            this.Close();
+            attendanceScreen.Show();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
 
         }

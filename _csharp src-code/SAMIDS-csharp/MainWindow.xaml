@@ -5,16 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SAMIDS_csharp"
         mc:Ignorable="d"
-        Title="SAMIDS" Height="693" Width="1161">
-    <Grid>
-        <Grid>
+        Title="SAMIDS" Height="693" Width="1070">
+    <Grid Margin="0,0,10,0">
+        <Grid Margin="-6,2,5,-2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="31*"/>
                 <ColumnDefinition Width="20*"/>
                 <ColumnDefinition Width="1106*"/>
             </Grid.ColumnDefinitions>
-            <Rectangle HorizontalAlignment="Left" Height="57" Margin="148,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="958" StrokeThickness="0" Fill="#FF395170" Grid.Column="2"/>
-            <Label Content="Intrusion System" HorizontalAlignment="Left" Margin="162,12,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="DemiBold" FontStyle="Normal" Foreground="White" Grid.Column="2"/>
+            <Rectangle Height="58" Margin="133,-4,-15,0" Stroke="Black" VerticalAlignment="Top" StrokeThickness="0" Fill="#FF395170" Grid.Column="2"/>
+            <Label Content="Intrusion System" HorizontalAlignment="Left" Margin="171,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="DemiBold" FontStyle="Normal" Foreground="White" Grid.Column="2"/>
+            <Rectangle Grid.Column="2" Height="439" Margin="162,77,10,0" Stroke="Black" VerticalAlignment="Top"/>
+            <TextBox Grid.Column="2" HorizontalAlignment="Left" Margin="162,538,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="454" Height="97"/>
+            <Button Grid.Column="2" Content=" View Intrusion Logs" HorizontalAlignment="Left" Margin="646,544,0,0" VerticalAlignment="Top" Click="Button_Click_1" Height="34" Width="170"/>
+            <Button Grid.Column="2" Content="Draw Intrusion Area" HorizontalAlignment="Left" Margin="646,593,0,0" VerticalAlignment="Top" Height="37" Width="170"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="850,553,0,0" TextWrapping="Wrap" Text="Selected: " VerticalAlignment="Top"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="906,553,0,0" TextWrapping="Wrap" Text="CAM_1" VerticalAlignment="Top" FontWeight="SemiBold"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="843,593,0,0" TextWrapping="Wrap" Text="x1 - 12.12" VerticalAlignment="Top"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="843,608,0,0" TextWrapping="Wrap" Text="y1 - 23.13" VerticalAlignment="Top"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="906,608,0,0" TextWrapping="Wrap" Text="y2 - 32.14" VerticalAlignment="Top"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="906,593,0,0" TextWrapping="Wrap" Text="x2 - 12.42" VerticalAlignment="Top"/>
         </Grid>
         <Grid Background="#FFFCFCFC" HorizontalAlignment="Left" Width="202">
             <Label Content="SAMIDS x USJR" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="Bold" FontStyle="Normal"/>
