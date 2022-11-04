@@ -25,7 +25,7 @@ namespace SAMIDS_csharp.Implementation
         } // example = DisplayNDarrayData<int>(nDimArray);
     }
 
-    internal class ConvLayer: Layers{
+    public class ConvLayer: Layers{
         private int filter_length;
         private int stride;
         private Tuple<int, int> kernel_size;
@@ -33,7 +33,7 @@ namespace SAMIDS_csharp.Implementation
         private string activation;
         private 
 
-        public ConvLayer(
+        ConvLayer(
             int filter_length,
             int kernel_size,
             int stride = 1,
@@ -48,8 +48,8 @@ namespace SAMIDS_csharp.Implementation
             this.activation = activation;
         }
 
-        public NDarray setInput() { 
-        
-        }
+        //public NDarray setInput() { 
+            
+        //}
     }
 }
