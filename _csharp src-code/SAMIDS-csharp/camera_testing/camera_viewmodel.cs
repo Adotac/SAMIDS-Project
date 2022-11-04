@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Threading;
 using System.ComponentModel;
+using forms = System.Windows.Forms;
 
 using AForge.Video;
 using AForge.Video.DirectShow;
@@ -156,6 +157,21 @@ namespace SAMIDS_csharp.camera_testing
             }
         }
 
+        //private Image drawRect(Image img) {
+        //    //Bitmap bmp = new Bitmap(260, 260, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        //    Graphics gBmp = Graphics.FromImage(img);
+        //    gBmp.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+
+        //    // draw a green rectangle to the bitmap in memory
+        //    gBmp.FillRectangle(new SolidBrush(Color.Red), 100, 50, 100, 100);
+
+            
+        //    forms.PaintEventArgs(gBmp).Graphics.DrawImage(img, new PointF(0.0F, 0.0F));
+
+        //    gBmp.Dispose();
+        //    return img;
+        //}
+
         private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
         {
             try
@@ -177,6 +193,8 @@ namespace SAMIDS_csharp.camera_testing
                 //}
                 using (var bitmap = (Bitmap)eventArgs.Frame.Clone())
                 {
+                    
+                    //var b = (Bitmap)drawRect(bitmap);
                     var bi = bitmap.BitmapToBitmapSource();
                     bi.Freeze();
                     //Application.Current.Dispatcher.Invoke(() => Image = bi);

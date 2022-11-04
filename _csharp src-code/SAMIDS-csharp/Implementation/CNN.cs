@@ -29,7 +29,7 @@ namespace SAMIDS_csharp.Implementation
         private string saved_model_loc;
         private string model_name;
 
-        public CNN(
+        CNN(
             string train_data_loc,
             string test_data_loc,
             string saved_model_loc,
