@@ -8,16 +8,35 @@
         Title="AttendanceScreen" Height="693" Width="1070">
 
     <Grid>
-        <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="327*"/>
+            <ColumnDefinition Width="208*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Margin="0,10,0,0" Grid.ColumnSpan="4" Height="687" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="31*"/>
-                <ColumnDefinition Width="20*"/>
-                <ColumnDefinition Width="1106*"/>
+                <ColumnDefinition Width="0*"/>
+                <ColumnDefinition Width="47*"/>
+                <ColumnDefinition Width="1023*"/>
             </Grid.ColumnDefinitions>
             <Rectangle HorizontalAlignment="Left" Height="57" Margin="148,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="889" StrokeThickness="0" Fill="#FF395170" Grid.Column="2"/>
-            <Label Content="Attendance System" HorizontalAlignment="Left" Margin="162,12,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="DemiBold" FontStyle="Normal" Foreground="White" Grid.Column="2"/>
+            <Label Content="Attendance System" HorizontalAlignment="Left" Margin="162,12,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="DemiBold" FontStyle="Normal" Foreground="White" Grid.Column="2" Height="34" Width="184"/>
+            <Rectangle Grid.Column="2" HorizontalAlignment="Left" Height="393" Margin="175,77,0,0" Stroke="Black" VerticalAlignment="Top" Width="637"/>
+            <TextBox Grid.Column="2" HorizontalAlignment="Left" Margin="826,77,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="172" Height="393"/>
+            <TextBox Grid.Column="2" HorizontalAlignment="Left" Margin="175,492,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="478" Height="146"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="668,498,0,0" TextWrapping="Wrap" Text="Location" VerticalAlignment="Top" Height="16" Width="56"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="668,522,0,0" TextWrapping="Wrap" Text="Room" VerticalAlignment="Top" Height="16" Width="31"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="668,546,0,0" TextWrapping="Wrap" Text="Logs" VerticalAlignment="Top" Height="16" Width="25"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="949,495,0,0" TextWrapping="Wrap" Text="SAN_BLG" VerticalAlignment="Top" FontWeight="SemiBold" Height="16" Width="50"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="965,519,0,0" TextWrapping="Wrap" Text="BCL_1" VerticalAlignment="Top" FontWeight="SemiBold" Height="16" Width="30"/>
+            <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="984,543,0,0" TextWrapping="Wrap" Text="21" VerticalAlignment="Top" FontWeight="SemiBold" Height="16" Width="11"/>
+            <Button Grid.Column="2" Content="Generate Report" HorizontalAlignment="Left" Margin="668,580,0,0" VerticalAlignment="Top" Width="160" Height="26"/>
+            <Button Grid.Column="2" Content="Re-Train Models" HorizontalAlignment="Left" Margin="839,612,0,0" VerticalAlignment="Top" Width="160" Height="26"/>
+            <Button Grid.Column="2" Content="View Attendance Logs" HorizontalAlignment="Left" Margin="668,612,0,0" VerticalAlignment="Top" Height="26" Width="160"/>
+            <Button Grid.Column="2" Content="Face Labels" HorizontalAlignment="Left" Margin="839,580,0,0" VerticalAlignment="Top" Width="160" Height="26"/>
         </Grid>
-        <Grid Background="#FFFCFCFC" HorizontalAlignment="Left" Width="202">
+        <Grid Background="#FFFCFCFC" HorizontalAlignment="Left" Width="202" Grid.ColumnSpan="3">
             <Label Content="SAMIDS x USJR" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="Bold" FontStyle="Normal"/>
             <Button Content="Intrusion System" HorizontalAlignment="Left" Margin="20,67,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="White" FontSize="16"/>
             <Button Content="Attendance System" HorizontalAlignment="Left" Margin="20,240,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="White" Background="#FF395170" FontSize="16"/>
