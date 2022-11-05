@@ -29,7 +29,7 @@ namespace SAMIDS_csharp.Implementation
         private string saved_model_loc;
         private string model_name;
 
-        public CNN(
+        CNN(
             string train_data_loc,
             string test_data_loc,
             string saved_model_loc,
@@ -53,6 +53,12 @@ namespace SAMIDS_csharp.Implementation
         //    //Cv2.Resize(img, 0, img.shape);
         //    //Cv2.CreateFrameSource_Video
         //}
+
+        public String train(int epochs = 1) {
+            // char char unya nani dre lmao
+
+            return "Model Training Complete!";
+        }
     }
 
 
