@@ -7,11 +7,7 @@
         mc:Ignorable="d"
         Title="SAMIDS" Height="693" Width="1070">
     <Grid Margin="0,0,10,0">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="207*"/>
-            <ColumnDefinition Width="5*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Margin="-6,2,5,0" Grid.ColumnSpan="2" Height="677" VerticalAlignment="Top">
+        <Grid Margin="-6,2,5,-2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="31*"/>
                 <ColumnDefinition Width="20*"/>

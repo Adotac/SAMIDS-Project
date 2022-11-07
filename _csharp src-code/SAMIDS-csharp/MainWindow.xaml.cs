@@ -29,10 +29,9 @@ namespace SAMIDS_csharp
 
         public MainWindow()
         {
-/*          
-            Camera_test NewWindowB = new Camera_test();
-            NewWindowB.Show();
-*/
+           // Camera_test NewWindowB = new Camera_test();
+           // NewWindowB.Show();
+
             InitializeComponent();
         }
 
