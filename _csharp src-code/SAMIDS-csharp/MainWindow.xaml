@@ -34,16 +34,16 @@
             <Label Content="SAMIDS x USJR" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.53,0.618" FontSize="20" FontFamily="Inter" FontWeight="Bold" FontStyle="Normal"/>
             <Button Content="Intrusion System" HorizontalAlignment="Left" Margin="20,67,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="White" Background="#FF395170" FontSize="16"/>
             <Button Content="Attendance System" HorizontalAlignment="Left" Margin="20,240,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="White" FontSize="16"/>
-            <Button Content="Add Camera" HorizontalAlignment="Left" Margin="20,597,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="White" FontSize="16"/>
-            <Button Content="Cam 1 - Cam 2" HorizontalAlignment="Left" Margin="20,108,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 3 - Cam 4" HorizontalAlignment="Left" Margin="20,144,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 5 - Cam 6" HorizontalAlignment="Left" Margin="20,180,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 1" HorizontalAlignment="Left" Margin="20,286,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 2" HorizontalAlignment="Left" Margin="20,322,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 3" HorizontalAlignment="Left" Margin="20,358,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 4" HorizontalAlignment="Left" Margin="20,398,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 5" HorizontalAlignment="Left" Margin="20,434,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
-            <Button Content="Cam 6" HorizontalAlignment="Left" Margin="20,470,0,0" VerticalAlignment="Top" Click="Button_Click" Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Add Camera" HorizontalAlignment="Left" Margin="20,597,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="White" FontSize="16"/>
+            <Button Content="Cam 1 - Cam 2" HorizontalAlignment="Left" Margin="20,108,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 3 - Cam 4" HorizontalAlignment="Left" Margin="20,144,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 5 - Cam 6" HorizontalAlignment="Left" Margin="20,180,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 1" HorizontalAlignment="Left" Margin="20,286,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 2" HorizontalAlignment="Left" Margin="20,322,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 3" HorizontalAlignment="Left" Margin="20,358,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 4" HorizontalAlignment="Left" Margin="20,398,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 5" HorizontalAlignment="Left" Margin="20,434,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
+            <Button Content="Cam 6" HorizontalAlignment="Left" Margin="20,470,0,0" VerticalAlignment="Top"  Width="165" Height="36" Foreground="Black" Background="{x:Null}" FontSize="16" BorderBrush="{x:Null}"/>
 
 
         </Grid>
