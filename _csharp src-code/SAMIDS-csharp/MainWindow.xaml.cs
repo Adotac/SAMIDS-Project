@@ -46,16 +46,19 @@ namespace SAMIDS_csharp
         void test() {
             NDarray temp1 = np.array(new double[,,] { 
                 { { 1, 2 }, { 6, 9 } }, 
-                { { 4, 4 }, { 5,5} } 
+                {{ 4, 4 }, { 5,5} } 
             } 
             );
+            temp1[0][1][0] = (NDarray)99;
 
             temp1.DisplayNDarray();
             temp1.DisplayNDarrayData();
 
             var temp2 = 0;
-            temp2 += (int)(temp1[1][1][1] + temp1[0][0][0]);
-            Debug.WriteLine($">> Test::: {temp2}:");
+
+            NDarray temp3 = np.pad(temp1, pad_width: np.array(new int[,] { {2,2},{2,2},{3,3} }) , "constant" );
+            //temp2 += (int)(temp1[1][1][1] + temp1[0][0][0]);
+            Debug.WriteLine($">> Test::: {temp3}");
 
             // debug helper util
             //foreach (var i in temp1.nEnumerate()) {
