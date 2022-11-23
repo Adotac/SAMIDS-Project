@@ -13,7 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
-using System.IO;
+using io = System.IO;
+using System.Reflection;
 using System.Text;
 
 using Numpy;
@@ -58,7 +59,52 @@ namespace SAMIDS_csharp
 
             NDarray temp3 = np.pad(temp1, pad_width: np.array(new int[,] { {2,2},{2,2},{3,3} }) , "constant" );
             //temp2 += (int)(temp1[1][1][1] + temp1[0][0][0]);
-            Debug.WriteLine($">> Test::: {temp3}");
+            Debug.WriteLine($">> Test:::\n {np.array(temp3).shape}");
+            //Debug.WriteLine($">> Test:::------------\n {(temp3[0][0][0]).GetDtype()}");
+
+            string tempPath = io.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\testFolder" ;
+            System.IO.Directory.CreateDirectory(tempPath);
+            Debug.WriteLine($">> Creating file at:::\n {tempPath}");
+            string fileName = io.Path.GetRandomFileName();
+
+            // This example uses a random string for the name, but you also can specify
+            // a particular name.
+            //string fileName = "MyNewFile.txt";
+
+            // Use Combine again to add the file name to the path.
+            tempPath = io.Path.Combine(tempPath, (fileName+".txt") );
+
+            if (!System.IO.File.Exists(tempPath))
+            {
+                using (System.IO.FileStream fs = System.IO.File.Create(tempPath))
+                {
+                    for (byte i = 0; i < 100; i++)
+                    {
+                        Byte[] info = new UTF8Encoding(true).GetBytes("GFG is a CS Portal.");
+                        fs.Write(info, 0, info.Length);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("File \"{0}\" already exists.", fileName);
+                return;
+            }
+
+            // Read and display the data from your file.
+            try
+            {
+                byte[] readBuffer = System.IO.File.ReadAllBytes(tempPath);
+                foreach (byte b in readBuffer)
+                {
+                    Console.Write(b + " ");
+                }
+                Console.WriteLine();
+            }
+            catch (System.IO.IOException e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
             // debug helper util
             //foreach (var i in temp1.nEnumerate()) {

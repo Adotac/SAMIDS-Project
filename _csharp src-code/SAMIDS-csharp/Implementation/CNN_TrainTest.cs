@@ -57,12 +57,28 @@ namespace SAMIDS_csharp.Implementation
             return archs;
         }
 
-        public String train(int epoch) {
+        public String train(int epoch=20) {
             this.arch = this.setArchitecture();
 
-            var model_source = this.model_directory + '/' + this.model_name + ".pckl";
+            string model_source = this.model_directory + '\\' + this.model_name + ".pckl";
 
             // os path file to create model pickle
+            if (!System.IO.File.Exists(model_source))
+            {
+                using (System.IO.FileStream fs = System.IO.File.Create(model_source))
+                {
+
+                    Byte[] info = new UTF8Encoding(true).GetBytes("GFG is a CS Portal.");
+                    fs.Write(info, 0, info.Length);
+
+                }
+            }
+            else
+            {
+                Console.WriteLine("File \"{0}\" already exists.", model_source);
+
+            }
+
 
             var ret = cnn.train();
             return ret;

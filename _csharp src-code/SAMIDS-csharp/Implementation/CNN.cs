@@ -28,24 +28,67 @@ namespace SAMIDS_csharp.Implementation
         private string test_data_loc;
         private string saved_model_loc;
         private string model_name;
+        (bool, string) face_label = (false, "");
 
+        private NDarray obj;
+        
         CNN(
             string train_data_loc,
             string test_data_loc,
             string saved_model_loc,
             string model_name,
             string model, 
-            string face_label
+            string? face_label
             ) { 
             
             this.architecture = new List<ARCHITECTURE>(); // check for empty list in init
             this.train_data_loc = train_data_loc;
             this.test_data_loc = test_data_loc;
             this.saved_model_loc = saved_model_loc;
-            this.model_name = model_name;
+            this.model_name = model_name + ".pckl";
+            if (face_label != null) {
+                this.face_label = (true, face_label);
+            }
             // later bool variables
+
+            //if (this.face_label.Item1 == false) { 
+            //    this.obj = 
+            //}
             
         }
+
+        private List<object> initObjectlayer() {
+            List<object> objectLayer = new List<object>();
+            string currentLayer;
+            
+            for (int i = 0; i < this.architecture.Count; i++) {
+                currentLayer = this.architecture[i].layer_type;
+
+                if (currentLayer == "conv")
+                {
+                    var obj = new ConvLayer(this.architecture[i].filter_size, this.architecture[i].kernel_size,
+                        this.architecture[i].stride, this.architecture[i].padding, this.architecture[i].activation);
+                }
+                else if (currentLayer == "max_pool") {
+                    var obj = new MaxpoolLayer(this.architecture[i].pool_size, this.architecture[i].padding, this.architecture[i].stride);
+                }
+                else if (currentLayer == "flatten") {
+                    var obj = "flatten";
+                }
+                else if (currentLayer == "dense") {
+                    var obj = new DenseLayer(this.architecture[i].input_size, this.architecture[i].output_size, this.architecture[i].activation);
+                }
+
+                objectLayer.Append(obj);
+
+            }
+
+            return objectLayer;
+        }
+
+        //private String label_predict(double n) {
+        //    return this.face_label.Item2[n];
+        //}
 
         // find out first the data type of image using eiither opencv or emgu or other libraries
         //private NDarray labels(OpenCvSharp.Mat img) { // one_hot_labels // erase comment later
