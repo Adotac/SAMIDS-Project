@@ -19,53 +19,45 @@ class SampleItemListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sample Items'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
-            },
-          ),
-        ],
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.black,
+        elevation: 0,
+        title: const Text(
+          'SAMIDS',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        actions: const [],
       ),
-
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
-      body: ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'sampleItemListView',
-        itemCount: items.length,
-        itemBuilder: (BuildContext context, int index) {
-          final item = items[index];
-
-          return ListTile(
-            title: Text('SampleItem ${item.id}'),
-            leading: const CircleAvatar(
-              // Display the Flutter Logo image asset.
-              foregroundImage: AssetImage('assets/images/flutter_logo.png'),
+      body: Row(children: [
+        SizedBox(
+          width: MediaQuery.of(context).size.width * 0.70,
+          child: Container(
+            color: Colors.red,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 400,
+                  width: 450,
+                  child: Card(
+                    child: Text("Sign up"),
+                  ),
+                ),
+              ],
             ),
-            onTap: () {
-              // Navigate to the details page. If the user leaves and returns to
-              // the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(
-                context,
-                SampleItemDetailsView.routeName,
-              );
-            }
-          );
-        },
-      ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            color: Colors.blue,
+            child: Column(
+              children: [
+                Text("data"),
+                Text("data"),
+              ],
+            ),
+          ),
+        )
+      ]),
     );
   }
 }
