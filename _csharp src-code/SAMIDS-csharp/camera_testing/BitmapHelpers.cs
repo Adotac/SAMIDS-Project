@@ -20,14 +20,5 @@ namespace SAMIDS_csharp.camera_testing
             bi.EndInit();
             return bi;
         }
-
-        public static BitmapSource BitmapToBitmapSource(this Bitmap bitmap)
-        {
-            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                          bitmap.GetHbitmap(),
-                          IntPtr.Zero,
-                          Int32Rect.Empty,
-                          BitmapSizeOptions.FromEmptyOptions());
-        }
     }
 }

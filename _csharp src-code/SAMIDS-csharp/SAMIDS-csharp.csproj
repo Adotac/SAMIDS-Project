@@ -28,6 +28,7 @@
     <PackageReference Include="NumSharp" Version="0.30.0" />
     <PackageReference Include="NumSharp.Bitmap" Version="0.30.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
+    <PackageReference Include="Razorvine.Pickle" Version="1.2.1" />
     <PackageReference Include="SharpCV" Version="0.11.0" />
   </ItemGroup>
 

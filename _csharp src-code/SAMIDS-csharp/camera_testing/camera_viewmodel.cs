@@ -195,7 +195,7 @@ namespace SAMIDS_csharp.camera_testing
                 {
                     
                     //var b = (Bitmap)drawRect(bitmap);
-                    var bi = bitmap.BitmapToBitmapSource();
+                    var bi = bitmap.ToBitmapImage();
                     bi.Freeze();
                     //Application.Current.Dispatcher.Invoke(() => Image = bi);
                     Application.Current.Dispatcher.BeginInvoke(new ThreadStart(delegate { Form.cam_screen.Source = bi; Image = bi; }));
