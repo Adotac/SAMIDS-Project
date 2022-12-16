@@ -97,6 +97,14 @@ namespace SAMIDS_csharp.Implementation
         //    //Cv2.CreateFrameSource_Video
         //}
 
+        private NDarray trainData_withLabels()
+        {
+            NDarray imageTrain = np.zeros();
+            //foreach (var i in )
+
+            return imageTrain;
+        }
+
         public String train(int epochs = 1) {
             // char char unya nani dre lmao
 

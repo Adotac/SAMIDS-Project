@@ -34,10 +34,10 @@ namespace SAMIDS_csharp
 
         public MainWindow()
         {
-            /*          
-                Camera_test NewWindowB = new Camera_test();
-                NewWindowB.Show();
-            */
+
+            Camera_test NewWindowB = new Camera_test();
+            NewWindowB.Show();
+
 
             InitializeComponent();
             test();
@@ -63,8 +63,8 @@ namespace SAMIDS_csharp
             //Debug.WriteLine($">> Test:::------------\n {(temp3[0][0][0]).GetDtype()}");
 
             string tempPath = io.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\testFolder" ;
-            System.IO.Directory.CreateDirectory(tempPath);
             Debug.WriteLine($">> Creating file at:::\n {tempPath}");
+            /*System.IO.Directory.CreateDirectory(tempPath);
             string fileName = io.Path.GetRandomFileName();
 
             // This example uses a random string for the name, but you also can specify
@@ -104,7 +104,7 @@ namespace SAMIDS_csharp
             catch (System.IO.IOException e)
             {
                 Console.WriteLine(e.Message);
-            }
+            } */
 
             // debug helper util
             //foreach (var i in temp1.nEnumerate()) {
