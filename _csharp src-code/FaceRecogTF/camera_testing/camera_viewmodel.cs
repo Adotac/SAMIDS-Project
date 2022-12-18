@@ -176,21 +176,6 @@ namespace FaceRecogTF.camera_testing
         {
             try
             {
-                //if (_recording)
-                //{
-                //    using (var bitmap = (Bitmap)eventArgs.Frame.Clone())
-                //    {
-                //        if (_firstFrameTime != null)
-                //        {
-                //            _writer.WriteVideoFrame(bitmap, DateTime.Now - _firstFrameTime.Value);
-                //        }
-                //        else
-                //        {
-                //            _writer.WriteVideoFrame(bitmap);
-                //            _firstFrameTime = DateTime.Now;
-                //        }
-                //    }
-                //}
                 using (var bitmap = (Bitmap)eventArgs.Frame.Clone())
                 {
                     
@@ -198,7 +183,7 @@ namespace FaceRecogTF.camera_testing
                     var bi = bitmap.ToBitmapImage();
                     bi.Freeze();
                     //Application.Current.Dispatcher.Invoke(() => Image = bi);
-                    Application.Current.Dispatcher.BeginInvoke(new ThreadStart(delegate { Form.cam_screen.Source = bi; Image = bi; }));
+                    Application.Current.Dispatcher.BeginInvoke(new ThreadStart(delegate { Form.cam_screen.Source = bi; Image = bi; })); // kani ang akong e extract na image
                 }
             }
             catch (Exception exc)

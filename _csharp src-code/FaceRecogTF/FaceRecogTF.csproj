@@ -15,7 +15,10 @@
     <PackageReference Include="NumSharp" Version="0.30.0" />
     <PackageReference Include="NumSharp.Bitmap" Version="0.30.0" />
     <PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
+    <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.10.0" />
     <PackageReference Include="SharpCV" Version="0.11.0" />
+    <PackageReference Include="TensorFlow.Keras" Version="0.7.2" />
+    <PackageReference Include="TensorFlow.NET" Version="0.70.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -23,7 +23,6 @@
     <PackageReference Include="AForge.Video.DirectShow" Version="2.2.5" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="Google.Protobuf" Version="3.21.9" />
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.13.1" />
     <PackageReference Include="Numpy" Version="3.10.1.30" />
     <PackageReference Include="NumSharp" Version="0.30.0" />
     <PackageReference Include="NumSharp.Bitmap" Version="0.30.0" />
