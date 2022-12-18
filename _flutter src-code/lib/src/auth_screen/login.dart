@@ -8,14 +8,12 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
   final Widget networkSvg = Expanded(
-    child: Container(
-      child: Image.asset(
-        fit: BoxFit.cover,
-        height: double.infinity,
-        width: double.infinity,
-        alignment: Alignment.center,
-        'assets/images/cloud_login_background.png',
-      ),
+    child: Image.asset(
+      fit: BoxFit.cover,
+      height: double.infinity,
+      width: double.infinity,
+      alignment: Alignment.center,
+      'assets/images/cloud_login_background.png',
     ),
   );
 
