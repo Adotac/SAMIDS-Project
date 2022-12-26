@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:samids_web_app/src/auth_screen/login.dart';
+import 'package:samids_web_app/src/sceens/login.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
           theme: ThemeData(),
-          darkTheme: ThemeData(),
+          // darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
 
           // Define a function to handle named routes in order to support
@@ -62,13 +62,7 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
-                switch (routeSettings.name) {
-                  case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
-
-                  default:
-                    return LoginScreen();
-                }
+                return LoginScreen();
               },
             );
           },
