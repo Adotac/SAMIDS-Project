@@ -135,6 +135,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.1.0"
+  sidebarx:
+    dependency: "direct main"
+    description:
+      name: sidebarx
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0"
   sky_engine:
     dependency: transitive
     description: flutter
