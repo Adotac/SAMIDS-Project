@@ -4,55 +4,53 @@ import 'dart:html';
 
 import 'package:flutter/material.dart';
 
-
 // ignore: must_be_immutable
 class LoginScreen extends StatelessWidget {
+  static const routeName = '/login';
+
   LoginScreen({super.key});
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  
 
-  final Widget networkSvg = Expanded(
-    child: Image.asset(
-      fit: BoxFit.cover,
-      height: double.infinity,
-      width: double.infinity,
-      alignment: Alignment.center,
-      'assets/images/cloud_login_background.png',
-    ),
+  final Widget backgroundImage = Image.asset(
+    fit: BoxFit.cover,
+    height: double.infinity,
+    width: double.infinity,
+    alignment: Alignment.center,
+    'assets/images/cloud_login_background.png',
   );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
+    return Stack(children: [
+      backgroundImage,
+      Scaffold(
         backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.black,
-        elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            const Text(
-              'Service Charge App',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            SizedBox(
-              height: 40,
-              child: Image.asset(
-                "assets/images/alliance_logo.png",
-                fit: BoxFit.fitHeight,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.black,
+          elevation: 0,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            // ignore: prefer_const_literals_to_create_immutables
+            children: [
+              SizedBox(
+                height: 40,
               ),
-            )
-          ],
+              const Text(
+                'SAMIDS',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          actions: const [],
         ),
-        actions: const [],
-      ),
-      body: Stack(children: [
-        networkSvg,
-        Row(
+        body: Row(
           children: [
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.70,
@@ -115,7 +113,6 @@ class LoginScreen extends StatelessWidget {
                                       backgroundColor: Colors.blue,
                                       foregroundColor: Colors.white),
                                   onPressed: () {
-                                
                                     // Navigator.pushReplacementNamed(
                                     //     context, routeAppView);
                                   },
@@ -147,8 +144,8 @@ class LoginScreen extends StatelessWidget {
             )
           ],
         ),
-      ]),
-    );
+      ),
+    ]);
   }
 
   Future<String?> forgetPass(BuildContext context) {
