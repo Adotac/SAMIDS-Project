@@ -40,7 +40,7 @@ class LoginScreen extends StatelessWidget {
                 height: 40,
               ),
               const Text(
-                'SAMIDS',
+                'Smart Attendance Management System',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -48,104 +48,86 @@ class LoginScreen extends StatelessWidget {
               ),
             ],
           ),
-          actions: const [],
         ),
-        body: Row(
+        body: LoginForumField(context),
+      ),
+    ]);
+  }
+
+  // ignore: non_constant_identifier_names
+  Container LoginForumField(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.70,
+      height: MediaQuery.of(context).size.height * 0.80,
+      alignment: Alignment.center,
+      child: SizedBox(
+        width: 300,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.70,
-              child: Container(
-                color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 420,
-                      width: 370,
-                      child: Card(
-                        elevation: 0,
-                        color: Colors.transparent,
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Login",
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                                child: TextField(
-                                  controller: emailController,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Email',
-                                      hintText: 'Enter your username'),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(10),
-                                child: TextField(
-                                  controller: passwordController,
-                                  obscureText: true,
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      labelText: 'Password',
-                                      hintText: 'Enter your secure password'),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                height: 60,
-                                width: double.infinity,
-                                child: TextButton(
-                                  style: TextButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white),
-                                  onPressed: () {
-                                    // Navigator.pushReplacementNamed(
-                                    //     context, routeAppView);
-                                  },
-                                  child: Text("Continue"),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  forgetPass(context);
-                                },
-                                child: Text("Forget password?"),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            Text(
+              "Login",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            Expanded(
-              child: Container(
-                  // child: Text("data"),
-                  ),
+            SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Email',
+                    hintText: 'Enter your username'),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Password',
+                    hintText: 'Enter your secure password'),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              height: 60,
+              width: double.infinity,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white),
+                onPressed: () {
+                  // Navigator.pushReplacementNamed(
+                  //     context, routeAppView);
+                },
+                child: Text("Continue"),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            TextButton(
+              onPressed: () {
+                forgetPass(context);
+              },
+              child: Text("Forget password?"),
             )
           ],
         ),
       ),
-    ]);
+    );
   }
 
   Future<String?> forgetPass(BuildContext context) {

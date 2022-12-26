@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/login.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 
@@ -63,7 +64,7 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
-                return LoginScreen();
+                return AdminDashboard();
               },
             );
           },
