@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:sidebarx/sidebarx.dart';
 
 import '../../constant/constant_values.dart';
@@ -18,30 +19,18 @@ class ScreenNavigator extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         final pageTitle = getTitleByIndex(controller.selectedIndex);
-        return Text(
-          pageTitle,
-          style: theme.textTheme.headlineSmall,
-        );
+        switch (controller.selectedIndex) {
+          case 0:
+            return AdminDashboard(
+              pageTitle: pageTitle,
+            );
+          default:
+            return Text(
+              pageTitle,
+              style: theme.textTheme.headlineSmall,
+            );
+        }
       },
     );
   }
-
-  // Widget body(BuildContext context) {
-  //   return Column(
-  //     children: [
-  //       Container(
-  //         alignment: Alignment.centerLeft,
-  //         // color: Colors.red,
-  //         height: 60,
-  //         child: Padding(
-  //           padding: const EdgeInsets.all(18.0),
-  //           child: Text(
-  //             pageTitle,
-  //             style: Theme.of(context).textTheme.titleLarge,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 }
