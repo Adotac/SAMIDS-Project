@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:samids_web_app/src/screen/admin/admin_view.dart';
-import 'package:samids_web_app/src/screen/login.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
-
-import 'settings/settings_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
@@ -55,7 +53,14 @@ class MyApp extends StatelessWidget {
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
-          theme: ThemeData(),
+          theme: ThemeData(
+            fontFamily: GoogleFonts.inter().fontFamily,
+            textTheme: const TextTheme(
+              titleLarge: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           // darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
 
