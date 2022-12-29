@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 
+import '../../widgets/bar_line.dart';
+import '../../widgets/title_medium_text.dart';
+
 class AdminDashboard extends StatelessWidget {
   final String pageTitle;
   const AdminDashboard({super.key, required this.pageTitle});
@@ -23,18 +26,59 @@ class AdminDashboard extends StatelessWidget {
                 const TitleMediumText(
                   title: "Attendance by Class",
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    barLine(10, 5),
-                    barLine(10, 7),
-                    barLine(10, 9),
-                    barLine(10, 2),
-                    barLine(10, 10),
-                    barLine(10, 3),
-                    barLine(10, 6),
-                    barLine(10, 4),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    // ignore: prefer_const_literals_to_create_immutables
+                    children: [
+                      const BarLine(
+                          max: 8, current: 5, subject: "Prog - 10023"),
+                      const BarLine(
+                          max: 9, current: 7, subject: "Prog2 - 2423"),
+                      const BarLine(
+                          max: 11,
+                          current: 9,
+                          subject: "DataStruct - 1234 sdadsdasdsad"),
+                      const BarLine(
+                          max: 8, current: 2, subject: "AppsDev - 3124"),
+                      const BarLine(max: 15, current: 10, subject: "QM - 9321"),
+                      const BarLine(max: 5, current: 3, subject: "Algo - 1032"),
+                      const BarLine(
+                          max: 15, current: 6, subject: "Digital -10234"),
+                      const BarLine(max: 12, current: 4, subject: "IM - 2321"),
+                      const BarLine(
+                          max: 8, current: 5, subject: "Prog - 10023"),
+                      const BarLine(
+                          max: 9, current: 7, subject: "Prog2 - 2423"),
+                      const BarLine(
+                          max: 11,
+                          current: 9,
+                          subject: "DataStruct - 1234 sdadsdasdsad"),
+                      const BarLine(
+                          max: 8, current: 2, subject: "AppsDev - 3124"),
+                      const BarLine(max: 15, current: 10, subject: "QM - 9321"),
+                      const BarLine(max: 5, current: 3, subject: "Algo - 1032"),
+                      const BarLine(
+                          max: 15, current: 6, subject: "Digital -10234"),
+                      const BarLine(max: 12, current: 4, subject: "IM - 2321"),
+                      const BarLine(
+                          max: 8, current: 5, subject: "Prog - 10023"),
+                      const BarLine(
+                          max: 9, current: 7, subject: "Prog2 - 2423"),
+                      const BarLine(
+                          max: 11,
+                          current: 9,
+                          subject: "DataStruct - 1234 sdadsdasdsad"),
+                      const BarLine(
+                          max: 8, current: 2, subject: "AppsDev - 3124"),
+                      const BarLine(max: 15, current: 10, subject: "QM - 9321"),
+                      const BarLine(max: 5, current: 3, subject: "Algo - 1032"),
+                      const BarLine(
+                          max: 15, current: 6, subject: "Digital -10234"),
+                      const BarLine(max: 12, current: 4, subject: "IM - 2321"),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -43,17 +87,6 @@ class AdminDashboard extends StatelessWidget {
       ],
     );
     ;
-  }
-
-  Padding barLine(max, current) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        color: Colors.grey.shade500,
-        height: 200 / max * current,
-        width: 65,
-      ),
-    );
   }
 
   Row remarkSection(BuildContext context) {
@@ -125,28 +158,6 @@ class AdminDashboard extends StatelessWidget {
             ),
             Text(description),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class TitleMediumText extends StatelessWidget {
-  final String title;
-  const TitleMediumText({
-    Key? key,
-    required this.title,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
         ),
       ),
     );
