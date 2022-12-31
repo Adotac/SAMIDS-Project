@@ -17,6 +17,7 @@ class AdminView extends StatelessWidget {
       builder: (context) {
         final isSmallScreen = MediaQuery.of(context).size.width < 600;
         return Scaffold(
+          
           key: _key,
           // drawer: ExampleSidebarX(controller: _controller),
           body: Row(
