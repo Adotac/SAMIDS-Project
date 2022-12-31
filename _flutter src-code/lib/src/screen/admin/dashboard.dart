@@ -7,40 +7,66 @@ import '../../widgets/title_medium_text.dart';
 
 class AdminDashboard extends StatelessWidget {
   final String pageTitle;
-  const AdminDashboard({super.key, required this.pageTitle});
+  AdminDashboard({super.key, required this.pageTitle});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [LocalAppBar(pageTitle: pageTitle), dashboardBody()],
+      children: [
+        LocalAppBar(pageTitle: pageTitle),
+        dashboardBody(),
+      ],
     );
-    ;
   }
 
+  // ignore: prefer_const_constructors
+  Widget sampleDataAct = Padding(
+    padding: const EdgeInsets.all(3.0),
+    child: const ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.grey,
+        radius: 25,
+      ),
+      title: Text("Martin Erickson Lapetaje • Prog 1 - 2019"),
+      subtitle: Text("12:11 On-Time"),
+    ),
+  );
+
+  // ignore: prefer_const_constructors
+  Widget sampleDataClasses = const ListTile(
+    leading: Text("10:30am - 11:30am "),
+    title: Text(" 10023 - Programming 1"),
+    // subtitle: Text("10023"),
+    trailing: Text(
+      "On Going",
+      style: TextStyle(
+        color: Colors.green,
+      ),
+    ),
+  );
   Expanded dashboardBody() {
     return Expanded(
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: Container(
-          // color: Colors.red,
-          // height: MediaQuery.of(context).size.height * .80,
-          child: Column(
-            children: [
-              remarkSection(),
-              attendanceBarSection(),
-              Row(
-                // ignore: prefer_const_literals_to_create_immutables
-                children: [
-                  const CardSmall(
-                    title: "Activities",
-                  ),
-                  const CardSmall(
-                    title: "Classes",
-                  )
-                ],
-              )
-            ],
-          ),
+        child: Column(
+          children: [
+            remarkSection(),
+            attendanceBarSection(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              // ignore: prefer_const_literals_to_create_immutables
+              children: [
+                CardSmall(
+                  title: "Activities",
+                  sampleData: sampleDataAct,
+                ),
+                CardSmall(
+                  title: "Classes",
+                  sampleData: sampleDataClasses,
+                )
+              ],
+            )
+          ],
         ),
       ),
     );
@@ -181,4 +207,3 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 }
-
