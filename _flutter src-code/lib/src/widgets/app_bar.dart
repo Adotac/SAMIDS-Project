@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:date_format/date_format.dart';
+import 'package:samids_web_app/src/constant/extentions.dart';
 
-class LocalAppBar extends StatelessWidget {
-  const LocalAppBar({
+class LocalAppBar extends StatefulWidget {
+  LocalAppBar({
     Key? key,
     required this.pageTitle,
   }) : super(key: key);
 
   final String pageTitle;
+
+  @override
+  State<LocalAppBar> createState() => _LocalAppBarState();
+}
+
+class _LocalAppBarState extends State<LocalAppBar> {
+  DateTime _dateTime = DateTime.now();
+  void _showDatePicker(context) {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022),
+      lastDate: DateTime.now(),
+    ).then((value) {
+      setState(() {
+        _dateTime = value!;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +42,7 @@ class LocalAppBar extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(18.0),
               child: Text(
-                pageTitle,
+                widget.pageTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -29,7 +50,21 @@ class LocalAppBar extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    initialDate: _dateTime,
+                    firstDate: DateTime(2022),
+                    lastDate: DateTime.now(),
+                  ).then((value) {
+                    setState(() {
+                      if (value == null) {
+                        return;
+                      }
+                      _dateTime = value;
+                    });
+                  });
+                },
                 icon: const Icon(Icons.edit_calendar_outlined),
               ),
               Container(
@@ -43,7 +78,8 @@ class LocalAppBar extends StatelessWidget {
                     bottom: 18,
                   ),
                   child: Text(
-                    "December 31, 2022",
+                    formatDate(_dateTime, [MM, ' ', dd, ', ', yyyy])
+                        .capitalize(),
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize:
