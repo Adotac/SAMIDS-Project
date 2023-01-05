@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 
+import '../../constant/constant_values.dart';
 import '../../widgets/bar_line.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/title_medium_text.dart';
@@ -75,7 +76,7 @@ class AdminDashboard extends StatelessWidget {
   Card attendanceBarSection() {
     return Card(
       child: Container(
-        alignment: Alignment.centerLeft,
+        // alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(15),
         width: double.maxFinite,
         child: Column(
@@ -89,44 +90,9 @@ class AdminDashboard extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                // ignore: prefer_const_literals_to_create_immutables
-                children: [
-                  const BarLine(max: 8, current: 5, subject: "Prog - 10023"),
-                  const BarLine(max: 9, current: 7, subject: "Prog2 - 2423"),
-                  const BarLine(
-                      max: 11,
-                      current: 9,
-                      subject: "DataStruct - 1234 sdadsdasdsad"),
-                  const BarLine(max: 8, current: 2, subject: "AppsDev - 3124"),
-                  const BarLine(max: 15, current: 10, subject: "QM - 9321"),
-                  const BarLine(max: 5, current: 3, subject: "Algo - 1032"),
-                  const BarLine(max: 15, current: 6, subject: "Digital -10234"),
-                  const BarLine(max: 12, current: 4, subject: "IM - 2321"),
-                  const BarLine(max: 8, current: 5, subject: "Prog - 10023"),
-                  const BarLine(max: 9, current: 7, subject: "Prog2 - 2423"),
-                  const BarLine(
-                      max: 11,
-                      current: 9,
-                      subject: "DataStruct - 1234 sdadsdasdsad"),
-                  const BarLine(max: 8, current: 2, subject: "AppsDev - 3124"),
-                  const BarLine(max: 15, current: 10, subject: "QM - 9321"),
-                  const BarLine(max: 5, current: 3, subject: "Algo - 1032"),
-                  const BarLine(max: 15, current: 6, subject: "Digital -10234"),
-                  const BarLine(max: 12, current: 4, subject: "IM - 2321"),
-                  const BarLine(max: 8, current: 5, subject: "Prog - 10023"),
-                  const BarLine(max: 9, current: 7, subject: "Prog2 - 2423"),
-                  const BarLine(
-                      max: 11,
-                      current: 9,
-                      subject: "DataStruct - 1234 sdadsdasdsad"),
-                  const BarLine(max: 8, current: 2, subject: "AppsDev - 3124"),
-                  const BarLine(max: 15, current: 10, subject: "QM - 9321"),
-                  const BarLine(max: 5, current: 3, subject: "Algo - 1032"),
-                  const BarLine(max: 15, current: 6, subject: "Digital -10234"),
-                  const BarLine(max: 12, current: 4, subject: "IM - 2321"),
-                ],
+                children: [for (var barLine in barLineSampleData) barLine],
               ),
-            )
+            ),
           ],
         ),
       ),

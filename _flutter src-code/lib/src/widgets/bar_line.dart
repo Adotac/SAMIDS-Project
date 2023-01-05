@@ -46,19 +46,7 @@ class BarLine extends StatelessWidget {
               ),
             ),
           ),
-          // Container(
-          //   width: 65,
-          //   padding: const EdgeInsets.only(top: 8.0),
-          //   child: const Text(
-          //     "10:30-11:30",
-          //     style: TextStyle(
-          //       overflow: TextOverflow.ellipsis,
-          //       fontSize: 10,
-          //       letterSpacing: -.1,
-          //       fontWeight: FontWeight.w600,
-          //     ),
-          //   ),
-          // )
+          
         ],
       ),
     );
