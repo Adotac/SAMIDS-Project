@@ -1,8 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/screen/admin/screen_nav.dart';
-import 'package:samids_web_app/src/screen/admin/sidebar_nav.dart';
+import 'package:samids_web_app/src/screen/admin/screen_navigator.dart';
+import 'package:samids_web_app/src/screen/sidebar_navigator.dart';
 import 'package:sidebarx/sidebarx.dart';
 
 class AdminView extends StatelessWidget {

@@ -1,20 +1,23 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 
 import '../../constant/constant_values.dart';
 import '../../widgets/bar_line.dart';
 import '../../widgets/card_small.dart';
+import '../../widgets/data_number.dart';
 import '../../widgets/title_medium_text.dart';
 
+// ignore: must_be_immutable
 class AdminDashboard extends StatelessWidget {
-  final String pageTitle;
-  AdminDashboard({super.key, required this.pageTitle});
+  AdminDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        LocalAppBar(pageTitle: pageTitle),
+        LocalAppBar(pageTitle: "Dashboard"),
         dashboardBody(),
       ],
     );
@@ -59,11 +62,11 @@ class AdminDashboard extends StatelessWidget {
               children: [
                 CardSmall(
                   title: "Activities",
-                  sampleData: sampleDataAct,
+                  child: sampleDataAct,
                 ),
                 CardSmall(
                   title: "Classes",
-                  sampleData: sampleDataClasses,
+                  child: sampleDataClasses,
                 )
               ],
             )
@@ -131,12 +134,13 @@ class AdminDashboard extends StatelessWidget {
                 // width: double.maxFinite,
                 child: Row(
                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // ignore: prefer_const_literals_to_create_immutables
                   children: [
-                    dataNumber("55", "Total logs", 5),
-                    dataNumber("11", "Late", 1),
-                    dataNumber("05", "Absent", 1),
-                    dataNumber("04", "Cutting", 1),
-                    dataNumber("35", "On-Time", 1),
+                    DataNumber(number: "55", description: "Total logs", flex: 5),
+                    DataNumber(number: "11", description: "Late", flex: 1),
+                    DataNumber(number: "05", description: "Absent", flex: 1),
+                    DataNumber(number: "04", description: "Cutting", flex: 1),
+                    DataNumber(number: "35", description: "On-Time", flex: 1),
                   ],
                 ),
               )

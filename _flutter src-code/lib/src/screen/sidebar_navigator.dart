@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:sidebarx/sidebarx.dart';
 
-import '../../constant/constant_values.dart';
+import '../constant/constant_values.dart';
 
 class SideBarX extends StatelessWidget {
   const SideBarX({
@@ -13,8 +13,6 @@ class SideBarX extends StatelessWidget {
         super(key: key);
 
   final SidebarXController _controller;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -83,31 +81,55 @@ class SideBarX extends StatelessWidget {
           ),
         );
       },
-      items: [
-        SidebarXItem(
-          icon: Icons.dashboard_outlined,
-          label: 'Dashboard',
-          onTap: () {
-            debugPrint('Home');
-          },
-        ),
-        const SidebarXItem(
-          icon: Icons.event_available_outlined,
-          label: 'Attendance',
-        ),
-        const SidebarXItem(
-          icon: Icons.school_outlined,
-          label: 'Classes',
-        ),
-        const SidebarXItem(
-          icon: Icons.manage_accounts_outlined,
-          label: 'Accounts',
-        ),
-        const SidebarXItem(
-          icon: Icons.settings_outlined,
-          label: 'Configurations',
-        ),
-      ],
+      items: sidebarStudent,
     );
+  }
+
+  List<SidebarXItem> get sidebarAdmin {
+    return [
+      SidebarXItem(
+        icon: Icons.dashboard_outlined,
+        label: 'Dashboard',
+        onTap: () {
+          debugPrint('Home');
+        },
+      ),
+      const SidebarXItem(
+        icon: Icons.event_available_outlined,
+        label: 'Attendance',
+      ),
+      const SidebarXItem(
+        icon: Icons.school_outlined,
+        label: 'Classes',
+      ),
+      const SidebarXItem(
+        icon: Icons.manage_accounts_outlined,
+        label: 'Accounts',
+      ),
+      const SidebarXItem(
+        icon: Icons.settings_outlined,
+        label: 'Configurations',
+      ),
+    ];
+  }
+
+  List<SidebarXItem> get sidebarStudent {
+    return [
+      SidebarXItem(
+        icon: Icons.dashboard_outlined,
+        label: 'Dashboard',
+        onTap: () {
+          debugPrint('Home');
+        },
+      ),
+      const SidebarXItem(
+        icon: Icons.event_available_outlined,
+        label: 'Attendance',
+      ),
+      const SidebarXItem(
+        icon: Icons.school_outlined,
+        label: 'Classes',
+      ),
+    ];
   }
 }
