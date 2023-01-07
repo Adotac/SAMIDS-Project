@@ -54,6 +54,11 @@ class MyApp extends StatelessWidget {
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
           theme: ThemeData(
+            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+            cardTheme: const CardTheme(
+              margin: EdgeInsets.all(6),
+              elevation: 0.2,
+            ),
             fontFamily: GoogleFonts.inter().fontFamily,
             textTheme: const TextTheme(
               titleLarge: TextStyle(

@@ -23,7 +23,7 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-  // ignore: prefer_const_constructors
+  
   Widget sampleDataAct = Padding(
     padding: const EdgeInsets.all(3.0),
     child: const ListTile(
@@ -36,7 +36,7 @@ class AdminDashboard extends StatelessWidget {
     ),
   );
 
-  // ignore: prefer_const_constructors
+  
   Widget sampleDataClasses = const ListTile(
     leading: Text("10:30am - 11:30am "),
     title: Text(" 10023 - Programming 1"),

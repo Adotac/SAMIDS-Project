@@ -12,6 +12,7 @@ environment:
 dependencies:
   calendar_date_picker2: ^0.3.5
   date_format: ^2.0.7
+  dio: ^4.0.6
   flutter:
     sdk: flutter
   flutter_localizations:
