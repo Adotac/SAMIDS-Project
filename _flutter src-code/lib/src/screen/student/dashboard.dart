@@ -27,8 +27,35 @@ class StudentDashboard extends StatelessWidget {
     ),
   );
 
+  bool _isSizeNotAllowed(BoxConstraints constraints) {
+    return (constraints.maxWidth <= 450);
+  }
+
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      if (_isSizeNotAllowed(constraints)) {
+        return Column(
+          children: [
+            LocalAppBar(pageTitle: "Dashboard"),
+            Expanded(
+                child: SingleChildScrollView(
+              child: Column(children: [
+                _mStudentInfo(),
+                _overviewCard(2, 0),
+                _performanceCard(2, 0),
+                recentLogsCard(context, 0),
+              ]),
+            )),
+          ],
+        );
+      }
+
+      return _webView(context);
+    });
+  }
+
+  Column _webView(BuildContext context) {
     return Column(
       children: [
         LocalAppBar(pageTitle: "Dashboard"),
@@ -38,11 +65,11 @@ class StudentDashboard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                studentInfo(),
+                _studentInfo(),
                 Row(
                   children: [
-                    overviewCard(),
-                    performanceCard(),
+                    _overviewCard(5),
+                    _performanceCard(3),
                   ],
                 ),
                 Row(
@@ -93,7 +120,7 @@ class StudentDashboard extends StatelessWidget {
           width: MediaQuery.of(context).size.width * 0.2,
           child: Text(
             textAlign: TextAlign.start,
-            '10023 - Programming 1 ',
+            '10023 - Programming 1',
             overflow: TextOverflow.ellipsis,
           ),
         )),
@@ -144,24 +171,25 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
-  Widget recentLogsCard(context) {
+  Widget recentLogsCard(context, [flexValue = 1]) {
     return CardSmall(
-      flexValue: 1, title: "Recent Logs", child: dataTable(context),
+      flexValue: flexValue, title: "Recent Logs", child: dataTable(context),
       // Column(
       //   children: [for (int i = 0; i < 10; i++) sampleDataAct],
       // ),
     );
   }
 
-  CardSmall performanceCard() {
+  CardSmall _performanceCard(leadingFlex, [flexValue = 1]) {
     return CardSmall(
-      flexValue: 1,
+      flexValue: flexValue,
       title: "Performance",
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         // ignore: prefer_const_literals_to_create_immutables
         children: [
-          DataNumber(number: "Great!", description: "Rating", flex: 3),
+          DataNumber(
+              number: "Great!", description: "Rating", flex: leadingFlex),
           DataNumber(number: "11%", description: "Late", flex: 1),
           DataNumber(number: "05%", description: "Absent", flex: 1),
           DataNumber(number: "04%", description: "Cutting", flex: 1),
@@ -172,7 +200,50 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
-  CardSmall studentInfo() {
+  Widget _mStudentInfo() {
+    return CardSmall(
+      title: "",
+      flexValue: 0,
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          // ignore: prefer_const_literals_to_create_immutables
+          children: [
+            Text(
+              "Martin Erickson Lapetaje",
+              style: TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              softWrap: true,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              "Bachelor of Science in Computer",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              "lapetajemartin@gmail.com",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  CardSmall _studentInfo() {
     return CardSmall(
       title: "",
       flexValue: 0,
@@ -218,14 +289,15 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
-  CardSmall overviewCard() {
+  CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
     return CardSmall(
-      flexValue: 1,
+      flexValue: flexValue,
       title: "Overview",
       child: Row(
         // ignore: prefer_const_literals_to_create_immutables
         children: [
-          DataNumber(number: "55", description: "Total logs", flex: 5),
+          DataNumber(
+              number: "55", description: "Total logs", flex: leadingFlex),
           DataNumber(number: "11", description: "Late", flex: 1),
           DataNumber(number: "05", description: "Absent", flex: 1),
           DataNumber(number: "04", description: "Cutting", flex: 1),
