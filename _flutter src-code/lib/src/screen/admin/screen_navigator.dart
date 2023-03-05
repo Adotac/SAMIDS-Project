@@ -21,7 +21,7 @@ class ScreenNavigator extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         final pageTitle = getTitleByIndex(controller.selectedIndex);
-        return studentPageNavigator(pageTitle, theme);
+        return adminPageNavigator(pageTitle, theme);
       },
     );
   }
@@ -31,7 +31,7 @@ class ScreenNavigator extends StatelessWidget {
       case 0:
         return AdminDashboard();
       case 1:
-        return const AdminAttendance();
+        return AdminAttendance();
       default:
         return Text(
           pageTitle,
@@ -40,12 +40,12 @@ class ScreenNavigator extends StatelessWidget {
     }
   }
 
-   StatelessWidget studentPageNavigator(String pageTitle, ThemeData theme) {
+  StatelessWidget studentPageNavigator(String pageTitle, ThemeData theme) {
     switch (controller.selectedIndex) {
       case 0:
-        return  StudentDashboard();
+        return StudentDashboard();
       case 1:
-        return const AdminAttendance();
+        return AdminAttendance();
       default:
         return Text(
           pageTitle,
