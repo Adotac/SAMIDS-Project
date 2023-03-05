@@ -116,8 +116,7 @@ class StudentDashboard extends StatelessWidget {
     return DataRow(
       cells: <DataCell>[
         DataCell(Text('02:12pm')),
-        DataCell(SizedBox(
-          width: MediaQuery.of(context).size.width * 0.2,
+        DataCell(Expanded(
           child: Text(
             textAlign: TextAlign.start,
             '10023 - Programming 1',
@@ -134,7 +133,7 @@ class StudentDashboard extends StatelessWidget {
       width: double.infinity,
       child: DataTable(
         dividerThickness: 0,
-        columnSpacing: 10,
+        columnSpacing: 5,
         // ignore: prefer_const_literals_to_create_immutables
         columns: [
           DataColumn(
@@ -191,8 +190,8 @@ class StudentDashboard extends StatelessWidget {
           DataNumber(
               number: "Great!", description: "Rating", flex: leadingFlex),
           DataNumber(number: "11%", description: "Late", flex: 1),
-          DataNumber(number: "05%", description: "Absent", flex: 1),
-          DataNumber(number: "04%", description: "Cutting", flex: 1),
+          DataNumber(number: "5%", description: "Absent", flex: 1),
+          DataNumber(number: "4%", description: "Cutting", flex: 1),
           DataNumber(number: "35%", description: "On-Time", flex: 1),
         ],
       ),
