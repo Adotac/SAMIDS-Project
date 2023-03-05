@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 
 import '../../widgets/app_bar.dart';
@@ -46,7 +48,7 @@ class StudentDashboard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    recentLogsCard(),
+                    recentLogsCard(context),
                     myClassesCard(),
                   ],
                 )
@@ -83,6 +85,55 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
+  DataRow sampleDataRow(context) {
+    return DataRow(
+      cells: <DataCell>[
+        DataCell(Text('02:12pm')),
+        DataCell(SizedBox(
+          width: MediaQuery.of(context).size.width * 0.2,
+          child: Text(
+            textAlign: TextAlign.start,
+            '10023 - Programming 1 ',
+            overflow: TextOverflow.ellipsis,
+          ),
+        )),
+        DataCell(Text('On-Time')),
+      ],
+    );
+  }
+
+  Widget dataTable(context) {
+    return SizedBox(
+      width: double.infinity,
+      child: DataTable(
+        dividerThickness: 0,
+        columnSpacing: 10,
+        // ignore: prefer_const_literals_to_create_immutables
+        columns: [
+          DataColumn(
+            label: Text(
+              'Time',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Subject',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Remark',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+        ],
+        rows: [for (int i = 0; i < 10; i++) sampleDataRow(context)],
+      ),
+    );
+  }
+
   CardSmall myClassesCard() {
     return CardSmall(
       flexValue: 1,
@@ -93,13 +144,12 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
-  CardSmall recentLogsCard() {
+  Widget recentLogsCard(context) {
     return CardSmall(
-      flexValue: 1,
-      title: "Recent Logs",
-      child: Column(
-        children: [for (int i = 0; i < 10; i++) sampleDataAct],
-      ),
+      flexValue: 1, title: "Recent Logs", child: dataTable(context),
+      // Column(
+      //   children: [for (int i = 0; i < 10; i++) sampleDataAct],
+      // ),
     );
   }
 
@@ -109,6 +159,7 @@ class StudentDashboard extends StatelessWidget {
       title: "Performance",
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        // ignore: prefer_const_literals_to_create_immutables
         children: [
           DataNumber(number: "Great!", description: "Rating", flex: 3),
           DataNumber(number: "11%", description: "Late", flex: 1),
@@ -135,6 +186,7 @@ class StudentDashboard extends StatelessWidget {
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          // ignore: prefer_const_literals_to_create_immutables
           children: [
             Text(
               "Martin Erickson Lapetaje",
@@ -171,6 +223,7 @@ class StudentDashboard extends StatelessWidget {
       flexValue: 1,
       title: "Overview",
       child: Row(
+        // ignore: prefer_const_literals_to_create_immutables
         children: [
           DataNumber(number: "55", description: "Total logs", flex: 5),
           DataNumber(number: "11", description: "Late", flex: 1),
