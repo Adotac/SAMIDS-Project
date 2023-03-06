@@ -6,9 +6,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../widgets/card_small.dart';
 
-class AdminAttendance extends StatelessWidget {
+class StudentAttendance extends StatelessWidget {
   final _textEditingController = TextEditingController();
-  AdminAttendance({super.key});
+  StudentAttendance({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,6 @@ class AdminAttendance extends StatelessWidget {
               ),
               child: DataTable(
                 columns: [
-                  _dataColumn("Student ID"),
                   _dataColumn("Attendance ID"),
                   _dataColumn("Room"),
                   _dataColumn("Subject"),
@@ -56,7 +55,6 @@ class AdminAttendance extends StatelessWidget {
     return DataRow(
       // ignore: prefer_const_literals_to_create_immutables
       cells: <DataCell>[
-        DataCell(Text('2019022233')),
         DataCell(Text('AD1234KA12')),
         DataCell(Text('BCL3')),
         DataCell(Text('10023 - Programming 1')),

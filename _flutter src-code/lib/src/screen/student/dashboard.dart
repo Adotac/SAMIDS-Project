@@ -76,7 +76,7 @@ class StudentDashboard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     recentLogsCard(context),
-                    myClassesCard(),
+                    myClassesCard(context),
                   ],
                 )
 
@@ -112,7 +112,7 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
-  DataRow sampleDataRow(context) {
+  DataRow logsSampleDataRow(context) {
     return DataRow(
       cells: <DataCell>[
         DataCell(Text('02:12pm')),
@@ -128,7 +128,26 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
-  Widget dataTable(context) {
+  DataRow classesSampleDataRow(context) {
+    return DataRow(
+      cells: <DataCell>[
+        DataCell(Text('10:30am - 11:30am ')),
+        DataCell(Expanded(
+          child: Text(
+            textAlign: TextAlign.start,
+            '10023 - Programming 1',
+            overflow: TextOverflow.ellipsis,
+          ),
+        )),
+        DataCell(Text(
+          'On Going',
+          style: TextStyle(color: Colors.green),
+        )),
+      ],
+    );
+  }
+
+  Widget dataTableLogs(context) {
     return SizedBox(
       width: double.infinity,
       child: DataTable(
@@ -155,24 +174,54 @@ class StudentDashboard extends StatelessWidget {
             ),
           ),
         ],
-        rows: [for (int i = 0; i < 10; i++) sampleDataRow(context)],
+        rows: [for (int i = 0; i < 10; i++) logsSampleDataRow(context)],
       ),
     );
   }
 
-  CardSmall myClassesCard() {
+  Widget dataTableClasses(context) {
+    return SizedBox(
+      width: double.infinity,
+      child: DataTable(
+        dividerThickness: 0,
+        columnSpacing: 5,
+        // ignore: prefer_const_literals_to_create_immutables
+        columns: [
+          DataColumn(
+            label: Text(
+              'Time',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Subject',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Status',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+        ],
+        rows: [for (int i = 0; i < 10; i++) classesSampleDataRow(context)],
+      ),
+    );
+  }
+
+  CardSmall myClassesCard(context) {
     return CardSmall(
       flexValue: 1,
       title: "My Classes",
-      child: Column(
-        children: [for (int i = 0; i < 5; i++) sampleDataClasses],
-      ),
+      child: dataTableClasses(context),
     );
   }
 
   Widget recentLogsCard(context, [flexValue = 1]) {
     return CardSmall(
-      flexValue: flexValue, title: "Recent Logs", child: dataTable(context),
+      flexValue: flexValue, title: "Recent Logs", child: dataTableLogs(context),
       // Column(
       //   children: [for (int i = 0; i < 10; i++) sampleDataAct],
       // ),
