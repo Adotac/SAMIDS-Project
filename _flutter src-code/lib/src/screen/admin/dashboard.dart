@@ -12,9 +12,40 @@ import '../../widgets/title_medium_text.dart';
 // ignore: must_be_immutable
 class AdminDashboard extends StatelessWidget {
   AdminDashboard({super.key});
+  bool _isSizeNotAllowed(BoxConstraints constraints) {
+    return (constraints.maxWidth <= 450);
+  }
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      if (_isSizeNotAllowed(constraints)) {
+        return Column(
+          children: [
+            LocalAppBar(pageTitle: "Dashboard"),
+            Expanded(
+                child: SingleChildScrollView(
+              child: Column(children: [
+                remarkCard(0, 2),
+                attendanceBarSection(),
+                CardSmall(
+                  flexValue: 0,
+                  title: "Activities",
+                  child: Column(
+                    children: [for (int i = 0; i < 10; i++) mSampleDataAct],
+                  ),
+                ),
+              ]),
+            )),
+          ],
+        );
+      }
+
+      return _webView();
+    });
+  }
+
+  Column _webView() {
     return Column(
       children: [
         LocalAppBar(pageTitle: "Dashboard"),
@@ -23,7 +54,6 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-  
   Widget sampleDataAct = Padding(
     padding: const EdgeInsets.all(3.0),
     child: const ListTile(
@@ -36,7 +66,14 @@ class AdminDashboard extends StatelessWidget {
     ),
   );
 
-  
+  Widget mSampleDataAct = Padding(
+    padding: const EdgeInsets.all(3.0),
+    child: const ListTile(
+      title: Text("Martin Erickson Lapetaje • Prog 1 - 2019"),
+      subtitle: Text("12:11 On-Time"),
+    ),
+  );
+
   Widget sampleDataClasses = const ListTile(
     leading: Text("10:30am - 11:30am "),
     title: Text(" 10023 - Programming 1"),
@@ -48,7 +85,7 @@ class AdminDashboard extends StatelessWidget {
       ),
     ),
   );
-  
+
   Expanded dashboardBody() {
     return Expanded(
       child: SingleChildScrollView(
@@ -112,9 +149,9 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 
-  Widget remarkCard() {
+  Widget remarkCard([flexValue = 1, flexTitle = 5]) {
     return Flexible(
-      flex: 1,
+      flex: flexValue,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
@@ -137,7 +174,10 @@ class AdminDashboard extends StatelessWidget {
                   // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   // ignore: prefer_const_literals_to_create_immutables
                   children: [
-                    DataNumber(number: "55", description: "Total logs", flex: 5),
+                    DataNumber(
+                        number: "55",
+                        description: "Total logs",
+                        flex: flexTitle),
                     DataNumber(number: "11", description: "Late", flex: 1),
                     DataNumber(number: "05", description: "Absent", flex: 1),
                     DataNumber(number: "04", description: "Cutting", flex: 1),
