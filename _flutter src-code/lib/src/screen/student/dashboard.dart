@@ -27,32 +27,61 @@ class StudentDashboard extends StatelessWidget {
     ),
   );
 
-  bool _isSizeNotAllowed(BoxConstraints constraints) {
+  bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
-      if (_isSizeNotAllowed(constraints)) {
-        return Column(
-          children: [
-            LocalAppBar(pageTitle: "Dashboard"),
-            Expanded(
-                child: SingleChildScrollView(
-              child: Column(children: [
-                _mStudentInfo(),
-                _overviewCard(2, 0),
-                _performanceCard(2, 0),
-                recentLogsCard(context, 0),
-              ]),
-            )),
-          ],
-        );
+      if (isMobile(constraints)) {
+        return _mobileView(context);
       }
 
       return _webView(context);
     });
+  }
+
+  Widget _mobileView(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.dashboard_outlined,
+            ),
+            label: 'Dashboard ',
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.event_available_outlined,
+              ),
+              label: 'Attendance'),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.school_outlined,
+            ),
+            label: 'Classes',
+          ),
+        ],
+      ),
+      appBar: AppBar(
+        title: Text("Dashboard"),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+              child: SingleChildScrollView(
+            child: Column(children: [
+              _mStudentInfo(),
+              _overviewCard(2, 0),
+              _performanceCard(2, 0),
+              recentLogsCard(context, 0),
+            ]),
+          )),
+        ],
+      ),
+    );
   }
 
   Column _webView(BuildContext context) {

@@ -54,6 +54,24 @@ class MyApp extends StatelessWidget {
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
           theme: ThemeData(
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Colors.white,
+              selectedItemColor: Colors.black,
+              // unselectedItemColor: Colors.grey[400],
+              elevation: 0.0,
+            ),
+            appBarTheme: ThemeData().appBarTheme.copyWith(
+                  color: Colors.white,
+                  iconTheme: const IconThemeData(
+                    color: Colors.black,
+                  ),
+                  titleTextStyle: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  elevation: 0.1,
+                ),
             scaffoldBackgroundColor: const Color(0xFFF5F6F9),
             cardTheme: const CardTheme(
               margin: EdgeInsets.all(6),

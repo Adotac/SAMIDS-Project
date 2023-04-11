@@ -21,7 +21,7 @@ class ScreenNavigator extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         final pageTitle = getTitleByIndex(controller.selectedIndex);
-        return adminPageNavigator(pageTitle, theme);
+        return studentPageNavigator(pageTitle, theme);
       },
     );
   }
