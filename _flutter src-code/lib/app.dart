@@ -55,13 +55,13 @@ class MyApp extends StatelessWidget {
           // SettingsController to display the correct theme.
           theme: ThemeData(
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: Colors.white,
+              backgroundColor: const Color(0xFFF5F6F9),
               selectedItemColor: Colors.black,
               // unselectedItemColor: Colors.grey[400],
               elevation: 0.0,
             ),
             appBarTheme: ThemeData().appBarTheme.copyWith(
-                  color: Colors.white,
+                  color: const Color(0xFFF5F6F9),
                   iconTheme: const IconThemeData(
                     color: Colors.black,
                   ),

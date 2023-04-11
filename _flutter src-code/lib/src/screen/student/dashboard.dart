@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
@@ -75,7 +76,7 @@ class StudentDashboard extends StatelessWidget {
             child: Column(children: [
               _mStudentInfo(),
               _overviewCard(2, 0),
-              _performanceCard(2, 0),
+              // _performanceCard(2, 0),
               recentLogsCard(context, 0),
             ]),
           )),
@@ -371,17 +372,58 @@ class StudentDashboard extends StatelessWidget {
       flexValue: flexValue,
       title: "Overview",
       child: Row(
-        // ignore: prefer_const_literals_to_create_immutables
         children: [
           DataNumber(
               number: "55", description: "Total logs", flex: leadingFlex),
-          DataNumber(number: "11", description: "Late", flex: 1),
-          DataNumber(number: "05", description: "Absent", flex: 1),
-          DataNumber(number: "04", description: "Cutting", flex: 1),
-          DataNumber(number: "35", description: "On-Time", flex: 1),
+
+          circularData(11, 'Absent', Colors.red),
+          circularData(05, 'Cutting', Colors.yellow),
+          circularData(04, 'On-Time', Colors.green),
+          circularData(35, 'Late', Colors.orange),
+
+          // DataNumber(number: "05", description: "Absent", flex: 1),
+          // DataNumber(number: "04", description: "Cutting", flex: 1),
+          // DataNumber(number: "35", description: "On-Time", flex: 1),
         ],
       ),
       // sampleData: sampleDataAct,
+    );
+  }
+
+  Widget circularData(value, description, color) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Flexible(
+        flex: 1,
+        child: Column(
+          children: [
+            CircularViewer(
+              // decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(200),
+              //     boxShadow: const [
+              //       BoxShadow(
+              //           offset: Offset(-10, -10),
+              //           color: Colors.white,
+              //           blurRadius: 20,
+              //           spreadRadius: 1),
+              //       BoxShadow(
+              //           offset: Offset(10, 10),
+              //           color: Color.fromARGB(255, 158, 158, 158),
+              //           blurRadius: 5,
+              //           spreadRadius: 1)
+              //     ]),
+              value: value,
+              maxValue: 55,
+              radius: 40,
+              textStyle: TextStyle(fontSize: 20),
+              color: Color(0xffEEEEEE),
+              sliderColor: color,
+              unSelectedColor: Color.fromARGB(255, 255, 255, 255),
+            ),
+            Text(description),
+          ],
+        ),
+      ),
     );
   }
 }
