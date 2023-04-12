@@ -5,12 +5,15 @@ import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
+import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
 import '../../widgets/mobile_view.dart';
+import '../../widgets/title_medium_text.dart';
+import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class StudentDashboard extends StatelessWidget {
-  static const routeName = '/studentDashboard';
+  static const routeName = '/student-dashboard';
   StudentDashboard({super.key});
 
   Widget sampleDataAct = const ListTile(
@@ -49,9 +52,10 @@ class StudentDashboard extends StatelessWidget {
   Widget _mobileView(BuildContext context) {
     return MobileView(
       appBarTitle: 'Dashboard',
+      userName: 'Martin Erickson Lapetaje',
       body: Column(
         children: [
-          _mStudentInfo(),
+          // _mStudentInfo(),
           _overviewCard(2, 0),
           // _performanceCard(2, 0),
           recentLogsCard(context, 0),
@@ -225,14 +229,18 @@ class StudentDashboard extends StatelessWidget {
     );
   }
 
+  String _formatCurrentDate() {
+    return DateFormat('MMMM d, y').format(DateTime.now());
+  }
+
+// Usage
+
   Widget recentLogsCard(context, [flexValue = 1]) {
-    return CardSmall(
-      flexValue: flexValue, title: "Recent Logs", child: dataTableLogs(context),
-      isShadow: false,
-      // Column(
-      //   children: [for (int i = 0; i < 10; i++) sampleDataAct],
-      // ),
-    );
+    return MobileSmallCard(
+        isShadow: false,
+        sideTitle: _formatCurrentDate(),
+        title: "Activities",
+        child: dataTableLogs(context));
   }
 
   CardSmall _performanceCard(leadingFlex, [flexValue = 1]) {
@@ -346,32 +354,47 @@ class StudentDashboard extends StatelessWidget {
       ]),
     );
   }
+// CardSmall(
+//   isShadow: true,
+//   flexValue: flexValue,
+//   title: "Overview",
+//   child: SingleChildScrollView(
+//     scrollDirection: Axis.horizontal,
+//     child: Row(
+//       children: [
+//         DataNumber(
+//           number: "55",
+//           description: "Total logs",
+//           flex: leadingFlex
+//         ),
+//         circularData(11, 'Absent', Colors.red),
+//         circularData(05, 'Cutting', Colors.yellow),
+//         circularData(04, 'On-Time', Colors.green),
+//         circularData(35, 'Late', Colors.orange),
+//       ],
+//     ),
+//   ),
+// );
 
-  CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
-    return CardSmall(
-      isShadow: true,
-      flexValue: flexValue,
-      title: "Overview",
-      child: Row(
-        children: [
-          DataNumber(
-              number: "55", description: "Total logs", flex: leadingFlex),
+  Widget _overviewCard(leadingFlex, [flexValue = 1]) {
+    return MobileSmallCard(
+        isShadow: true,
+        sideTitle: "Total logs",
+        sideTitleTrailer: '55',
+        title: "Overview",
+        child: Row(
+          children: [
+            circularData(11, 'Absent', Colors.red, 32),
+            circularData(05, 'Cutting', Colors.yellow, 32),
+            circularData(04, 'On-Time', Colors.green, 32),
+            circularData(35, 'Late', Colors.orange, 32),
+          ],
+        ));
 
-          circularData(11, 'Absent', Colors.red),
-          circularData(05, 'Cutting', Colors.yellow),
-          circularData(04, 'On-Time', Colors.green),
-          circularData(35, 'Late', Colors.orange),
-
-          // DataNumber(number: "05", description: "Absent", flex: 1),
-          // DataNumber(number: "04", description: "Cutting", flex: 1),
-          // DataNumber(number: "35", description: "On-Time", flex: 1),
-        ],
-      ),
-      // sampleData: sampleDataAct,
-    );
+    // sampleData: sampleDataAct,
   }
 
-  Widget circularData(value, description, color) {
+  Widget circularData(value, description, color, [radius = 40]) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Flexible(
@@ -395,7 +418,7 @@ class StudentDashboard extends StatelessWidget {
               //     ]),
               value: value,
               maxValue: 55,
-              radius: 40,
+              radius: radius,
               textStyle: TextStyle(fontSize: 20),
               color: Color(0xffEEEEEE),
               sliderColor: color,

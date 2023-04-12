@@ -89,7 +89,8 @@ class LoginScreen extends StatelessWidget {
                     content: RichText(
                       text: TextSpan(
                         text: 'An email for password reset has been sent to ',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.black),
                         children: [
                           TextSpan(
                             text: email,
@@ -326,7 +327,9 @@ class LoginScreen extends StatelessWidget {
                   height: 50,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/student-dashboard');
+                    },
                     child: const Text("Continue"),
                   ),
                 ),
