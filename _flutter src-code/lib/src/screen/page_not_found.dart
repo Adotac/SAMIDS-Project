@@ -9,22 +9,26 @@ class PageNotFound extends StatelessWidget {
 
   const PageNotFound({super.key});
 
+  void navigateBack(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
+          showAppBar: false,
+          showBottomNavBar: false,
           appBarTitle: "Page Not Found",
           userName: "",
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "assets/images/page_not_found.png",
-                  width: 250,
-                  height: 250,
-                  fit: BoxFit.cover,
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => navigateBack(context),
                 ),
                 SizedBox(height: 30),
                 TitleMediumText(title: "Page Not Found"),
@@ -47,11 +51,9 @@ class PageNotFound extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "assets/images/page_not_found.png",
-                  width: 400,
-                  height: 400,
-                  fit: BoxFit.cover,
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => navigateBack(context),
                 ),
                 SizedBox(height: 30),
                 TitleMediumText(title: "Page Not Found"),
