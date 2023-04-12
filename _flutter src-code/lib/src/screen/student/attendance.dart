@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
+import 'package:samids_web_app/src/widgets/mobile_view.dart';
 
 import '../../widgets/card_small.dart';
 
@@ -28,10 +29,12 @@ class StudentAttendance extends StatelessWidget {
   }
 
   Widget _mobileView(context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Attendance"),
-      ),
+    return MobileView(
+      currentIndex: 1,
+      showAppBar: true,
+      showBottomNavBar: true,
+      appBarTitle: "Attendance",
+      userName: "",
       body: _attendanceBody(context),
     );
   }

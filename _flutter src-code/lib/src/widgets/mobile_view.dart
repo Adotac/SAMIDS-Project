@@ -1,12 +1,13 @@
 import 'dart:js';
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/screen/page_not_found.dart';
 
 import '../screen/student/attendance.dart';
 import '../screen/student/classes.dart';
 import '../screen/student/dashboard.dart';
 
-class MobileView extends StatelessWidget {
+class MobileView extends StatefulWidget {
   final Widget body;
   final String appBarTitle;
   final String userName;
@@ -23,7 +24,13 @@ class MobileView extends StatelessWidget {
     required this.currentIndex,
   }) : super(key: key);
 
+  @override
+  State<MobileView> createState() => _MobileViewState();
+}
+
+class _MobileViewState extends State<MobileView> {
   BottomNavigationBar _buildBottomNavigationBar(context, int currentIndex) {
+    print('currentIndex: $currentIndex');
     return BottomNavigationBar(
       currentIndex: currentIndex,
       selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -50,13 +57,17 @@ class MobileView extends StatelessWidget {
       onTap: (int index) {
         switch (index) {
           case 0:
-            Navigator.of(context).pushNamed(StudentDashboard.routeName);
+            Navigator.of(context).popAndPushNamed(StudentDashboard.routeName);
             break;
           case 1:
-            Navigator.of(context).pushNamed(StudentAttendance.routeName);
+            Navigator.of(context).popAndPushNamed(StudentAttendance.routeName);
             break;
           case 2:
-            Navigator.of(context).pushNamed(StudentClasses.routeName);
+            Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
+            break;
+
+          case 3:
+            Navigator.of(context).pushNamed(PageNotFound.routeName);
             break;
         }
       },
@@ -67,11 +78,11 @@ class MobileView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Visibility(
-        visible: showBottomNavBar,
-        child: _buildBottomNavigationBar(context, currentIndex),
+        visible: widget.showBottomNavBar,
+        child: _buildBottomNavigationBar(context, widget.currentIndex),
       ),
-      body: !showAppBar
-          ? body
+      body: !widget.showAppBar
+          ? widget.body
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
@@ -91,7 +102,7 @@ class MobileView extends StatelessWidget {
                         title: AnimatedOpacity(
                           duration: const Duration(milliseconds: 0),
                           opacity: constraints.biggest.height > 80 ? 0.0 : 1.0,
-                          child: Text(appBarTitle,
+                          child: Text(widget.appBarTitle,
                               style: Theme.of(context).textTheme.titleLarge),
                         ),
                         background: Padding(
@@ -106,7 +117,7 @@ class MobileView extends StatelessWidget {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               Text(
-                                userName,
+                                widget.userName,
                                 style: Theme.of(context).textTheme.titleLarge,
                               ),
                             ],
@@ -119,7 +130,7 @@ class MobileView extends StatelessWidget {
                 SliverList(
                   delegate: SliverChildListDelegate([
                     SingleChildScrollView(
-                      child: body,
+                      child: widget.body,
                     ),
                   ]),
                 ),

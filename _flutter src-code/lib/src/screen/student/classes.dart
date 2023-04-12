@@ -14,6 +14,7 @@ class StudentClasses extends StatelessWidget {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
+          currentIndex: 2,
           appBarTitle: "Classes",
           userName: "",
           body: Column(
