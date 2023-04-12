@@ -9,7 +9,7 @@ import '../../widgets/card_small.dart';
 class StudentAttendance extends StatelessWidget {
   final _textEditingController = TextEditingController();
   StudentAttendance({super.key});
-
+  static const routeName = '/student-attendance';
   @override
   Widget build(BuildContext context) {
     return Column(

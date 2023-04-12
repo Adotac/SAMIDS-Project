@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/screen/student/dashboard.dart';
 
 import '../widgets/responsive_builder.dart';
 
@@ -259,7 +260,8 @@ class LoginScreen extends StatelessWidget {
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white),
                       onPressed: () {
-                        Navigator.pushNamed(context, '/student-dashboard');
+                        Navigator.pushNamed(
+                            context, StudentDashboard.routeName);
                       },
                       child: const Text("Continue"),
                     ),

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
@@ -127,24 +128,33 @@ class _StudentDashboardState extends State<StudentDashboard> {
         children: [
           SizedBox(height: 60), // Add space to adjust for the AppBar
           ListTile(
-            leading: Icon(Icons.event_note),
-            title: Text('Attendance'),
+            leading: Icon(Icons.event_note_outlined),
+            title: Text('Dashboard'),
             onTap: () {
               // Navigate to Attendance Page
-              Navigator.of(context).pushNamed('/attendance');
+              Navigator.pushNamed(context, StudentDashboard.routeName);
             },
           ),
           ListTile(
-            leading: Icon(Icons.settings),
+            leading: Icon(
+              Icons.event_available_outlined,
+            ),
+            title: Text('Attendance'),
+            onTap: () {
+              Navigator.pushNamed(context, StudentAttendance.routeName);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.settings_outlined),
             title: Text('Settings'),
             onTap: () {
               // Navigate to Settings Page
-              Navigator.of(context).pushNamed('/settings');
+              // Navigator.pushNamed(context, StudentDashboard.routeName);
             },
           ),
           Spacer(),
           ListTile(
-            leading: Icon(Icons.logout),
+            leading: Icon(Icons.logout_outlined),
             title: Text('Logout'),
             onTap: () {
               // Perform Logout action and navigate to Login Page

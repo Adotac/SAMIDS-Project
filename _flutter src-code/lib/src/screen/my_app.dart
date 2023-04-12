@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 
 import 'student/attendance.dart';
@@ -16,12 +17,12 @@ class MyApp extends StatelessWidget {
 
   Route<dynamic>? generateRoutes(RouteSettings settings) {
     switch (settings.name) {
-      case '/':
+      case StudentDashboard.routeName:
         return MaterialPageRoute(builder: (_) => const StudentDashboard());
-      case '/attendance':
+      case StudentAttendance.routeName:
         return MaterialPageRoute(builder: (_) => StudentAttendance());
       default:
-        return null;
+        return MaterialPageRoute(builder: (_) => const PageNotFound());
     }
   }
 
