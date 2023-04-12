@@ -16,7 +16,20 @@ class CardSmall extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flexible(
       flex: flexValue,
-      child: Card(
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        decoration: ShapeDecoration(
+            color: Colors.white,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shadows: const [
+              BoxShadow(
+                spreadRadius: -2,
+                blurRadius: 10,
+                color: Colors.black26,
+                offset: Offset(5, 8),
+              ),
+            ]),
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Column(
