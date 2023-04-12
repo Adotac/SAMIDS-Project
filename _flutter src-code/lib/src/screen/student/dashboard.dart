@@ -246,12 +246,13 @@ class StudentDashboard extends StatelessWidget {
       flexValue: 1,
       title: "My Classes",
       child: dataTableClasses(context),
+      isShadow: false,
     );
   }
 
   Widget recentLogsCard(context, [flexValue = 1]) {
     return CardSmall(
-      flexValue: flexValue, title: "Recent Logs", child: dataTableLogs(context),
+      flexValue: flexValue, title: "Recent Logs", child: dataTableLogs(context), isShadow: false,
       // Column(
       //   children: [for (int i = 0; i < 10; i++) sampleDataAct],
       // ),
@@ -262,6 +263,7 @@ class StudentDashboard extends StatelessWidget {
     return CardSmall(
       flexValue: flexValue,
       title: "Performance",
+      isShadow: true,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         // ignore: prefer_const_literals_to_create_immutables
@@ -280,6 +282,7 @@ class StudentDashboard extends StatelessWidget {
 
   Widget _mStudentInfo() {
     return CardSmall(
+      isShadow: false,
       title: "",
       flexValue: 0,
       child: SizedBox(
@@ -323,6 +326,7 @@ class StudentDashboard extends StatelessWidget {
 
   CardSmall _studentInfo() {
     return CardSmall(
+      isShadow: false,
       title: "",
       flexValue: 0,
       child: Row(children: [
@@ -369,6 +373,7 @@ class StudentDashboard extends StatelessWidget {
 
   CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
     return CardSmall(
+      isShadow: true,
       flexValue: flexValue,
       title: "Overview",
       child: Row(

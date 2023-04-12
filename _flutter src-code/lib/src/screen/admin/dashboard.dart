@@ -29,6 +29,7 @@ class AdminDashboard extends StatelessWidget {
                 remarkCard(0, 2),
                 attendanceBarSection(),
                 CardSmall(
+                  isShadow: true,
                   flexValue: 0,
                   title: "Activities",
                   child: Column(
@@ -99,10 +100,12 @@ class AdminDashboard extends StatelessWidget {
               // ignore: prefer_const_literals_to_create_immutables
               children: [
                 CardSmall(
+                  isShadow: true,
                   title: "Activities",
                   child: sampleDataAct,
                 ),
                 CardSmall(
+                  isShadow: true,
                   title: "Classes",
                   child: sampleDataClasses,
                 )

@@ -5,10 +5,12 @@ class CardSmall extends StatelessWidget {
   final Widget child;
   final String title;
   final int flexValue;
+  final bool isShadow;
   const CardSmall({
     Key? key,
     required this.title,
     required this.child,
+    required this.isShadow,
     this.flexValue = 1,
   }) : super(key: key);
 
@@ -22,14 +24,14 @@ class CardSmall extends StatelessWidget {
             color: Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            shadows: const [
+            shadows: isShadow ? const [
               BoxShadow(
                 spreadRadius: -2,
                 blurRadius: 10,
                 color: Colors.black26,
                 offset: Offset(5, 8),
               ),
-            ]),
+            ]: null),
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Column(

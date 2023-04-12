@@ -44,7 +44,7 @@ class _CircularViewerState extends State<CircularViewer>
 
     
     WidgetsBinding.instance.addPostFrameCallback((_) async{
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1000));
     // Start the animation after the screen has loaded
     controller.forward();
   });
