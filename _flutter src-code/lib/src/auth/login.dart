@@ -261,7 +261,9 @@ class LoginScreen extends StatelessWidget {
                           foregroundColor: Colors.white),
                       onPressed: () {
                         Navigator.pushNamed(
-                            context, StudentDashboard.routeName);
+                          context,
+                          StudentDashboard.routeName,
+                        );
                       },
                       child: const Text("Continue"),
                     ),

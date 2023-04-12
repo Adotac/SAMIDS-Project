@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/widgets/app_bar.dart';
-import 'package:samids_web_app/src/widgets/card_small.dart';
-import 'package:samids_web_app/src/widgets/mobile_view.dart';
 
-import 'package:samids_web_app/src/widgets/title_medium_text.dart';
+import '../../widgets/mobile_view.dart';
 
 class StudentClasses extends StatelessWidget {
   static const routeName = '/student-classes';
@@ -17,40 +14,38 @@ class StudentClasses extends StatelessWidget {
           currentIndex: 2,
           appBarTitle: "Classes",
           userName: "",
-          body: Column(
-            children: [
-              LocalAppBar(pageTitle: "Classes"),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TitleMediumText(title: "Classes"),
-                    SizedBox(height: 16),
-                    dataTableClasses(context),
-                  ],
-                ),
-              ),
-            ],
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 1,
+                  child: dataTableClasses(context)),
+            ),
           ),
         );
       } else {
         return Scaffold(
+          appBar: AppBar(
+            title: const Text("Classes"),
+          ),
           body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              LocalAppBar(pageTitle: "Classes"),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                child: Text(
+                  '1st Semester 2023',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TitleMediumText(title: "Classes"),
-                    SizedBox(height: 16),
-                    dataTableClasses(context),
-                  ],
-                ),
+                child: dataTableClasses(context),
               ),
             ],
           ),
@@ -61,11 +56,9 @@ class StudentClasses extends StatelessWidget {
 
   Widget dataTableClasses(context) {
     return SizedBox(
-      width: double.infinity,
       child: DataTable(
-        dividerThickness: 0,
-        columnSpacing: 5,
-        columns: [
+        dividerThickness: 1,
+        columns: const [
           DataColumn(
             label: Text(
               'Time',
@@ -80,7 +73,13 @@ class StudentClasses extends StatelessWidget {
           ),
           DataColumn(
             label: Text(
-              'Status',
+              'Subject Code',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+          DataColumn(
+            label: Text(
+              'Days',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
           ),
@@ -94,7 +93,8 @@ class StudentClasses extends StatelessWidget {
     return DataRow(cells: <DataCell>[
       DataCell(Text('08:00 AM - 10:00 AM')),
       DataCell(Text('Computer Programming')),
-      DataCell(Text('Pending')),
+      DataCell(Text('CP101')),
+      DataCell(Text('MWF')),
     ]);
   }
 }

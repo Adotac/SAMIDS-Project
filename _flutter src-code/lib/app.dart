@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/controllers/student.controller.dart';
 
 import 'package:samids_web_app/src/screen/my_app.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
@@ -92,6 +93,7 @@ class MyApp extends StatelessWidget {
           // darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           initialRoute: LoginScreen.routeName,
+          home: LoginScreen(),
 
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
@@ -101,7 +103,10 @@ class MyApp extends StatelessWidget {
                 return MaterialPageRoute(
                     builder: (_) => const StudentDashboard());
               case StudentAttendance.routeName:
-                return MaterialPageRoute(builder: (_) => StudentAttendance());
+                return MaterialPageRoute(
+                    builder: (_) => StudentAttendance(
+                          studentController: StudentController.instance,
+                        ));
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case StudentClasses.routeName:
