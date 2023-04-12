@@ -8,6 +8,7 @@ import '../../widgets/card_small.dart';
 import '../../widgets/data_number.dart';
 
 class StudentDashboard extends StatelessWidget {
+  static const routeName = '/studentDashboard';
   StudentDashboard({super.key});
 
   Widget sampleDataAct = const ListTile(
@@ -252,7 +253,8 @@ class StudentDashboard extends StatelessWidget {
 
   Widget recentLogsCard(context, [flexValue = 1]) {
     return CardSmall(
-      flexValue: flexValue, title: "Recent Logs", child: dataTableLogs(context), isShadow: false,
+      flexValue: flexValue, title: "Recent Logs", child: dataTableLogs(context),
+      isShadow: false,
       // Column(
       //   children: [for (int i = 0; i < 10; i++) sampleDataAct],
       // ),

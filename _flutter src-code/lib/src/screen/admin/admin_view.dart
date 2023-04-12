@@ -1,40 +1,80 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/screen/admin/screen_navigator.dart';
-import 'package:samids_web_app/src/screen/sidebar_navigator.dart';
-import 'package:sidebarx/sidebarx.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:samids_web_app/src/settings/settings_controller.dart';
 
-class AdminView extends StatelessWidget {
-  AdminView({Key? key}) : super(key: key);
+import '../student/attendance.dart';
+import '../student/dashboard.dart';
 
-  final _controller = SidebarXController(selectedIndex: 0, extended: true);
-  final _key = GlobalKey<ScaffoldState>();
+class MyApp extends StatelessWidget {
+  const MyApp({
+    Key? key,
+    required this.settingsController,
+  }) : super(key: key);
+
+  final SettingsController settingsController;
+
+  Route<dynamic>? generateRoutes(RouteSettings settings) {
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (_) => StudentDashboard());
+      case '/attendance':
+        return MaterialPageRoute(builder: (_) => StudentAttendance());
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        final isSmallScreen = MediaQuery.of(context).size.width < 600;
-        return Scaffold(
-          
-          key: _key,
-          // drawer: ExampleSidebarX(controller: _controller),
-          body: Row(
-            children: [
-              if (!isSmallScreen) SideBarX(controller: _controller),
-              Expanded(
-                child: Center(
-                  child: ScreenNavigator(
-                    controller: _controller,
+    return AnimatedBuilder(
+      animation: settingsController,
+      builder: (BuildContext context, Widget? child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          restorationScopeId: 'app',
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en', ''), // English, no country code
+          ],
+          theme: ThemeData(
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Color(0xFFF5F6F9),
+              selectedItemColor: Colors.black,
+              elevation: 0.0,
+            ),
+            appBarTheme: ThemeData().appBarTheme.copyWith(
+                  color: const Color(0xFFF5F6F9),
+                  iconTheme: const IconThemeData(
+                    color: Colors.black,
                   ),
+                  titleTextStyle: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  elevation: 0.1,
                 ),
+            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+            cardTheme: const CardTheme(
+              margin: EdgeInsets.all(6),
+              elevation: 0.2,
+            ),
+            fontFamily: GoogleFonts.inter().fontFamily,
+            textTheme: const TextTheme(
+              titleLarge: TextStyle(
+                fontWeight: FontWeight.bold,
               ),
-            ],
+            ),
           ),
+          themeMode: settingsController.themeMode,
+          onGenerateRoute: generateRoutes,
         );
       },
     );
   }
 }
-
