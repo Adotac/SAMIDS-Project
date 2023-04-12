@@ -32,15 +32,118 @@ class LoginScreen extends StatelessWidget {
     return ResponsiveBuilder(
       builder: (context, isMobile) {
         if (isMobile) {
-          return buildMobileView(context);
+          return _buildMobileView(context);
         } else {
-          return buildWebView(context);
+          return _buildWebView(context);
         }
       },
     );
   }
 
-  Widget buildMobileView(BuildContext context) {
+  Future<void> _showResetPasswordDialog(BuildContext context) async {
+    String email = '';
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        title: Text(
+          'Reset Password',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.error,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextField(
+              onChanged: (value) {
+                email = value;
+              },
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                hintText: 'Enter your email',
+              ),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (isValidEmail(email)) {
+                // send email password reset
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(
+                      'Password Reset',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    content: RichText(
+                      text: TextSpan(
+                        text: 'An email for password reset has been sent to ',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: email,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // show invalid email error
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: Text(
+                      'Invalid Email',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    content: const Text('Please enter a valid email address'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
+            child: const Text('Reset Password'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool isValidEmail(String email) {
+    RegExp regExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return regExp.hasMatch(email);
+  }
+
+  Widget _buildMobileView(BuildContext context) {
     return Stack(
       children: [
         backgroundImageMobile,
@@ -62,7 +165,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget buildWebView(BuildContext context) {
+  Widget _buildWebView(BuildContext context) {
     return Stack(
       children: [
         backgroundImage,
@@ -86,7 +189,7 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(
                   width: 450,
                   height: 600,
-                  child: loginForumWeb(),
+                  child: loginForumWeb(context),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.3,
@@ -99,7 +202,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Column loginForumWeb() {
+  Column loginForumWeb(context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -162,7 +265,7 @@ class LoginScreen extends StatelessWidget {
                     height: 10,
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => _showResetPasswordDialog(context),
                     child: const Text("Forget password?"),
                   )
                 ],
@@ -231,7 +334,7 @@ class LoginScreen extends StatelessWidget {
                   height: 20,
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => _showResetPasswordDialog(context),
                   child: const Text("Forget password?"),
                 ),
               ],

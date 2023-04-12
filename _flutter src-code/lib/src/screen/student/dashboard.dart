@@ -8,6 +8,7 @@ import '../../widgets/card_small.dart';
 import '../../widgets/data_number.dart';
 import '../../widgets/mobile_view.dart';
 
+// ignore: must_be_immutable
 class StudentDashboard extends StatelessWidget {
   static const routeName = '/studentDashboard';
   StudentDashboard({super.key});
