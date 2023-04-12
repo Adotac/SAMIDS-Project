@@ -176,9 +176,11 @@ class LoginScreen extends StatelessWidget {
 
   Widget loginForumFieldMobile(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
             "Login",
@@ -190,41 +192,50 @@ class LoginScreen extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          const TextField(
-            decoration: InputDecoration(
-              labelText: 'Email',
-              hintText: 'Enter your email',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'Password',
-              hintText: 'Enter your password',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
           Container(
-            height: 50,
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {},
-              child: const Text("Continue"),
+            constraints: const BoxConstraints(
+              maxWidth: 370,
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Text("Forget password?"),
+            child: Column(
+              children: [
+                const TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'Enter your email',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    hintText: 'Enter your password',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: const Text("Continue"),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text("Forget password?"),
+                ),
+              ],
+            ),
           ),
           const SizedBox(
             height: 50,
