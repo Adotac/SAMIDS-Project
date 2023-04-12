@@ -6,6 +6,7 @@ import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/data_number.dart';
+import '../../widgets/mobile_view.dart';
 
 class StudentDashboard extends StatelessWidget {
   static const routeName = '/studentDashboard';
@@ -45,42 +46,14 @@ class StudentDashboard extends StatelessWidget {
   }
 
   Widget _mobileView(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.dashboard_outlined,
-            ),
-            label: 'Dashboard ',
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.event_available_outlined,
-              ),
-              label: 'Attendance'),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.school_outlined,
-            ),
-            label: 'Classes',
-          ),
-        ],
-      ),
-      appBar: AppBar(
-        title: Text("Dashboard"),
-      ),
+    return MobileView(
+      appBarTitle: 'Dashboard',
       body: Column(
         children: [
-          Expanded(
-              child: SingleChildScrollView(
-            child: Column(children: [
-              _mStudentInfo(),
-              _overviewCard(2, 0),
-              // _performanceCard(2, 0),
-              recentLogsCard(context, 0),
-            ]),
-          )),
+          _mStudentInfo(),
+          _overviewCard(2, 0),
+          // _performanceCard(2, 0),
+          recentLogsCard(context, 0),
         ],
       ),
     );
