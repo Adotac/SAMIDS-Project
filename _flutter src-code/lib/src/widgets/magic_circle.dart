@@ -28,8 +28,8 @@ class Circle extends CustomPainter {
     canvas.drawCircle(center, radius - 15, unSelectedAreaBrush);
     canvas.drawArc(
         Rect.fromCircle(center: const Offset(0, 0), radius: radius - 7),
-        0, //radians
-        -angle * pi / 180, //radians
+        pi, //radians
+        angle * pi / 180, //radians
         false,
         sliderBrush);
     canvas.drawCircle(center, radius - 45, circleBrush);
