@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
+import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
@@ -59,6 +60,13 @@ class StudentDashboard extends StatelessWidget {
           _overviewCard(2, 0),
           // _performanceCard(2, 0),
           recentLogsCard(context, 0),
+          // CustomListTile(
+          //   title: "Programming 1",
+          //   subtitle: "On-Time",
+          //   leadingIcon: Icons.access_alarm_sharp,
+          //   trailingText: "02:12pm",
+          //   subTrailingText: '10023',
+          // ),
         ],
       ),
     );
@@ -88,7 +96,6 @@ class StudentDashboard extends StatelessWidget {
                     myClassesCard(context),
                   ],
                 )
-
                 // Row(
                 //   crossAxisAlignment: CrossAxisAlignment.start,
                 //   children: [
@@ -233,14 +240,28 @@ class StudentDashboard extends StatelessWidget {
     return DateFormat('MMMM d, y').format(DateTime.now());
   }
 
-// Usage
-
   Widget recentLogsCard(context, [flexValue = 1]) {
     return MobileSmallCard(
-        isShadow: false,
-        sideTitle: _formatCurrentDate(),
-        title: "Activities",
-        child: dataTableLogs(context));
+      isShadow: false,
+      sideTitle: _formatCurrentDate(),
+      title: "Recent Activity",
+      child: Column(
+        children: List.generate(
+          20,
+          (index) => CustomListTile(
+            title: "Programming $index",
+            subtitle: getStatusText("On-Time"),
+            leadingIcon: Icons.access_alarm_sharp,
+            trailingText: "02:12pm",
+            subTrailingText: '10023',
+          ),
+        ),
+      ),
+    );
+    //  Row(
+
+    // ));
+    // dataTableLogs(context));
   }
 
   CardSmall _performanceCard(leadingFlex, [flexValue = 1]) {
@@ -375,6 +396,32 @@ class StudentDashboard extends StatelessWidget {
 //     ),
 //   ),
 // );
+
+  Text getStatusText(String status) {
+    final String lowercaseStatus = status.toLowerCase();
+    Color color;
+    switch (lowercaseStatus) {
+      case 'absent':
+        color = Colors.red;
+        break;
+      case 'cutting':
+        color = Colors.yellow;
+        break;
+      case 'on-time':
+        color = Colors.green;
+        break;
+      case 'late':
+        color = Colors.orange;
+        break;
+      default:
+        color = Colors.black;
+        break;
+    }
+    return Text(
+      status,
+      style: TextStyle(color: color),
+    );
+  }
 
   Widget _overviewCard(leadingFlex, [flexValue = 1]) {
     return MobileSmallCard(
