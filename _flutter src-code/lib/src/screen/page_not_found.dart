@@ -18,7 +18,7 @@ class PageNotFound extends StatelessWidget {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
-          currentIndex: 3,
+          currentIndex: 0,
           showAppBar: false,
           showBottomNavBar: false,
           appBarTitle: "Page Not Found",

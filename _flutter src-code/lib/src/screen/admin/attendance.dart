@@ -21,7 +21,6 @@ class AdminAttendance extends StatelessWidget {
   }
 
   Widget _attendanceBody(context) {
-    
     return Expanded(
         child: SingleChildScrollView(
       scrollDirection: Axis.vertical,

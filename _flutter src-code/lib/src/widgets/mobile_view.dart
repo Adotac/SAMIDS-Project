@@ -18,7 +18,7 @@ class MobileView extends StatefulWidget {
     Key? key,
     required this.body,
     required this.appBarTitle,
-    required this.userName,
+    this.userName = '',
     this.showBottomNavBar = true,
     this.showAppBar = true,
     required this.currentIndex,
@@ -65,13 +65,62 @@ class _MobileViewState extends State<MobileView> {
           case 2:
             Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
             break;
-
           case 3:
-            Navigator.of(context).pushNamed(PageNotFound.routeName);
+            Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
             break;
         }
       },
     );
+  }
+
+  String _getGreeting() {
+    var hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good morning';
+    } else if (hour < 18) {
+      return 'Good afternoon';
+    } else {
+      return 'Good evening';
+    }
+  }
+
+  Widget _buildGreetingText(
+    context,
+    String userName, [
+    String? greeting,
+  ]) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (greeting != null)
+            Text(
+              greeting,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          Text(
+            userName,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBar(int currentIndex, context) {
+    switch (currentIndex) {
+      case 0:
+        return _buildGreetingText(context, widget.userName, _getGreeting());
+
+      case 1:
+      case 2:
+        return _buildGreetingText(context, widget.appBarTitle);
+
+      default:
+        return const SizedBox();
+    }
   }
 
   @override
@@ -105,24 +154,7 @@ class _MobileViewState extends State<MobileView> {
                           child: Text(widget.appBarTitle,
                               style: Theme.of(context).textTheme.titleLarge),
                         ),
-                        background: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Good Morning,',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              Text(
-                                widget.userName,
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                            ],
-                          ),
-                        ),
+                        background: _buildAppBar(widget.currentIndex, context),
                       );
                     },
                   ),
