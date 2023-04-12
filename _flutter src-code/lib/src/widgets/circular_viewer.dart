@@ -32,14 +32,22 @@ class _CircularViewerState extends State<CircularViewer>
   int animatedValue = 0;
   late Animation<int> animation;
   @override
-  void initState() {
+  void initState()  {
     super.initState();
 
     controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 5));
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
     animation = IntTween(begin: 0, end: widget.value.toInt()).animate(
         CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn));
+
+    //Future.delayed(const Duration(seconds: 6));
+
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      await Future.delayed(const Duration(milliseconds: 1500));
+    // Start the animation after the screen has loaded
     controller.forward();
+  });
     animation.addListener(() {
       setState(() {});
     });
