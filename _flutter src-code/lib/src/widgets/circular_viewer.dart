@@ -38,7 +38,7 @@ class _CircularViewerState extends State<CircularViewer>
     controller =
         AnimationController(vsync: this, duration: const Duration(milliseconds: 3000));
     animation = IntTween(begin: 0, end: widget.value.toInt()).animate(
-        CurvedAnimation(parent: controller, curve: Curves.fastLinearToSlowEaseIn));
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn));
 
     //Future.delayed(const Duration(seconds: 6));
 

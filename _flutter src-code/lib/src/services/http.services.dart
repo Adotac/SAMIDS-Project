@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
-class HttpServices{
- Future<http.Response> get(String url, {Map<String, String>? headers, Map<String, String>? query}) async {
+class HttpService {
+  static Future<http.Response> get(String url, {Map<String, String>? headers, Map<String, String>? query}) async {
     final uri = Uri.parse(url).replace(queryParameters: query);
     final response = await http.get(uri, headers: headers);
     return response;
   }
 
-  Future<http.Response> post(String url, {dynamic body, Map<String, String>? headers, Map<String, String>? query}) async {
+  static Future<http.Response> post(String url, {dynamic body, Map<String, String>? headers, Map<String, String>? query}) async {
     final uri = Uri.parse(url).replace(queryParameters: query);
     final response = await http.post(
       uri,
@@ -19,7 +18,7 @@ class HttpServices{
     return response;
   }
 
-  Future<http.Response> put(String url, {dynamic body, Map<String, String>? headers, Map<String, String>? query}) async {
+  static Future<http.Response> put(String url, {dynamic body, Map<String, String>? headers, Map<String, String>? query}) async {
     final uri = Uri.parse(url).replace(queryParameters: query);
     final response = await http.put(
       uri,
@@ -29,7 +28,7 @@ class HttpServices{
     return response;
   }
 
-  Future<http.Response> patch(String url, {dynamic body, Map<String, String>? headers, Map<String, String>? query}) async {
+  static Future<http.Response> patch(String url, {dynamic body, Map<String, String>? headers, Map<String, String>? query}) async {
     final uri = Uri.parse(url).replace(queryParameters: query);
     final response = await http.patch(
       uri,
@@ -39,7 +38,7 @@ class HttpServices{
     return response;
   }
 
-  Future<http.Response> delete(String url, {Map<String, String>? headers, Map<String, String>? query}) async {
+  static Future<http.Response> delete(String url, {Map<String, String>? headers, Map<String, String>? query}) async {
     final uri = Uri.parse(url).replace(queryParameters: query);
     final response = await http.delete(
       uri,
@@ -47,7 +46,4 @@ class HttpServices{
     );
     return response;
   }
-
-
-
 }

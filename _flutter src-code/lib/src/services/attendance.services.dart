@@ -1,78 +1,44 @@
+import 'package:samids_web_app/src/services/DTO/add_attendance.dart';
 import 'package:samids_web_app/src/services/http.services.dart';
 import 'package:http/http.dart' as http;
 
-class AttendanceService{
-final HttpServices httpService;
-final String _baseUrl = "https://localhost:7170/api";
-  AttendanceService({required this.httpService});
+class AttendanceService {
+  final String _baseUrl = "https://localhost:7170/api";
 
-  Future<http.Response> getRemarksCount() async {
-    return await httpService.get('$_baseUrl/GetRemarksCount');
+  Future<http.Response> getRemarksCount({int? studentNo, DateTime? date}) async {
+    Map<String, String>? query;
+    if (studentNo != null && date != null) {
+      query = {'studentNo': studentNo.toString(), 'date': date.toIso8601String()};
+    } else if (studentNo != null) {
+      query = {'studentNo': studentNo.toString()};
+    }
+    return await HttpService.get("$_baseUrl/GetRemarksCount", query: query);
   }
 
-  Future<http.Response> getRemarksCountByStudentNo(int studentNo) async {
-    return await httpService.get('$_baseUrl/GetRemarksCount/$studentNo');
+  Future<http.Response> getAll({
+    DateTime? date,
+    String? room,
+    int? studentNo,
+    String? remarks,
+  }) async {
+    Map<String, String>? query = {};
+    if (date != null) query['date'] = date.toIso8601String();
+    if (room != null) query['room'] = room;
+    if (studentNo != null) query['studentNo'] = studentNo.toString();
+    if (remarks != null) query['remarks'] = remarks;
+
+    return await HttpService.get(_baseUrl, query: query);
   }
 
-  Future<http.Response> getRemarksCountByStudentNoAndDate(int studentNo, DateTime date) async {
-    final formattedDate = date.toString().substring(0, 10); // format the date as YYYY-MM-DD
-    return await httpService.get('$_baseUrl/GetRemarksCount/$studentNo&$formattedDate');
+  Future<http.Response> getAllSA({required int studentId}) async {
+    return await HttpService.get("$_baseUrl/GetAllSA", query: {'studentId': studentId.toString()});
   }
 
-  Future<http.Response> getAttendances() async {
-    return await httpService.get('$_baseUrl/');
+  Future<http.Response> getAllFA({required int facultyId}) async {
+    return await HttpService.get("$_baseUrl/GetAllFA", query: {'facultyId': facultyId.toString()});
   }
 
-  Future<http.Response> getAttendancesByDate(DateTime date) async {
-    final formattedDate = date.toString().substring(0, 10); // format the date as YYYY-MM-DD
-    return await httpService.get('$_baseUrl/$formattedDate');
+  Future<http.Response> addAttendance(AddAttendanceDto attendance) async {
+    return await HttpService.post(_baseUrl, body: attendance);
   }
-
-  Future<http.Response> getAttendancesByDateAndStudentNo(DateTime date, int studentNo) async {
-    final formattedDate = date.toString().substring(0, 10); // format the date as YYYY-MM-DD
-    return await httpService.get('$_baseUrl/$formattedDate&$studentNo');
-  }
-
-  Future<http.Response> getAttendancesByRoom(String room) async {
-    return await httpService.get('$_baseUrl/$room');
-  }
-
-  Future<http.Response> getAttendancesByRoomAndRemarks(String room, String remarks) async {
-    return await httpService.get('$_baseUrl/$room&$remarks');
-  }
-
-  Future<http.Response> getAttendancesByRoomAndStudentNo(String room, int studentNo) async {
-    return await httpService.get('$_baseUrl/$room&$studentNo');
-  }
-
-  Future<http.Response> getAttendancesByStudentNo(int studentNo) async {
-    return await httpService.get('$_baseUrl/$studentNo');
-  }
-
-  Future<http.Response> getAttendancesByStudentNoAndRemarks(int studentNo, String remarks) async {
-    return await httpService.get('$_baseUrl/$studentNo&$remarks');
-  }
-
-  Future<http.Response> getAttendancesByRemarks(String remarks) async {
-    return await httpService.get('$_baseUrl/$remarks');
-  }
-
-  Future<http.Response> getAttendancesByRoomAndStudentNoAndRemarks(String room, int studentNo, String remarks) async {
-    return await httpService.get('$_baseUrl/$room&$studentNo&$remarks');
-  }
-
-  Future<http.Response> getStudentAttendance(int studentId) async {
-    return await httpService.get('$_baseUrl/GetAllSA?studentId=$studentId');
-  }
-
-  Future<http.Response> getFacultyAttendance(int facultyId) async {
-    return await httpService.get('$_baseUrl/GetAllFA?facultyId=$facultyId');
-  }
-
-  Future<http.Response> addAttendance(Map<String, dynamic> attendance) async {
-    return await httpService.post('$_baseUrl/', body: attendance);
-  }
-
-
-
 }
