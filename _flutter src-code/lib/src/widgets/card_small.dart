@@ -24,14 +24,16 @@ class CardSmall extends StatelessWidget {
             color: Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            shadows: isShadow ? const [
-              BoxShadow(
-                spreadRadius: -2,
-                blurRadius: 10,
-                color: Colors.black26,
-                offset: Offset(5, 8),
-              ),
-            ]: null),
+            shadows: isShadow
+                ? const [
+                    BoxShadow(
+                      spreadRadius: -2,
+                      blurRadius: 10,
+                      color: Colors.black26,
+                      offset: Offset(5, 8),
+                    ),
+                  ]
+                : null),
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Column(

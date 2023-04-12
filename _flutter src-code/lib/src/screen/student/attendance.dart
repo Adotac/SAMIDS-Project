@@ -9,20 +9,35 @@ import '../../widgets/card_small.dart';
 class StudentAttendance extends StatelessWidget {
   final _textEditingController = TextEditingController();
   StudentAttendance({super.key});
+  static const routeName = '/student-attendance';
+
+  bool isMobile(BoxConstraints constraints) {
+    return (constraints.maxWidth <= 450);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        LocalAppBar(pageTitle: "Attendance"),
-        _attendanceBody(context),
-      ],
+    return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      if (isMobile(constraints)) {
+        return _mobileView(context);
+      }
+
+      // return _webView();
+      return Container(child: Text(''));
+    });
+  }
+
+  Widget _mobileView(context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Attendance"),
+      ),
+      body: _attendanceBody(context),
     );
   }
 
   Widget _attendanceBody(context) {
-    return Expanded(
-        child: SingleChildScrollView(
+    return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Card(
         child: Column(children: [
@@ -48,7 +63,7 @@ class StudentAttendance extends StatelessWidget {
               ))
         ]),
       ),
-    ));
+    );
   }
 
   DataRow _sampleDataRow(context) {

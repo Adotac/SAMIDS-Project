@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:samids_web_app/src/auth/login.dart';
 
-import 'package:samids_web_app/src/screen/admin/admin_view.dart';
+import 'package:samids_web_app/src/screen/my_app.dart';
+import 'package:samids_web_app/src/screen/page_not_found.dart';
+import 'package:samids_web_app/src/screen/student/attendance.dart';
+import 'package:samids_web_app/src/screen/student/classes.dart';
+import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -86,16 +91,25 @@ class MyApp extends StatelessWidget {
           ),
           // darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
+          initialRoute: LoginScreen.routeName,
 
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                return AdminView();
-              },
-            );
+          onGenerateRoute: (RouteSettings settings) {
+            switch (settings.name) {
+              case StudentDashboard.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => const StudentDashboard());
+              case StudentAttendance.routeName:
+                return MaterialPageRoute(builder: (_) => StudentAttendance());
+              case LoginScreen.routeName:
+                return MaterialPageRoute(builder: (_) => LoginScreen());
+              case StudentClasses.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => const StudentClasses());
+              default:
+                return MaterialPageRoute(builder: (_) => const PageNotFound());
+            }
           },
         );
       },
