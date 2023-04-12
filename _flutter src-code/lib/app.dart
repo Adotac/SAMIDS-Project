@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 
-import 'package:samids_web_app/src/screen/admin/admin_view.dart';
+import 'package:samids_web_app/src/screen/my_app.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 import 'package:google_fonts/google_fonts.dart';

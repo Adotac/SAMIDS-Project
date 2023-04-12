@@ -258,7 +258,9 @@ class LoginScreen extends StatelessWidget {
                       style: TextButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/student-dashboard');
+                      },
                       child: const Text("Continue"),
                     ),
                   ),

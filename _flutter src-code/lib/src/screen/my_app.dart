@@ -3,8 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 
-import '../student/attendance.dart';
-import '../student/dashboard.dart';
+import 'student/attendance.dart';
+import 'student/dashboard.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Route<dynamic>? generateRoutes(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => StudentDashboard());
+        return MaterialPageRoute(builder: (_) => const StudentDashboard());
       case '/attendance':
         return MaterialPageRoute(builder: (_) => StudentAttendance());
       default:

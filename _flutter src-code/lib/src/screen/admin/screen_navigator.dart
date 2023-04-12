@@ -40,10 +40,10 @@ class ScreenNavigator extends StatelessWidget {
     }
   }
 
-  StatelessWidget studentPageNavigator(String pageTitle, ThemeData theme) {
+  Widget studentPageNavigator(String pageTitle, ThemeData theme) {
     switch (controller.selectedIndex) {
       case 0:
-        return StudentDashboard();
+        return const StudentDashboard();
       case 1:
         return AdminAttendance();
       default:

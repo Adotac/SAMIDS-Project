@@ -16,7 +16,7 @@ class Circle extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     var center = const Offset(0, 0);
     canvas.translate(size.width / 2, size.height / 2);
-    var radius = size.width / 2;
+    var radius = max(0, size.width / 2); // Ensure the radius is non-negative
     var circleBrush = Paint()..color = color;
     var unSelectedAreaBrush = Paint()..color = unSelectedColor;
     var sliderBrush = Paint()
@@ -24,15 +24,17 @@ class Circle extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 16
       ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius, circleBrush);
-    canvas.drawCircle(center, radius - 15, unSelectedAreaBrush);
+    canvas.drawCircle(center, radius.toDouble(), circleBrush);
+    canvas.drawCircle(center, max(0, radius - 15), unSelectedAreaBrush);
     canvas.drawArc(
-        Rect.fromCircle(center: const Offset(0, 0), radius: radius - 7),
-        pi, //radians
-        angle * pi / 180, //radians
+        Rect.fromCircle(
+            center: const Offset(0, 0),
+            radius: max(0, radius - 7)), // Ensure the radius is non-negative
+        0, //radians
+        -angle * pi / 180, //radians
         false,
         sliderBrush);
-    canvas.drawCircle(center, radius - 45, circleBrush);
+    canvas.drawCircle(center, max(0, radius - 45), circleBrush);
   }
 
   @override
