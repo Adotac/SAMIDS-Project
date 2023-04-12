@@ -59,7 +59,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   Widget _mobileView() {
     return MobileView(
-      currentIndex: 1,
+      currentIndex: 0,
       appBarTitle: 'Dashboard',
       userName: 'Martin Erickson Lapetaje',
       body: Column(
