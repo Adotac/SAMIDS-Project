@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 
+import '../screen/settings.dart';
 import '../screen/student/attendance.dart';
 import '../screen/student/classes.dart';
 import '../screen/student/dashboard.dart';
@@ -11,15 +12,17 @@ class MobileView extends StatefulWidget {
   final String userName;
   bool showBottomNavBar;
   bool showAppBar;
+  bool appBarOnly;
   final int currentIndex;
   MobileView({
     Key? key,
     required this.body,
     required this.appBarTitle,
+    required this.currentIndex,
     this.userName = '',
     this.showBottomNavBar = true,
     this.showAppBar = true,
-    required this.currentIndex,
+    this.appBarOnly = false,
   }) : super(key: key);
 
   @override
@@ -128,13 +131,21 @@ class _MobileViewState extends State<MobileView> {
         visible: widget.showBottomNavBar,
         child: _buildBottomNavigationBar(context, widget.currentIndex),
       ),
-      body: !widget.showAppBar
+      appBar: widget.appBarOnly
+          ? AppBar(
+              leadingWidth: 48,
+              title: Text(widget.appBarTitle),
+            )
+          : null,
+      body: (!widget.showAppBar || widget.appBarOnly)
           ? widget.body
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
                   leading: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(SettingsPage.routeName);
+                    },
                     icon: const Icon(Icons.settings_outlined),
                   ),
                   leadingWidth: 48,
