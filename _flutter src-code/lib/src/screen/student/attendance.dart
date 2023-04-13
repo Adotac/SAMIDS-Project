@@ -164,7 +164,6 @@ class StudentAttendance extends StatelessWidget {
           borderRadius: BorderRadius.circular(5),
           border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
-        autofocus: true,
         onSubmitted: (_textEditingController) {
           if (kDebugMode) {
             print(_textEditingController.toString());

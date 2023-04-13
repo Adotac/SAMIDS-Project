@@ -148,6 +148,8 @@ class LoginScreen extends StatelessWidget {
   Widget _buildMobileView(BuildContext context) {
     return Stack(
       children: [
+        Container(
+            color: Colors.white), // Add this line to set a white background
         backgroundImageMobile,
         Scaffold(
           backgroundColor: Colors.transparent,

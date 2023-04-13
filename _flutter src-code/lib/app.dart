@@ -6,6 +6,7 @@ import 'package:samids_web_app/src/controllers/student.controller.dart';
 
 import 'package:samids_web_app/src/screen/my_app.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
+import 'package:samids_web_app/src/screen/settings.dart';
 import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
@@ -107,6 +108,8 @@ class MyApp extends StatelessWidget {
                     builder: (_) => StudentAttendance(
                           studentController: StudentController.instance,
                         ));
+              case SettingsPage.routeName:
+                return MaterialPageRoute(builder: (_) => SettingsPage());
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case StudentClasses.routeName:
