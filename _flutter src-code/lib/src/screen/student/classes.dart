@@ -17,6 +17,33 @@ class StudentClasses extends StatelessWidget {
       teacher: 'John Doe',
       room: '101',
     ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'MWF',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'MWF',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'MWF',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
     // Add more subjects here
   ];
 

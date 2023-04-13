@@ -44,11 +44,15 @@ class _SideMenuState extends State<SideMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.only(left: 18.0, bottom: 18),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
       width: 250,
-      color: Colors.grey[200],
       child: Column(
         children: [
-          SizedBox(height: 60),
+          const SizedBox(height: 60),
           _buildListTile(
             icon: Icons.event_note_outlined,
             title: 'Dashboard',

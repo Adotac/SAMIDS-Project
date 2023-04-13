@@ -9,18 +9,27 @@ class ClassesListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      title: Text(subject.name),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(subject.code),
-          Text(subject.timeSchedule),
-          Text(subject.daySchedule),
-        ],
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
       ),
-      trailing: Icon(Icons.arrow_forward_ios),
+      child: Card(
+        child: ListTile(
+          onTap: onTap,
+          title: Text(subject.name),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(subject.code),
+              Text(subject.timeSchedule),
+              Text(subject.daySchedule),
+            ],
+          ),
+          trailing: Icon(Icons.arrow_forward_ios),
+        ),
+      ),
     );
   }
 }

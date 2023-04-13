@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -92,10 +94,9 @@ class MyApp extends StatelessWidget {
           // ),
           // darkTheme: ThemeData.dark(),
           theme: ThemeData(
-            primaryColor: const Color(0xFF044BD9),
             appBarTheme: AppBarTheme(
-              color: const Color(0xFF72B6F2),
-              iconTheme: const IconThemeData(
+              color: const Color(0xFFF5F6F9),
+              iconTheme: IconThemeData(
                 color: Colors.black,
               ),
               titleTextStyle: const TextStyle(
@@ -124,7 +125,7 @@ class MyApp extends StatelessWidget {
                 ),
             colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
                 .copyWith(background: const Color(0xFFF5F6F9))
-                .copyWith(secondary: const Color(0xFF05F2DB)),
+                .copyWith(secondary: Color.fromARGB(255, 0, 0, 0)),
           ),
 
           themeMode: settingsController.themeMode,
