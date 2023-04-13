@@ -1,3 +1,4 @@
+import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/services/DTO/add_attendance.dart';
 import 'package:samids_web_app/src/services/http.services.dart';
 import 'package:http/http.dart' as http;
@@ -19,12 +20,12 @@ class AttendanceService {
     DateTime? date,
     String? room,
     int? studentNo,
-    String? remarks,
+    Remarks? remarks,
   }) async {
-    Map<String, String>? query = {};
-    if (date != null) query['date'] = date.toIso8601String();
+    Map<String, dynamic>? query = {};
+    if (date != null) query['date'] = date;
     if (room != null) query['room'] = room;
-    if (studentNo != null) query['studentNo'] = studentNo.toString();
+    if (studentNo != null) query['studentNo'] = studentNo;
     if (remarks != null) query['remarks'] = remarks;
 
     return await HttpService.get(_baseUrl, query: query);
