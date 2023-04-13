@@ -391,17 +391,17 @@ class _StudentDashboardState extends State<StudentDashboard> {
         title: "Overview",
         child: Row(
           children: [
-            circularData(11, 'Absent', Colors.red, 32),
-            circularData(05, 'Cutting', Colors.yellow, 32),
-            circularData(04, 'On-Time', Colors.green, 32),
-            circularData(35, 'Late', Colors.orange, 32),
+            circularData(11.0, 'Absent', Colors.red, 32.0),
+            circularData(05.0, 'Cutting', Colors.yellow, 32.0),
+            circularData(04.0, 'On-Time', Colors.green, 32.0),
+            circularData(35.0, 'Late', Color.fromRGBO(255, 152, 0, 1), 32.0),
           ],
         ));
 
     // sampleData: sampleDataAct,
   }
 
-  Widget circularData(value, description, color, [radius = 40]) {
+  Widget circularData(value, description, color, [radius = 40.0]) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Flexible(
