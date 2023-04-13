@@ -24,16 +24,16 @@ class Student {
 
   static Student fromJson(Map<String, dynamic> json) {
     return Student(
-      studentID: json['StudentID'],
-      studentNo: json['StudentNo'],
-      rfid: json['Rfid'],
-      lastName: json['LastName'],
-      firstName: json['FirstName'],
-      course: json['Course'],
-      year: yearValues.map[json['Year']]!,
-      subjects: json['Subjects'] != null
+      studentID: json['studentid'],
+      studentNo: json['studentno'],
+      rfid: json['rfid'],
+      lastName: json['lastname'],
+      firstName: json['firstname'],
+      course: json['course'],
+      year: yearValues.map[json['year'].toLowerCase()]!,
+      subjects: json['subjects'] != null
           ? List<Subject>.from(
-              json['Subjects'].map((x) => Subject.fromJson(x)),
+              json['subjects'].map((x) => Subject.fromJson(x)),
             )
           : null,
     );
@@ -41,15 +41,15 @@ class Student {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['StudentID'] = studentID;
-    data['StudentNo'] = studentNo;
-    data['Rfid'] = rfid;
-    data['LastName'] = lastName;
-    data['FirstName'] = firstName;
-    data['Course'] = course;
-    data['Year'] = yearValues.reverse[year];
+    data['studentid'] = studentID;
+    data['studentno'] = studentNo;
+    data['rfid'] = rfid;
+    data['lastname'] = lastName;
+    data['firstname'] = firstName;
+    data['course'] = course;
+    data['year'] = yearValues.reverse[year]!.toString().toLowerCase();
     if (subjects != null) {
-      data['Subjects'] = subjects!.map((x) => x.toJson()).toList();
+      data['subjects'] = subjects!.map((x) => x.toJson()).toList();
     }
     return data;
   }
@@ -58,9 +58,8 @@ class Student {
 enum Year { first, second, third, fourth }
 
 final yearValues = EnumValues({
-  'First': Year.first,
-  'Second': Year.second,
-  'Third': Year.third,
-  'Fourth': Year.fourth
+  'first': Year.first,
+  'second': Year.second,
+  'third': Year.third,
+  'fourth': Year.fourth
 });
-
