@@ -3,32 +3,22 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
+#include <ESP8266WiFi.h>
+#include <Ticker.h>
+#include <AsyncMqtt_Generic.h>
 
-#include <Arduino.h>
-#include <WiFi.h>
+String deviceNumber = String("101");
+String deviceId = String(deviceNumber + "_RFID");
 
-String deviceId = String("101_RFID");
-const char *PubTopic1 = String("mqtt/RFID/json/" + deviceId).c_str(); // for JSON DATA
-const char *SubTopic = String("mqtt/RFID/response/" + deviceId).c_str(); // for image data buffer base64 string
+String topictemp = String("mqtt/RFID/attendance/" + deviceNumber); // publish to be read by deviceCAM
+String subtopictemp = String("mqtt/API/response/" + deviceId); // from the API
 
-extern "C"
-{
-#include "freertos/FreeRTOS.h"
-#include "freertos/timers.h"
-}
-#define ASYNC_TCP_SSL_ENABLED true
-#include <AsyncMQTT_ESP32.h>
 
-String deviceId = String("101_CAM");
-const char *PubTopic1 = String("mqtt/RFID/json/" + deviceId).c_str(); // for JSON DATA
-const char *SubTopic = String("mqtt/RFID/response/" + deviceId).c_str(); // for image data buffer base64 string
+#define MQTT_SECURE true
 
-#if ASYNC_TCP_SSL_ENABLED
-  #define MQTT_SECURE true
+const char *PubTopic = topictemp.c_str();
+const char *SubTopic = subtopictemp.c_str();
 
-  const char *PubTopic1 = topictemp1.c_str();
-  const char *SubTopic = subtopictemp.c_str();
-#endif
 
 constexpr uint8_t RST_PIN = D3;     // Configurable, see typical pin layout above
 constexpr uint8_t SS_PIN = D4;     // Configurable, see typical pin layout above
@@ -38,8 +28,12 @@ MFRC522 rfid(SS_PIN, RST_PIN);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 AsyncMqttClient mqttClient;
-TimerHandle_t mqttReconnectTimer;
-TimerHandle_t wifiReconnectTimer;
+Ticker mqttReconnectTimer;
+
+WiFiEventHandler wifiConnectHandler;
+WiFiEventHandler wifiDisconnectHandler;
+
+Ticker wifiReconnectTimer;
 
 //-------------------------------------------------//
 
@@ -61,7 +55,7 @@ void sendDataPayload(){
 //-------------------------------------------------//
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Initialize LCD
   lcd.init();
@@ -70,12 +64,12 @@ void setup() {
   while (!Serial && millis() < 5000);
   delay(500);
 
-  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0,
-                                    reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
-  wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0,
-                                    reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
+  Serial.print("\nStarting FullyFeature_ESP8266 on ");
+  Serial.println(ARDUINO_BOARD);
+  Serial.println(ASYNC_MQTT_GENERIC_VERSION);
 
-  WiFi.onEvent(onWifiEvent);
+  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
+  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
@@ -83,24 +77,21 @@ void setup() {
   mqttClient.onUnsubscribe(onMqttUnsubscribe);
   mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
+  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
+
+  connectToWifi();
 
   mqttClient.setClientId(deviceId.c_str());
   Serial.print("Device ID: ");
   Serial.println(deviceId);
 
   mqttClient.setKeepAlive(30);
-  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
-#if ASYNC_TCP_SSL_ENABLED
-  mqttClient.setSecure(MQTT_SECURE);
   if(MQTT_SECURE){
     mqttClient.setCredentials(UNAME, PASS);
   }
-  
 
-#endif
-
-  connectToWifi(WIFI_SSID, WIFI_PASSWORD);
+  connectToWifi();
 
   // Initialize RFID
   SPI.begin();
@@ -108,7 +99,7 @@ void setup() {
 
   Serial.println("ESP8226 now has started!!");
   setLCD("Device Ready!", 0, 0, true);
-  delay(1000);
+  delay(2000);
 }
 
 String tag;
@@ -124,7 +115,6 @@ void loop() {
     {
       prev_ms = millis();
       Serial.println("No Message");
-      mqttClient.publish("mqtt/IDLE/test", "No Message");
     }
   }
 }
@@ -159,28 +149,26 @@ bool RFID_Scanner(){
 
 void connectToWifi(){
   Serial.print("Connectiog to ");
-  setLCD("Connectiog to ", 0, 0, true);
-  setLCD(" Wifi ", 1, 0, true);
+  setLCD("Connecting to ", 0, 0, true);
+  setLCD(" Wifi ", 0, 1, false);
  
-  status = WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   delay(1000);
   Serial.println(WIFI_SSID);
-  while (status != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
-    // Connect to WPA/WPA2 network
-    status = WiFi.status();
   }
 
   Serial.println("Wifi Connected!!");
-  Serial.println(WIFI_WEBSERVER_VERSION);
-  // print the received signal strength:
-  int32_t rssi = WiFi.RSSI();
-  Serial.print(F(", Signal strength (RSSI):"));
-  Serial.print(rssi);
-  Serial.println(F(" dBm"));
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  // Serial.println(WIFI_WEBSERVER_VERSION);
+  // // print the received signal strength:
+  // int32_t rssi = WiFi.RSSI();
+  // Serial.print(F(", Signal strength (RSSI):"));
+  // Serial.print(rssi);
+  // Serial.println(F(" dBm"));
+  // Serial.print("IP address: ");
+  // Serial.println(WiFi.localIP());
 }
 
 void printSeparationLine()
@@ -188,34 +176,119 @@ void printSeparationLine()
   Serial.println("************************************************");
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message received: ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
+void connectToMqtt()
+{
+  Serial.println("Connecting to MQTT...");
+
+  mqttClient.connect();
 }
 
-void mqttconnect() {
-  Serial.print("Attempting host connection...");
-  while (!client.connect(MQTT_HOST, MQTT_PORT)) {
-    Serial.print(".");
-    delay(1000);
-    
-  }
+void onWifiConnect(const WiFiEventStationModeGotIP& event)
+{   
+  (void) event;
 
-  Serial.println("\nHost Connected!");
+  Serial.print("Connected to Wi-Fi. IP address: ");
+  Serial.println(WiFi.localIP());
+  connectToMqtt();
+}
 
-  // initialize mqtt client
-  mqttClient.begin(client);
-  Serial.print("Connecting to mqtt broker...");
-  while (!mqttClient.connect(deviceId.c_str(), UNAME, PASS)) {
-    Serial.print(".");
-    delay(1000);
-  }
-  Serial.println(" connected!");
+
+void onWifiDisconnect(const WiFiEventStationModeDisconnected& event)
+{
+  (void) event;
+
+  Serial.println("Disconnected from Wi-Fi.");
+  mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
+  wifiReconnectTimer.once(2, connectToWifi);
+}
+
+
+void onMqttConnect(bool sessionPresent)
+{
+  Serial.print("Connected to MQTT broker: ");
+  Serial.print(MQTT_HOST);
+  Serial.print(", port: ");
+  Serial.println(MQTT_PORT);
+  Serial.print("PubTopic: ");
+  Serial.println(PubTopic);
 
   printSeparationLine();
+  Serial.print("Session present: ");
+  Serial.println(sessionPresent);
+
+  uint16_t packetIdSub = mqttClient.subscribe(PubTopic, 2);
+  Serial.print("Subscribing at QoS 2, packetId: ");
+  Serial.println(packetIdSub);
+
+  mqttClient.publish(PubTopic, 0, true, "ESP8266 Test1");
+  Serial.println("Publishing at QoS 0");
+
+  uint16_t packetIdPub1 = mqttClient.publish(PubTopic, 1, true, "ESP8266 Test2");
+  Serial.print("Publishing at QoS 1, packetId: ");
+  Serial.println(packetIdPub1);
+
+  uint16_t packetIdPub2 = mqttClient.publish(PubTopic, 2, true, "ESP8266 Test3");
+  Serial.print("Publishing at QoS 2, packetId: ");
+  Serial.println(packetIdPub2);
+
+  printSeparationLine();
+}
+
+void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
+{
+  (void) reason;
+
+  Serial.println("Disconnected from MQTT.");
+
+  if (WiFi.isConnected())
+  {
+    mqttReconnectTimer.once(2, connectToMqtt);
+  }
+}
+
+void onMqttSubscribe(const uint16_t& packetId, const uint8_t& qos)
+{
+  Serial.println("Subscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+  Serial.print("  qos: ");
+  Serial.println(qos);
+}
+
+void onMqttUnsubscribe(const uint16_t& packetId)
+{
+  Serial.println("Unsubscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+}
+
+void onMqttMessage(char* topic, char* payload, const AsyncMqttClientMessageProperties& properties,
+                   const size_t& len, const size_t& index, const size_t& total)
+{
+  (void) payload;
+
+  Serial.println("Publish received.");
+  Serial.print("  topic: ");
+  Serial.println(topic);
+  Serial.print("  qos: ");
+  Serial.println(properties.qos);
+  Serial.print("  dup: ");
+  Serial.println(properties.dup);
+  Serial.print("  retain: ");
+  Serial.println(properties.retain);
+  Serial.print("  len: ");
+  Serial.println(len);
+  Serial.print("  index: ");
+  Serial.println(index);
+  Serial.print("  total: ");
+  Serial.println(total);
+}
+
+void onMqttPublish(const uint16_t& packetId)
+{
+  Serial.println("Publish acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
 }
 
 void setLCD(const char* tmp, int c1, int c2, bool clf){
