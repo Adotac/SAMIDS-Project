@@ -8,12 +8,20 @@ import 'package:samids_web_app/src/services/DTO/register_user.dart';
 import 'package:samids_web_app/src/services/http.services.dart';
 
 class AuthService {
-  static const String _baseUrl = 'https://localhost:7170/api/auth';
+  static const String _baseUrl = 'https://localhost:7170/api/Auth';
 
   static Future<CRUDReturn> login(UserDto credentials) async {
-    final response = await HttpService.post('$_baseUrl/login', body: credentials.toJson());
+    try{
+      final response = await HttpService.post('$_baseUrl/login', body: credentials.toJson(), headers: {"Content-Type": "application/json"});
     final jsonResponse = jsonDecode(response.body);
+    print(jsonResponse);
     return CRUDReturn.fromJson(jsonResponse);
+    
+    }catch(error){
+      print(error);
+      return CRUDReturn(success: false, data: error);
+    }
+    
   }
 
   static Future<CRUDReturn> register(UserRegisterDto credentials) async {

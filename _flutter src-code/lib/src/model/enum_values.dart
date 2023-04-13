@@ -1,12 +1,12 @@
 class EnumValues<T> {
-  late Map<String, T> map;
-  late Map<T, String> reverseMap;
+  late Map<int, T> map;
+  late Map<T, int> reverseMap;
 
   EnumValues(this.map) {
     reverseMap = map.map((k, v) => MapEntry(v, k));
   }
 
-  Map<T, String> get reverse {
+  Map<T, int> get reverse {
     return reverseMap;
   }
 }

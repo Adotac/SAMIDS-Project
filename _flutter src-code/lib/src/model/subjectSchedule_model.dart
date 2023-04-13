@@ -46,11 +46,11 @@ class SubjectSchedule {
 enum DayOfWeek { monday, tuesday, wednesday, thursday, friday, saturday, sunday }
 
 final dayOfWeekValues = EnumValues({
-  'Monday': DayOfWeek.monday,
-  'Tuesday': DayOfWeek.tuesday,
-  'Wednesday': DayOfWeek.wednesday,
-  'Thursday': DayOfWeek.thursday,
-  'Friday': DayOfWeek.friday,
-  'Saturday': DayOfWeek.saturday,
-  'Sunday': DayOfWeek.sunday
+  0: DayOfWeek.monday,
+  1: DayOfWeek.tuesday,
+  2: DayOfWeek.wednesday,
+  3: DayOfWeek.thursday,
+  4: DayOfWeek.friday,
+  5: DayOfWeek.saturday,
+  6: DayOfWeek.sunday
 });
