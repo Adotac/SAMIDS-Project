@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../../model/test_subject.model.dart';
+import '../../widgets/classes_tile_list.dart';
 import '../../widgets/mobile_view.dart';
 
 class StudentClasses extends StatelessWidget {
   static const routeName = '/student-classes';
-  const StudentClasses({Key? key}) : super(key: key);
+  StudentClasses({Key? key}) : super(key: key);
+  final List<Subject> subjects = [
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'MWF',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+    // Add more subjects here
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +30,7 @@ class StudentClasses extends StatelessWidget {
           userName: "",
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 1,
-                  child: dataTableClasses(context)),
-            ),
+            child: _buildClasses(context),
           ),
         );
       } else {
@@ -45,7 +51,11 @@ class StudentClasses extends StatelessWidget {
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: dataTableClasses(context),
+                child: Text(
+                  'Total Units: 18',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                //  _buildClasses(context),
               ),
             ],
           ),
@@ -54,47 +64,62 @@ class StudentClasses extends StatelessWidget {
     });
   }
 
-  Widget dataTableClasses(context) {
-    return SizedBox(
-      child: DataTable(
-        dividerThickness: 1,
-        columns: const [
-          DataColumn(
-            label: Text(
-              'Time',
-              style: TextStyle(fontStyle: FontStyle.italic),
+  void showSubjectDetails(BuildContext context, Subject subject) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(subject.name),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text('Subject Code: ${subject.code}'),
+                Text('Subject Description: ${subject.desc}'),
+                Text('Schedule Time: ${subject.timeSchedule}'),
+                Text('Schedule Day: ${subject.daySchedule}'),
+                Text('Subject Teacher: ${subject.teacher}'),
+                Text('Subject Room: ${subject.room}'),
+              ],
             ),
           ),
-          DataColumn(
-            label: Text(
-              'Subject',
-              style: TextStyle(fontStyle: FontStyle.italic),
+          actions: [
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-          ),
-          DataColumn(
-            label: Text(
-              'Subject Code',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Days',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ],
-        rows: [for (int i = 0; i < 10; i++) classesSampleDataRow(context)],
-      ),
+          ],
+        );
+      },
     );
   }
 
-  DataRow classesSampleDataRow(context) {
-    return DataRow(cells: <DataCell>[
-      DataCell(Text('08:00 AM - 10:00 AM')),
-      DataCell(Text('Computer Programming')),
-      DataCell(Text('CP101')),
-      DataCell(Text('MWF')),
-    ]);
+  Widget _buildClasses(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: subjects.length,
+      itemBuilder: (BuildContext context, int index) {
+        return ClassesListTile(
+          subject: subjects[index],
+          onTap: () => showSubjectDetails(context, subjects[index]),
+        );
+      },
+    );
   }
+
+  // Widget _buildClasses(BuildContext context) {
+  //   return Expanded(
+  //     child: ListView.builder(
+  //       itemCount: subjects.length,
+  //       itemBuilder: (BuildContext context, int index) {
+  //         return ClassesListTile(
+  //           subject: subjects[index],
+  //           onTap: () => showSubjectDetails(context, subjects[index]),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 }

@@ -110,8 +110,7 @@ class MyApp extends StatelessWidget {
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case StudentClasses.routeName:
-                return MaterialPageRoute(
-                    builder: (_) => const StudentClasses());
+                return MaterialPageRoute(builder: (_) => StudentClasses());
               default:
                 return MaterialPageRoute(builder: (_) => const PageNotFound());
             }
