@@ -8,12 +8,7 @@ class StudentController extends ChangeNotifier {
   static void initialize() =>
       GetIt.instance.registerSingleton<StudentController>(StudentController());
 
-  List<Student> _students = [
-    Student(name: 'John Doe', age: 20),
-    Student(name: 'Jane Doe', age: 21),
-    Student(name: 'Bob Smith', age: 22),
-  ];
-
+  final List<Student> _students = [];
   List<Student> get students => _students;
 
   void addStudent(Student student) {

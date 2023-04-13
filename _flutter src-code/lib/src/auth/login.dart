@@ -329,7 +329,7 @@ class LoginScreen extends StatelessWidget {
                 const TextField(
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    hintText: 'Enter your email',
+                    hintText: 'Enter your username',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -352,7 +352,7 @@ class LoginScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/attendance-dashboard');
+                      Navigator.pushNamed(context, '/student-dashboard');
                     },
                     child: const Text("Continue"),
                   ),

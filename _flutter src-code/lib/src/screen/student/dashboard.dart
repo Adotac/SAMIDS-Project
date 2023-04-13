@@ -1,12 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/controllers/student_dashboard_controller.dart';
 import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
+import '../../controllers/student.controller.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
@@ -18,13 +20,21 @@ import 'package:intl/intl.dart';
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
   static const routeName = '/student-dashboard';
-  const StudentDashboard({super.key});
+  StudentDashboardController sdController = StudentDashboardController.instance;
+  StudentDashboard({super.key});
 
   @override
   State<StudentDashboard> createState() => _StudentDashboardState();
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
+  // add on init
+  @override
+  void initState() {
+    widget.sdController.getAttendance();
+    super.initState();
+  }
+
   Widget sampleDataAct = const ListTile(
     leading: Text("02:12pm"),
     title: Text("10023 - Programming 1"),
