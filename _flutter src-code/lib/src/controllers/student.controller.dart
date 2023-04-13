@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-class Student {
-  final String name;
-  final int age;
-
-  Student({required this.name, required this.age});
-}
 
 class StudentController extends ChangeNotifier {
   static StudentController get instance => GetIt.instance<StudentController>();

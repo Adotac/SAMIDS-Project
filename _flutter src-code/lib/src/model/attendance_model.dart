@@ -61,8 +61,8 @@ class Attendance {
 
 }
 final remarksValues = EnumValues({
-  'OnTime': Remarks.onTime,
-  'Late': Remarks.late,
-  'Cutting': Remarks.cutting,
-  'Absent': Remarks.absent
+  0: Remarks.onTime,
+  1: Remarks.late,
+  2: Remarks.cutting,
+  3: Remarks.absent
 });

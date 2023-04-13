@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/controllers/auth.controller.dart';
+import 'package:samids_web_app/src/controllers/student.controller.dart';
+import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
+import 'package:samids_web_app/src/services/DTO/login_user.dart';
 
 import '../widgets/responsive_builder.dart';
 
 class LoginScreen extends StatelessWidget {
+  late final TextEditingController _usernameController = TextEditingController();
+  late final TextEditingController _passwordController = TextEditingController();
   LoginScreen({Key? key});
 
   static const routeName = '/login';
+
 
   final Widget backgroundImage = Expanded(
     child: Image.asset(
@@ -229,18 +236,20 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(10),
                     child: TextField(
+                      controller: _usernameController,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Username',
                           hintText: 'Enter your username'),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(10),
                     child: TextField(
+                      controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
@@ -259,9 +268,18 @@ class LoginScreen extends StatelessWidget {
                       style: TextButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white),
-                      onPressed: () {
+                      onPressed: () async{
+
+                        print("${_usernameController.text} ${_passwordController.text}");
+                        var success = await AuthController.instance.login(_usernameController.text, _passwordController.text);
+                        print(success);
+                        if(success){
+                          
+                          StudentDashboardController.initialize(AuthController.instance.loggedInUser!.student as Student);                        
                         Navigator.pushNamed(
                             context, StudentDashboard.routeName);
+                        }
+                        
                       },
                       child: const Text("Continue"),
                     ),

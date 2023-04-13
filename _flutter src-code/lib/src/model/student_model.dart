@@ -24,16 +24,16 @@ class Student {
 
   static Student fromJson(Map<String, dynamic> json) {
     return Student(
-      studentID: json['StudentID'],
-      studentNo: json['StudentNo'],
-      rfid: json['Rfid'],
-      lastName: json['LastName'],
-      firstName: json['FirstName'],
-      course: json['Course'],
-      year: yearValues.map[json['Year']]!,
-      subjects: json['Subjects'] != null
+      studentID: json['studentID'],
+      studentNo: json['studentNo'],
+      rfid: json['rfid'],
+      lastName: json['lastName'],
+      firstName: json['firstName'],
+      course: json['course'],
+      year: yearValues.map[json['year'].toString()] ?? Year.first,
+      subjects: json['subjects'] != null
           ? List<Subject>.from(
-              json['Subjects'].map((x) => Subject.fromJson(x)),
+              json['subjects'].map((x) => Subject.fromJson(x)),
             )
           : null,
     );
@@ -41,15 +41,15 @@ class Student {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['StudentID'] = studentID;
-    data['StudentNo'] = studentNo;
-    data['Rfid'] = rfid;
-    data['LastName'] = lastName;
-    data['FirstName'] = firstName;
-    data['Course'] = course;
-    data['Year'] = yearValues.reverse[year];
+    data['studentID'] = studentID;
+    data['studentNo'] = studentNo;
+    data['rfid'] = rfid;
+    data['lastName'] = lastName;
+    data['firstName'] = firstName;
+    data['course'] = course;
+    data['year'] = yearValues.reverse[year];
     if (subjects != null) {
-      data['Subjects'] = subjects!.map((x) => x.toJson()).toList();
+      data['subjects'] = subjects!.map((x) => x.toJson()).toList();
     }
     return data;
   }
@@ -58,9 +58,9 @@ class Student {
 enum Year { first, second, third, fourth }
 
 final yearValues = EnumValues({
-  'First': Year.first,
-  'Second': Year.second,
-  'Third': Year.third,
-  'Fourth': Year.fourth
+  0: Year.first,
+  1: Year.second,
+  2: Year.third,
+  3: Year.fourth
 });
 

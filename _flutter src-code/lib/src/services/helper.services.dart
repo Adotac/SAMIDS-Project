@@ -11,6 +11,16 @@ class EnumValues<T> {
   }
 }
 
+//Remarks Helper
+enum Remarks
+    {
+        OnTime, // 0
+        Late, // 1
+        Cutting, // 2
+        Absent // 3
+
+    }
+
 //Year Helper
 Year yearFromJson(String year) {
   switch (year) {

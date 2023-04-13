@@ -31,17 +31,17 @@ class User {
 
   static User fromJson(Map<String, dynamic> json) {
     return User(
-      userId: json['UserId'],
+      userId: json['userId'],
       student:
-          json['Student'] != null ? Student.fromJson(json['Student']) : null,
-      firstName: json['FirstName'],
-      lastName: json['LastName'],
-      email: json['Email'],
-      passwordHash: base64.decode(json['PasswordHash']),
-      passwordSalt: base64.decode(json['PasswordSalt']),
-      type: typesValues.map[json['Type']]!,
-      schoolYear: json['SchoolYear'],
-      deleted: json['Deleted'],
+          json['student'] != null ? Student.fromJson(json['student']) : null,
+      firstName: json['firstName'],
+      lastName: json['lastName'],
+      email: json['email'],
+      passwordHash: base64.decode(json['passwordHash']),
+      passwordSalt: base64.decode(json['passwordSalt']),
+      type: typesValues.map[json['type']]!,
+      schoolYear: json['schoolYear'],
+      deleted: json['deleted'],
     );
   }
 
@@ -59,10 +59,12 @@ class User {
     data['Deleted'] = deleted;
     return data;
   }
+
+  get studentNo => student!.studentNo;
 }
 
 
 
 enum Types { student, faculty }
 
-final typesValues = EnumValues({'Student': Types.student, 'Faculty': Types.faculty});
+final typesValues = EnumValues({0: Types.student, 1: Types.faculty});
