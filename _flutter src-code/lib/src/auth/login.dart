@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student.controller.dart';
 import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/services/DTO/login_user.dart';
 
+import '../model/student_model.dart';
 import '../widgets/responsive_builder.dart';
 
-class LoginScreen extends StatelessWidget {
-  late final TextEditingController _usernameController = TextEditingController();
-  late final TextEditingController _passwordController = TextEditingController();
+class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key});
 
   static const routeName = '/login';
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  late final TextEditingController _usernameController;
+  late final TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    _usernameController = TextEditingController();
+    _usernameController.text = '2019020654';
+
+    _passwordController = TextEditingController();
+    _passwordController.text = 'test123';
+    super.initState();
+  }
 
   final Widget backgroundImage = Expanded(
     child: Image.asset(
@@ -48,6 +63,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
+  //add on init
   Future<void> _showResetPasswordDialog(BuildContext context) async {
     String email = '';
 
@@ -71,7 +87,7 @@ class LoginScreen extends StatelessWidget {
               },
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'Enter your email',
+                hintText: 'Username',
               ),
             ),
           ],
@@ -245,7 +261,7 @@ class LoginScreen extends StatelessWidget {
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Username',
-                          hintText: 'Enter your username'),
+                          hintText: 'Username'),
                     ),
                   ),
                   Padding(
@@ -270,18 +286,8 @@ class LoginScreen extends StatelessWidget {
                       style: TextButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white),
-                      onPressed: () async{
-
-                        print("${_usernameController.text} ${_passwordController.text}");
-                        var success = await AuthController.instance.login(_usernameController.text, _passwordController.text);
-                        print(success);
-                        if(success){
-                          
-                          StudentDashboardController.initialize(AuthController.instance.loggedInUser!.student as Student);                        
-                        Navigator.pushNamed(
-                            context, StudentDashboard.routeName);
-                        }
-                        
+                      onPressed: () async {
+                        await _onLogin(context);
                       },
                       child: const Text("Continue"),
                     ),
@@ -300,6 +306,48 @@ class LoginScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _onLogin(BuildContext context) async {
+    try {
+      var success = await AuthController.instance
+          .login(_usernameController.text, _passwordController.text);
+      if (success) {
+        StudentDashboardController.initialize(
+            AuthController.instance.loggedInUser!.student as Student);
+
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          Navigator.pushNamed(context, StudentDashboard.routeName);
+        });
+      } else {
+        if (!mounted) return;
+
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Error'),
+            content: Row(
+              children: const [
+                Icon(Icons.error, color: Colors.red),
+                SizedBox(width: 8),
+                Expanded(child: Text('Invalid username or password')),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _passwordController.clear();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Widget loginForumFieldMobile(BuildContext context) {
@@ -326,9 +374,10 @@ class LoginScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Email',
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
                     hintText: 'Enter your username',
                     border: OutlineInputBorder(),
                   ),
@@ -336,9 +385,10 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                const TextField(
+                TextField(
+                  controller: _passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
                     border: OutlineInputBorder(),
@@ -351,8 +401,8 @@ class LoginScreen extends StatelessWidget {
                   height: 50,
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/student-dashboard');
+                    onPressed: () async {
+                      await _onLogin(context);
                     },
                     child: const Text("Continue"),
                   ),

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
-import 'package:samids_web_app/src/controllers/student.controller.dart';
 
-import 'package:samids_web_app/src/screen/my_app.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
 import 'package:samids_web_app/src/screen/student/attendance.dart';
@@ -103,10 +101,7 @@ class MyApp extends StatelessWidget {
               case StudentDashboard.routeName:
                 return MaterialPageRoute(builder: (_) => StudentDashboard());
               case StudentAttendance.routeName:
-                return MaterialPageRoute(
-                    builder: (_) => StudentAttendance(
-                          studentController: StudentController.instance,
-                        ));
+                return MaterialPageRoute(builder: (_) => StudentAttendance());
               case SettingsPage.routeName:
                 return MaterialPageRoute(builder: (_) => SettingsPage());
               case LoginScreen.routeName:

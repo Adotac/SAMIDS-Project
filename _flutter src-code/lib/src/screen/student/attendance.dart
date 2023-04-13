@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student.controller.dart';
+
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:samids_web_app/src/widgets/mobile_view.dart';
@@ -11,10 +11,11 @@ import '../../widgets/side_menu.dart';
 
 class StudentAttendance extends StatelessWidget {
   final _textEditingController = TextEditingController();
-  StudentAttendance({super.key, required this.studentController});
+  StudentAttendance({
+    super.key,
+  });
   static const routeName = '/student-attendance';
 
-  final StudentController studentController;
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
   }

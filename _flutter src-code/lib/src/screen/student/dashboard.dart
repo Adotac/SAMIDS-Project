@@ -1,14 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard_controller.dart';
+
 import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
-import '../../controllers/student.controller.dart';
+import '../../controllers/student_dashboard.controller.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';

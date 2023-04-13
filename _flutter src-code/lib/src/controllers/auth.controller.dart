@@ -1,17 +1,18 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
 import 'package:samids_web_app/src/model/user_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/DTO/login_user.dart';
 import 'package:samids_web_app/src/services/DTO/register_user.dart';
 import 'package:samids_web_app/src/services/auth.services.dart';
 
-
 class AuthController with ChangeNotifier {
   bool isLoggedIn = false;
   User? loggedInUser;
-
+  final Logger _logger = Logger();
   static void initialize() =>
       GetIt.instance.registerSingleton<AuthController>(AuthController());
 
@@ -21,7 +22,8 @@ class AuthController with ChangeNotifier {
   Future<bool> login(String username, String password) async {
     try {
       print("Im here now");
-      var credentials = UserDto.fromJson({'Username':username,'Password':password}); 
+      var credentials =
+          UserDto.fromJson({'Username': username, 'Password': password});
       CRUDReturn result = await AuthService.login(credentials);
       if (result.success) {
         isLoggedIn = true;
@@ -29,10 +31,11 @@ class AuthController with ChangeNotifier {
         notifyListeners();
         return true;
       } else {
+        print('Login failed');
         return false;
       }
-    } catch (e,st) {
-      print("$e and $st"); 
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' getStudentById $e $stacktrace');
       return false;
     }
   }
