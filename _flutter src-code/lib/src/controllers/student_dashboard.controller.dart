@@ -24,6 +24,7 @@ class StudentDashboardController with ChangeNotifier {
 
   Future<List<Attendance>> getAttendance() async {
     try {
+      print('gi call ko ');
       CRUDReturn response = await AttendanceService.getAll(
           studentNo: student.studentNo, date: DateTime.now());
       if (response.success) {

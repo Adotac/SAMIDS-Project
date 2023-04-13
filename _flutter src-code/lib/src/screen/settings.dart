@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
+import '../model/student_model.dart';
 import '../widgets/mobile_view.dart';
 
 class SettingsPage extends StatelessWidget {
   static const routeName = '/settings';
-
-  SettingsPage({Key? key}) : super(key: key);
+  final StudentDashboardController sdController;
+  const SettingsPage({
+    Key? key,
+    required this.sdController,
+  }) : super(key: key);
 
   Widget _buildUserInformation(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: StudentInfoCard(),
+      child: StudentInfoCard(
+        student: sdController.student,
+      ),
     );
   }
 

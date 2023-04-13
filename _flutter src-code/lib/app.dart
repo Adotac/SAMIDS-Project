@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
@@ -58,38 +59,74 @@ class MyApp extends StatelessWidget {
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
+          // theme: ThemeData(
+          //   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          //     backgroundColor: const Color(0xFFF5F6F9),
+          //     selectedItemColor: Colors.black,
+          //     // unselectedItemColor: Colors.grey[400],
+          //     elevation: 0.0,
+          //   ),
+          //   appBarTheme: ThemeData().appBarTheme.copyWith(
+          //         color: const Color(0xFFF5F6F9),
+          //         iconTheme: const IconThemeData(
+          //           color: Colors.black,
+          //         ),
+          //         titleTextStyle: const TextStyle(
+          //           color: Colors.black,
+          //           fontSize: 20,
+          //           fontWeight: FontWeight.bold,
+          //         ),
+          //         elevation: 0.1,
+          //       ),
+          //   scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+          //   cardTheme: const CardTheme(
+          //     margin: EdgeInsets.all(6),
+          //     elevation: 0.2,
+          //   ),
+          //   fontFamily: GoogleFonts.inter().fontFamily,
+          //   textTheme: const TextTheme(
+          //     titleLarge: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
+          // ),
+          // darkTheme: ThemeData.dark(),
           theme: ThemeData(
+            primaryColor: const Color(0xFF044BD9),
+            appBarTheme: AppBarTheme(
+              color: const Color(0xFF72B6F2),
+              iconTheme: const IconThemeData(
+                color: Colors.black,
+              ),
+              titleTextStyle: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              elevation: 0.1,
+            ),
             bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: const Color(0xFFF5F6F9),
+              backgroundColor: Color(0xFFF5F6F9),
               selectedItemColor: Colors.black,
-              // unselectedItemColor: Colors.grey[400],
               elevation: 0.0,
             ),
-            appBarTheme: ThemeData().appBarTheme.copyWith(
-                  color: const Color(0xFFF5F6F9),
-                  iconTheme: const IconThemeData(
-                    color: Colors.black,
-                  ),
-                  titleTextStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  elevation: 0.1,
-                ),
             scaffoldBackgroundColor: const Color(0xFFF5F6F9),
             cardTheme: const CardTheme(
               margin: EdgeInsets.all(6),
               elevation: 0.2,
             ),
             fontFamily: GoogleFonts.inter().fontFamily,
-            textTheme: const TextTheme(
-              titleLarge: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            textTheme: ThemeData.light().textTheme.copyWith(
+                  titleLarge: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF0D0D0D),
+                  ),
+                ),
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+                .copyWith(background: const Color(0xFFF5F6F9))
+                .copyWith(secondary: const Color(0xFF05F2DB)),
           ),
-          // darkTheme: ThemeData.dark(),
+
           themeMode: settingsController.themeMode,
           initialRoute: LoginScreen.routeName,
           home: LoginScreen(),
@@ -103,7 +140,10 @@ class MyApp extends StatelessWidget {
               case StudentAttendance.routeName:
                 return MaterialPageRoute(builder: (_) => StudentAttendance());
               case SettingsPage.routeName:
-                return MaterialPageRoute(builder: (_) => SettingsPage());
+                return MaterialPageRoute(
+                    builder: (_) => SettingsPage(
+                          sdController: StudentDashboardController.instance,
+                        ));
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case StudentClasses.routeName:

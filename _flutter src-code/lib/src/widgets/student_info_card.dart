@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/model/student_model.dart';
 import 'package:samids_web_app/src/widgets/card_small.dart';
 
+import '../controllers/auth.controller.dart';
+
 class StudentInfoCard extends StatelessWidget {
-  const StudentInfoCard({Key? key}) : super(key: key);
+  final currentUser = AuthController.instance;
+  final Student student;
+  StudentInfoCard({Key? key, required this.student}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +28,15 @@ class StudentInfoCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Martin Erickson Lapetaje",
-                    style: TextStyle(
+                  Text(
+                    '${student.firstName} ${student.lastName}',
+                    style: const TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
-                    "Bachelor of Science in Computer Science",
+                    student.course,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
@@ -41,7 +46,7 @@ class StudentInfoCard extends StatelessWidget {
                     height: 10,
                   ),
                   Text(
-                    "lapetajemartin@gmail.com",
+                    currentUser.loggedInUser?.email ?? 'No email',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w300,

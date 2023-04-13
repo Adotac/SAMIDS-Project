@@ -30,24 +30,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
-  final Widget backgroundImage = Expanded(
-    child: Image.asset(
-      fit: BoxFit.cover,
-      height: double.infinity,
-      width: double.infinity,
-      alignment: Alignment.center,
-      'assets/images/cloud_login_background.png',
-    ),
+  final Widget backgroundImage = Image.asset(
+    fit: BoxFit.cover,
+    height: double.infinity,
+    width: double.infinity,
+    alignment: Alignment.center,
+    'assets/images/cloud_login_background.png',
   );
 
-  final Widget backgroundImageMobile = Expanded(
-    child: Image.asset(
-      fit: BoxFit.cover,
-      height: double.infinity,
-      width: double.infinity,
-      alignment: const Alignment(.3, .1),
-      'assets/images/cloud_login_background.png',
-    ),
+  final Widget backgroundImageMobile = Image.asset(
+    fit: BoxFit.cover,
+    height: double.infinity,
+    width: double.infinity,
+    alignment: const Alignment(.3, .1),
+    'assets/images/cloud_login_background.png',
   );
 
   @override
@@ -321,7 +317,6 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       } else {
         if (!mounted) return;
-
         showDialog(
           context: context,
           builder: (_) => AlertDialog(

@@ -28,11 +28,14 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
+  StudentDashboardController get _sdController => widget.sdController;
   // add on init
   @override
   void initState() {
-    widget.sdController.getAttendance();
+    print('sdController.getAttendance');
+    _sdController.getAttendance();
     super.initState();
+    print('sdController.getAttendance');
   }
 
   Widget sampleDataAct = const ListTile(
@@ -72,7 +75,8 @@ class _StudentDashboardState extends State<StudentDashboard> {
     return MobileView(
       currentIndex: 0,
       appBarTitle: 'Dashboard',
-      userName: 'Martin Erickson Lapetaje',
+      userName:
+          '${_sdController.student.firstName} ${_sdController.student.lastName}',
       body: Column(
         children: [
           _mobileOverviewCard(2, 0),
@@ -105,7 +109,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    StudentInfoCard(),
+                    StudentInfoCard(student: _sdController.student),
                     SizedBox(height: 8),
                     Row(
                       children: [
@@ -116,10 +120,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(flex: 1, child: _recentLogsCard(context)),
-                        _myClassesCard(context)
-                      ],
+                      children: [_recentLogsCard(), _myClassesCard(context)],
                     ),
                     SizedBox(height: 8),
                   ],
@@ -304,8 +305,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
     // dataTableLogs(context));
   }
 
-  Widget _recentLogsCard([flexValue = 1]) {
+  Widget _recentLogsCard() {
     return CardSmall(
+      flexValue: 1,
       isShadow: false,
       title: "Recent Activity",
       child: Column(
@@ -325,27 +327,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
     // ));
     // dataTableLogs(context));
-  }
-
-  CardSmall _performanceCard(leadingFlex, [flexValue = 1]) {
-    return CardSmall(
-      flexValue: flexValue,
-      title: "Performance",
-      isShadow: true,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        // ignore: prefer_const_literals_to_create_immutables
-        children: [
-          DataNumber(
-              number: "Great!", description: "Rating", flex: leadingFlex),
-          DataNumber(number: "11%", description: "Late", flex: 1),
-          DataNumber(number: "5%", description: "Absent", flex: 1),
-          DataNumber(number: "4%", description: "Cutting", flex: 1),
-          DataNumber(number: "35%", description: "On-Time", flex: 1),
-        ],
-      ),
-      // sampleData: sampleDataActyiee,
-    );
   }
 
   Text getStatusText(String status) {
@@ -383,6 +364,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         children: [
           DataNumber(
               number: "55", description: "Total logs", flex: leadingFlex),
+          Spacer(),
           circularData(11, 'Absent', Colors.red),
           circularData(05, 'Cutting', Colors.yellow),
           circularData(04, 'On-Time', Colors.green),
@@ -414,22 +396,19 @@ class _StudentDashboardState extends State<StudentDashboard> {
   Widget circularData(value, description, color, [radius = 40.0]) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Flexible(
-        flex: 1,
-        child: Column(
-          children: [
-            CircularViewer(
-              value: value,
-              maxValue: 55,
-              radius: radius,
-              textStyle: TextStyle(fontSize: 20),
-              color: Color(0xffEEEEEE),
-              sliderColor: color,
-              unSelectedColor: Color.fromARGB(255, 255, 255, 255),
-            ),
-            Text(description),
-          ],
-        ),
+      child: Column(
+        children: [
+          CircularViewer(
+            value: value,
+            maxValue: 55,
+            radius: radius,
+            textStyle: TextStyle(fontSize: 20),
+            color: Color(0xffEEEEEE),
+            sliderColor: color,
+            unSelectedColor: Color.fromARGB(255, 255, 255, 255),
+          ),
+          Text(description),
+        ],
       ),
     );
   }
