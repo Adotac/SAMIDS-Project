@@ -179,7 +179,8 @@ void printSeparationLine()
 void connectToMqtt()
 {
   Serial.println("Connecting to MQTT...");
-
+  setLCD("Connecting to ", 0, 0, true);
+  setLCD(" Server ", 0, 1, false);
   mqttClient.connect();
 }
 
@@ -236,9 +237,11 @@ void onMqttConnect(bool sessionPresent)
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 {
-  (void) reason;
+  Serial.print("Free heap memory: ");
+  Serial.println(ESP.getFreeHeap());
 
-  Serial.println("Disconnected from MQTT.");
+  Serial.print("Disconnected from MQTT. Reason: ");
+  Serial.println(static_cast<int>(reason));
 
   if (WiFi.isConnected())
   {
