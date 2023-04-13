@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/screen/settings.dart';
 
 import '../screen/student/attendance.dart';
 import '../screen/student/dashboard.dart';
@@ -53,7 +54,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Dashboard',
             index: 0,
             onTap: () {
-              Navigator.pushNamed(context, StudentDashboard.routeName);
+              Navigator.popAndPushNamed(context, StudentDashboard.routeName);
             },
           ),
           _buildListTile(
@@ -61,7 +62,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Attendance',
             index: 1,
             onTap: () {
-              Navigator.pushNamed(context, StudentAttendance.routeName);
+              Navigator.popAndPushNamed(context, StudentAttendance.routeName);
             },
           ),
           _buildListTile(
@@ -69,7 +70,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Settings',
             index: 2,
             onTap: () {
-              // Navigate to Settings Page
+              Navigator.popAndPushNamed(context, SettingsPage.routeName);
             },
           ),
           Spacer(),
