@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
+import 'package:samids_web_app/src/controllers/student.controller.dart';
 import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/services/DTO/login_user.dart';
@@ -274,7 +275,7 @@ class LoginScreen extends StatelessWidget {
                         print(success);
                         if(success){
                           
-                          StudentDashboardController.initialize(AuthController.instance.loggedInUser!.studentNo);                        
+                          StudentDashboardController.initialize(AuthController.instance.loggedInUser!.student as Student);                        
                         Navigator.pushNamed(
                             context, StudentDashboard.routeName);
                         }

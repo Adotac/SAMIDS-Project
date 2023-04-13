@@ -23,7 +23,6 @@ class AuthController with ChangeNotifier {
       print("Im here now");
       var credentials = UserDto.fromJson({'Username':username,'Password':password}); 
       CRUDReturn result = await AuthService.login(credentials);
-      print("here ${result.data}");
       if (result.success) {
         isLoggedIn = true;
         loggedInUser = User.fromJson(result.data['user']);

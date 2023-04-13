@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/services/DTO/add_attendance.dart';
+import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/http.services.dart';
 import 'package:http/http.dart' as http;
 
 class AttendanceService {
-  final String _baseUrl = "https://localhost:7170/api";
+  static const  String _baseUrl = "https://localhost:7170/api";
 
-  Future<http.Response> getRemarksCount({int? studentNo, DateTime? date}) async {
+  static Future<http.Response> getRemarksCount({int? studentNo, DateTime? date}) async {
     Map<String, String>? query;
     if (studentNo != null && date != null) {
       query = {'studentNo': studentNo.toString(), 'date': date.toIso8601String()};
@@ -16,7 +19,7 @@ class AttendanceService {
     return await HttpService.get("$_baseUrl/GetRemarksCount", query: query);
   }
 
-  Future<http.Response> getAll({
+  static Future<CRUDReturn> getAll({
     DateTime? date,
     String? room,
     int? studentNo,
@@ -28,18 +31,20 @@ class AttendanceService {
     if (studentNo != null) query['studentNo'] = studentNo;
     if (remarks != null) query['remarks'] = remarks;
 
-    return await HttpService.get(_baseUrl, query: query);
+    final response = await HttpService.get(_baseUrl, query: query);
+    final jsonResponse = jsonDecode(response.body);
+    return CRUDReturn.fromJson(jsonResponse);
   }
 
-  Future<http.Response> getAllSA({required int studentId}) async {
+  static Future<http.Response> getAllSA({required int studentId}) async {
     return await HttpService.get("$_baseUrl/GetAllSA", query: {'studentId': studentId.toString()});
   }
 
-  Future<http.Response> getAllFA({required int facultyId}) async {
+  static Future<http.Response> getAllFA({required int facultyId}) async {
     return await HttpService.get("$_baseUrl/GetAllFA", query: {'facultyId': facultyId.toString()});
   }
 
-  Future<http.Response> addAttendance(AddAttendanceDto attendance) async {
+  static Future<http.Response> addAttendance(AddAttendanceDto attendance) async {
     return await HttpService.post(_baseUrl, body: attendance);
   }
 }
