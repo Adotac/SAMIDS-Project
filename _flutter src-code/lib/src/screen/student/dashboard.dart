@@ -77,19 +77,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
       animation: _sdController,
       builder: (context, child) {
         return MobileView(
-          currentIndex: 0,
-          appBarTitle: 'Dashboard',
-          userName:
-              '${_sdController.student.firstName} ${_sdController.student.lastName}',
-          body: _sdController.isCountCalculated
-              ? Column(
-                  children: [
-                    _mobileOverviewCard(2, 0),
-                    _mobileRecentLogsCard(0),
-                  ],
-                )
-              : Column(
-                  children: [
+            currentIndex: 0,
+            appBarTitle: 'Dashboard',
+            userName:
+                '${_sdController.student.firstName} ${_sdController.student.lastName}',
+            body: _sdController.isCountCalculated
+                ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard(0)]
+                : [
                     Spacer(),
                     Center(
                       child: CircularProgressIndicator(
@@ -99,9 +93,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-        );
+                  ]);
       },
     );
   }
@@ -320,8 +312,8 @@ class _StudentDashboardState extends State<StudentDashboard> {
             leadingColors:
                 _sdController.getStatusColor(attendance.remarks, context),
             trailingText: _sdController.formatTime(_getActualTime(attendance)),
-            subTrailingText: attendance.subjectSchedule?.schedId.toString() ??
-                'No subject id',
+            subTrailingText:
+                attendance.subjectSchedule?.room.toString() ?? 'No subject id',
           );
         },
       ),

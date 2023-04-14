@@ -1,6 +1,6 @@
-import 'package:samids_web_app/src/model/faculty_model.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
-import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
+
+import 'faculty_model.dart';
 
 class Subject {
   int subjectID;
@@ -8,7 +8,6 @@ class Subject {
   String subjectDescription;
   List<Student>? students;
   List<Faculty>? faculties;
-  List<SubjectSchedule>? subjectSchedules;
 
   Subject({
     required this.subjectID,
@@ -16,7 +15,6 @@ class Subject {
     required this.subjectDescription,
     this.students,
     this.faculties,
-    this.subjectSchedules,
   });
 
   static Subject fromJson(Map<String, dynamic> json) {
@@ -34,11 +32,6 @@ class Subject {
               json['faculties'].map((x) => Faculty.fromJson(x)),
             )
           : null,
-      subjectSchedules: json['subjectSchedules'] != null
-          ? List<SubjectSchedule>.from(
-              json['subjectSchedules'].map((x) => SubjectSchedule.fromJson(x)),
-            )
-          : null,
     );
   }
 
@@ -53,10 +46,7 @@ class Subject {
     if (faculties != null) {
       data['Faculties'] = faculties!.map((v) => v.toJson()).toList();
     }
-    if (subjectSchedules != null) {
-      data['subjectSchedules'] =
-          subjectSchedules!.map((v) => v.toJson()).toList();
-    }
+
     return data;
   }
 }

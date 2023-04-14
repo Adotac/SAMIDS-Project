@@ -11,7 +11,7 @@ import 'package:samids_web_app/src/services/http.services.dart';
 import 'package:logger/logger.dart';
 
 class StudentService {
-  final Logger _logger = Logger();
+  static final Logger _logger = Logger();
 
   static const String _baseUrl = "https://localhost:7170/api";
 
@@ -22,7 +22,7 @@ class StudentService {
     return CRUDReturn.fromJson(jsonDecode(response.body));
   }
 
-  Future<CRUDReturn> getStudentById(int id) async {
+  static Future<CRUDReturn> getStudentById(int id) async {
     try {
       final response = await HttpService.get('$_baseUrl/Student/?id=$id');
       return CRUDReturn.fromJson(jsonDecode(response.body));
@@ -32,7 +32,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> getStudentByRfid(int rfid) async {
+  static Future<CRUDReturn> getStudentByRfid(int rfid) async {
     try {
       final response = await HttpService.get('$_baseUrl/students/byRfid/$rfid');
       if (kDebugMode) _logger.i('${response.statusCode} ${response.body}');
@@ -43,7 +43,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> addStudent(AddStudentDto student) async {
+  static Future<CRUDReturn> addStudent(AddStudentDto student) async {
     try {
       final response =
           await HttpService.post('$_baseUrl/students', body: student.toJson());
@@ -55,7 +55,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> deleteStudent(int id) async {
+  static Future<CRUDReturn> deleteStudent(int id) async {
     try {
       final response = await HttpService.delete('$_baseUrl/students?id=$id');
       if (kDebugMode) _logger.i('${response.statusCode} ${response.body}');
@@ -66,7 +66,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> updateStudent(StudentUpdateDto student) async {
+  static Future<CRUDReturn> updateStudent(StudentUpdateDto student) async {
     try {
       final response =
           await HttpService.patch('$_baseUrl/students', body: student.toJson());
@@ -78,7 +78,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> addStudentSubject(
+  static Future<CRUDReturn> addStudentSubject(
       AddStudentSubjectDto<int> request) async {
     try {
       final response = await HttpService.patch('$_baseUrl/students/addSubject',
@@ -91,7 +91,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> addStudentSubjects(
+  static Future<CRUDReturn> addStudentSubjects(
       AddStudentSubjectDto<List<Subject>> request) async {
     try {
       final response = await HttpService.patch('$_baseUrl/students/addSubjects',
@@ -104,7 +104,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> removeStudentSubject(
+  static Future<CRUDReturn> removeStudentSubject(
       AddStudentSubjectDto<int> request) async {
     try {
       final response = await HttpService.patch(
@@ -118,7 +118,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> removeStudentSubjects(
+  static Future<CRUDReturn> removeStudentSubjects(
       AddStudentSubjectDto<List<Subject>> request) async {
     try {
       final response = await HttpService.patch(
@@ -132,10 +132,10 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> getStudentClasses(DateTime date, int studentNo) async {
+  static Future<CRUDReturn> getStudentClasses(int studentNo) async {
     try {
       final response = await HttpService.get(
-          '$_baseUrl/students/classesByDate?date=$date&studentNo=$studentNo');
+          '$_baseUrl/Student/Classes?studentNo=$studentNo');
       if (kDebugMode) _logger.i('${response.statusCode} ${response.body}');
       return CRUDReturn.fromJson(jsonDecode(response.body));
     } catch (e, stacktrace) {
@@ -144,7 +144,7 @@ class StudentService {
     }
   }
 
-  Future<CRUDReturn> getStudentClassesByDay(
+  static Future<CRUDReturn> getStudentClassesByDay(
       DateTime date, int studentNo) async {
     try {
       final response = await HttpService.get('$_baseUrl/students/classesByDay',

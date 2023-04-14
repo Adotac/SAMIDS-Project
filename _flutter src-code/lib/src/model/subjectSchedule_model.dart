@@ -1,6 +1,16 @@
 import 'package:samids_web_app/src/model/Subject_model.dart';
 import 'package:samids_web_app/src/model/enum_values.dart';
 
+enum Weekday {
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday,
+}
+
 class SubjectSchedule {
   int schedId;
   Subject? subject;
@@ -42,22 +52,14 @@ class SubjectSchedule {
   }
 }
 
-enum DayOfWeek {
-  monday,
-  tuesday,
-  wednesday,
-  thursday,
-  friday,
-  saturday,
-  sunday
-}
+enum DayOfWeek { M, T, W, TH, F, S, SU }
 
 final dayOfWeekValues = EnumValues({
-  0: DayOfWeek.monday,
-  1: DayOfWeek.tuesday,
-  2: DayOfWeek.wednesday,
-  3: DayOfWeek.thursday,
-  4: DayOfWeek.friday,
-  5: DayOfWeek.saturday,
-  6: DayOfWeek.sunday
+  0: DayOfWeek.M,
+  1: DayOfWeek.T,
+  2: DayOfWeek.W,
+  3: DayOfWeek.TH,
+  4: DayOfWeek.F,
+  5: DayOfWeek.S,
+  6: DayOfWeek.SU
 });

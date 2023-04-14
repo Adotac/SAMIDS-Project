@@ -94,8 +94,37 @@ class MyApp extends StatelessWidget {
           // ),
           // darkTheme: ThemeData.dark(),
           theme: ThemeData(
+            inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).primaryColor,
+                ),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
             scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+            ),
             appBarTheme: AppBarTheme(
+              toolbarHeight: 80,
               color: const Color(0xFFF5F6F9),
               iconTheme: IconThemeData(
                 color: Colors.black,
@@ -107,12 +136,18 @@ class MyApp extends StatelessWidget {
               ),
               elevation: 0.1,
             ),
+
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               selectedItemColor: Theme.of(context).primaryColor,
               elevation: 0.0,
             ),
-            cardTheme: const CardTheme(
+
+            cardTheme: CardTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                    20.0), // set circular border radius for Cards
+              ),
               margin: EdgeInsets.all(6),
               elevation: 0.2,
             ),
@@ -161,7 +196,10 @@ class MyApp extends StatelessWidget {
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case StudentClasses.routeName:
-                return MaterialPageRoute(builder: (_) => StudentClasses());
+                return MaterialPageRoute(
+                    builder: (_) => StudentClasses(
+                          sdController: StudentDashboardController.instance,
+                        ));
               default:
                 return MaterialPageRoute(builder: (_) => const PageNotFound());
             }

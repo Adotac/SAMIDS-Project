@@ -7,7 +7,7 @@ import '../screen/student/classes.dart';
 import '../screen/student/dashboard.dart';
 
 class MobileView extends StatefulWidget {
-  final Widget body;
+  final List<Widget> body;
   final String appBarTitle;
   final String userName;
   bool showBottomNavBar;
@@ -139,12 +139,15 @@ class _MobileViewState extends State<MobileView> {
       ),
       appBar: widget.appBarOnly
           ? AppBar(
+              automaticallyImplyLeading: false,
               leadingWidth: 48,
               title: Text(widget.appBarTitle),
             )
           : null,
       body: (!widget.showAppBar || widget.appBarOnly)
-          ? widget.body
+          ? Column(
+              children: [...widget.body],
+            )
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
@@ -176,59 +179,11 @@ class _MobileViewState extends State<MobileView> {
                 ),
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    widget.body,
+                    ...widget.body,
                   ]),
                 ),
               ],
             ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     bottomNavigationBar: Visibility(
-  //       visible: widget.showBottomNavBar,
-  //       child: _buildBottomNavigationBar(context, widget.currentIndex),
-  //     ),
-  //     body: !widget.showAppBar
-  //         ? widget.body
-  //         : CustomScrollView(
-  //             slivers: [
-  //               SliverAppBar(
-  //                 leading: IconButton(
-  //                   onPressed: () {},
-  //                   icon: const Icon(Icons.settings_outlined),
-  //                 ),
-  //                 leadingWidth: 48,
-  //                 automaticallyImplyLeading: false,
-  //                 pinned: true,
-  //                 floating: true,
-  //                 expandedHeight: 100.0,
-  //                 flexibleSpace: LayoutBuilder(
-  //                   builder:
-  //                       (BuildContext context, BoxConstraints constraints) {
-  //                     return FlexibleSpaceBar(
-  //                       title: AnimatedOpacity(
-  //                         duration: const Duration(milliseconds: 0),
-  //                         opacity: constraints.biggest.height > 80 ? 0.0 : 1.0,
-  //                         child: Text(widget.appBarTitle,
-  //                             style: Theme.of(context).textTheme.titleLarge),
-  //                       ),
-  //                       background: _buildAppBar(widget.currentIndex, context),
-  //                     );
-  //                   },
-  //                 ),
-  //               ),
-  //               SliverList(
-  //                 delegate: SliverChildListDelegate([
-  //                   SingleChildScrollView(
-  //                     child: widget.body,
-  //                   ),
-  //                 ]),
-  //               ),
-  //             ],
-  //           ),
-  //   );
-  // }
 }

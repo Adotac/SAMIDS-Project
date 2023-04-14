@@ -67,45 +67,69 @@ class _StudentAttendanceState extends State<StudentAttendance> {
   // Widget _mobileView(BuildContext context) {
   Widget _mobileView(BuildContext context) {
     return MobileView(
+      appBarOnly: true,
       appBarTitle: 'Attendance',
       currentIndex: 1,
-      body: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Expanded(
-          child: _mobileAttendanceBody(context),
-        ),
-      ),
+      body: _mobileAttendanceBody(context),
     );
   }
 
-  Widget _mobileAttendanceBody(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: 18),
-        _searchBar(context),
-        SizedBox(height: 8),
-        for (int i = 0; _sdController.allAttendanceList.length > i; i++)
-          AttendanceTile(
-            subject: _sdController.allAttendanceList[i].subjectSchedule?.subject
-                    ?.subjectName ??
-                'No Subject',
-            room: _sdController.allAttendanceList[i].subjectSchedule?.room ??
-                'No Room',
-            date: _sdController
-                .formatDate(_getActualTime(_sdController.allAttendanceList[i])),
-            timeIn: _sdController.allAttendanceList[i].actualTimeIn != null
-                ? _sdController.formatTime(
-                    _sdController.allAttendanceList[i].actualTimeIn!)
-                : 'No Time In',
-            timeOut: _sdController.allAttendanceList[i].actualTimeOut != null
-                ? _sdController.formatTime(
-                    _sdController.allAttendanceList[i].actualTimeOut!)
-                : 'No Time In',
-            remarks: _sdController
-                .getStatusText(_sdController.allAttendanceList[i].remarks.name),
-          ),
-      ],
-    );
+  // Widget _mobileAttendanceBody(BuildContext context) {
+  //   return Column(
+  //     children: [
+  //       SizedBox(height: 18),
+  //       _searchBar(context),
+  //       SizedBox(height: 8),
+  //       for (int i = 0; _sdController.allAttendanceList.length > i; i++)
+  //         AttendanceTile(
+  //           subject: _sdController.allAttendanceList[i].subjectSchedule?.subject
+  //                   ?.subjectName ??
+  //               'No Subject',
+  //           room: _sdController.allAttendanceList[i].subjectSchedule?.room ??
+  //               'No Room',
+  //           date: _sdController
+  //               .formatDate(_getActualTime(_sdController.allAttendanceList[i])),
+  //           timeIn: _sdController.allAttendanceList[i].actualTimeIn != null
+  //               ? _sdController.formatTime(
+  //                   _sdController.allAttendanceList[i].actualTimeIn!)
+  //               : 'No Time In',
+  //           timeOut: _sdController.allAttendanceList[i].actualTimeOut != null
+  //               ? _sdController.formatTime(
+  //                   _sdController.allAttendanceList[i].actualTimeOut!)
+  //               : 'No Time In',
+  //           remarks: _sdController
+  //               .getStatusText(_sdController.allAttendanceList[i].remarks.name),
+  //         ),
+  //     ],
+  //   );
+  // }
+
+  List<Widget> _mobileAttendanceBody(BuildContext context) {
+    return [
+      _searchBar(context),
+      SizedBox(height: 8),
+      Expanded(
+        child: ListView.builder(
+          itemCount: _sdController.allAttendanceList.length,
+          itemBuilder: (BuildContext context, int i) {
+            Attendance attendance = _sdController.allAttendanceList[i];
+            return AttendanceTile(
+              subject: attendance.subjectSchedule?.subject?.subjectName ??
+                  'No Subject',
+              room: attendance.subjectSchedule?.room ?? 'No Room',
+              date: _sdController.formatDate(_getActualTime(attendance)),
+              timeIn: attendance.actualTimeIn != null
+                  ? _sdController.formatTime(attendance.actualTimeIn!)
+                  : 'No Time In',
+              timeOut: attendance.actualTimeOut != null
+                  ? _sdController.formatTime(attendance.actualTimeOut!)
+                  : 'No Time Out',
+              remarks: _sdController.getStatusText(attendance.remarks.name),
+            );
+          },
+        ),
+      ),
+    ];
   }
 
   DateTime _getActualTime(Attendance attendance) =>
@@ -176,10 +200,6 @@ class _StudentAttendanceState extends State<StudentAttendance> {
     ThemeData currentTheme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      height: 42,
-      width: MediaQuery.of(context).size.width > 450
-          ? MediaQuery.of(context).size.width * 0.8
-          : MediaQuery.of(context).size.width * 0.95,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         shape: BoxShape.rectangle,

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/model/test_subject.model.dart';
+import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
+import 'package:intl/intl.dart';
+import '../model/Subject_model.dart';
 
 class ClassesListTile extends StatelessWidget {
-  final Subject subject;
+  final Subject? subject;
+  final SubjectSchedule? subjectSchedule;
   final VoidCallback onTap;
   final bool enableShadow;
 
@@ -11,6 +14,7 @@ class ClassesListTile extends StatelessWidget {
     required this.subject,
     required this.onTap,
     this.enableShadow = false,
+    required this.subjectSchedule,
   }) : super(key: key);
 
   @override
@@ -18,7 +22,7 @@ class ClassesListTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+        margin: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 8.0),
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           boxShadow: enableShadow
@@ -42,15 +46,15 @@ class ClassesListTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    subject.name,
-                    style: TextStyle(
+                    '${subject?.subjectID.toString() ?? "No Subject Code"}  ${subject?.subjectName ?? "No Subject Name"}',
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    subject.code,
+                    subjectSchedule?.room ?? 'No Class Room',
                     style: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context).textTheme.caption?.color,
@@ -64,19 +68,21 @@ class ClassesListTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  subject.timeSchedule,
+                  subjectSchedule != null
+                      ? getTimeStartEnd(subjectSchedule!)
+                      : 'No Time Schedule',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  subject.daySchedule,
+                  subjectSchedule?.day.name ?? 'No Class Day  ',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Theme.of(context).textTheme.caption?.color,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                 ),
               ],
@@ -85,5 +91,16 @@ class ClassesListTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String getTimeStartEnd(SubjectSchedule subjectSchedule) {
+    final timeStart = formatTime(subjectSchedule.timeStart);
+    final timeEnd = formatTime(subjectSchedule.timeEnd);
+    return '$timeStart - $timeEnd';
+  }
+
+  String formatTime(DateTime dateTime) {
+    final formattedTime = DateFormat('hh:mm a').format(dateTime);
+    return formattedTime;
   }
 }

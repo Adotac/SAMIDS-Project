@@ -17,13 +17,13 @@ class Faculty {
 
   static Faculty fromJson(Map<String, dynamic> json) {
     return Faculty(
-      facultyId: json['FacultyId'],
-      facultyNo: json['FacultyNo'],
-      lastName: json['LastName'],
-      firstName: json['FirstName'],
-      subjects: json['Subjects'] != null
+      facultyId: json['facultyId'],
+      facultyNo: json['facultyNo'],
+      lastName: json['lastName'],
+      firstName: json['firstName'],
+      subjects: json['subjects'] != null
           ? List<Subject>.from(
-              json['Subjects'].map((x) => Subject.fromJson(x)),
+              json['subjects'].map((x) => Subject.fromJson(x)),
             )
           : null,
     );
@@ -31,12 +31,12 @@ class Faculty {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['FacultyId'] = facultyId;
-    data['FacultyNo'] = facultyNo;
-    data['LastName'] = lastName;
-    data['FirstName'] = firstName;
+    data['facultyId'] = facultyId;
+    data['facultyNo'] = facultyNo;
+    data['lastName'] = lastName;
+    data['firstName'] = firstName;
     if (subjects != null) {
-      data['Subjects'] = subjects!.map((x) => x.toJson()).toList();
+      data['subjects'] = subjects!.map((x) => x.toJson()).toList();
     }
     return data;
   }

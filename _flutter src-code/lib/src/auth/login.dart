@@ -66,6 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         title: Text(
@@ -100,6 +101,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     title: Text(
                       'Password Reset',
                       style: TextStyle(
@@ -135,6 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     title: Text(
                       'Invalid Email',
                       style: TextStyle(
@@ -346,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Theme.of(context).primaryColor,
                           foregroundColor: Colors.white),
                       onPressed: () async {
                         await _onLogin(context);
@@ -386,6 +391,8 @@ class _LoginScreenState extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (_) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             title: const Text('Error'),
             content: Row(
               children: const [
@@ -461,7 +468,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 50,
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white),
                     onPressed: () async {
                       await _onLogin(context);
                     },

@@ -38,6 +38,8 @@ class SettingsPage extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     title: Text('Change Password',
                         style:
                             TextStyle(color: Theme.of(context).primaryColor)),
@@ -80,21 +82,15 @@ class SettingsPage extends StatelessWidget {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
-          showBottomNavBar: false,
-          appBarOnly: true,
-          currentIndex: 1, // Assuming settings page has index 3
-          appBarTitle: "Settings",
-          userName: "",
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildUserInformation(context),
-                _buildSettingsList(context),
-              ],
-            ),
-          ),
-        );
+            showBottomNavBar: false,
+            appBarOnly: true,
+            currentIndex: 1, // Assuming settings page has index 3
+            appBarTitle: "Settings",
+            userName: "",
+            body: [
+              _buildUserInformation(context),
+              _buildSettingsList(context),
+            ]);
       } else {
         return Scaffold(
           appBar: AppBar(

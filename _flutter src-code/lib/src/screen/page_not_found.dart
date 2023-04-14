@@ -18,34 +18,28 @@ class PageNotFound extends StatelessWidget {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
-          currentIndex: 0,
-          showAppBar: false,
-          showBottomNavBar: false,
-          appBarTitle: "Page Not Found",
-          userName: "",
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => navigateBack(context),
+            currentIndex: 0,
+            showAppBar: false,
+            showBottomNavBar: false,
+            appBarTitle: "Page Not Found",
+            userName: "",
+            body: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => navigateBack(context),
+              ),
+              SizedBox(height: 30),
+              TitleMediumText(title: "Page Not Found"),
+              SizedBox(height: 10),
+              Text(
+                "The requested page couldn't be found",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
                 ),
-                SizedBox(height: 30),
-                TitleMediumText(title: "Page Not Found"),
-                SizedBox(height: 10),
-                Text(
-                  "The requested page couldn't be found",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+              ),
+            ]);
       } else {
         return Scaffold(
           body: Center(

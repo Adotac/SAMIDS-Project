@@ -32,7 +32,7 @@ class Attendance {
       student:
           json['student'] != null ? Student.fromJson(json['student']) : null,
       subjectSchedule: json['subjectSchedule'] != null
-          ? SubjectSchedule.fromJson(json['subjectSchedules'])
+          ? SubjectSchedule.fromJson(json['subjectSchedule'])
           : null,
       device: json['device'] != null ? Device.fromJson(json['device']) : null,
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
