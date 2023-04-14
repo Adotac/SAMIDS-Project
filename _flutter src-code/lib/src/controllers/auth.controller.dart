@@ -21,7 +21,6 @@ class AuthController with ChangeNotifier {
 
   Future<bool> login(String username, String password) async {
     try {
-      print("Im here now");
       var credentials =
           UserDto.fromJson({'Username': username, 'Password': password});
       CRUDReturn result = await AuthService.login(credentials);
@@ -35,7 +34,7 @@ class AuthController with ChangeNotifier {
         return false;
       }
     } catch (e, stacktrace) {
-      if (kDebugMode) _logger.i(' getStudentById $e $stacktrace');
+      if (kDebugMode) _logger.i(' AuthController logins $e $stacktrace');
       return false;
     }
   }

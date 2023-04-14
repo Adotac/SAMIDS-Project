@@ -24,7 +24,14 @@ class CustomListTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(child: Icon(leadingIcon)),
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              color: Theme.of(context).accentColor,
+            ),
+            child: Icon(leadingIcon, color: Colors.white),
+          ),
           const SizedBox(width: 16.0),
           Expanded(
             child: Column(
@@ -32,7 +39,10 @@ class CustomListTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
                 SizedBox(height: spaceBetween),
                 subtitle,
@@ -45,10 +55,20 @@ class CustomListTile extends StatelessWidget {
             children: [
               Text(
                 trailingText,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
               SizedBox(height: spaceBetween),
-              Text(subTrailingText),
+              Text(
+                subTrailingText,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).textTheme.caption?.color,
+                ),
+              ),
             ],
           ),
         ],

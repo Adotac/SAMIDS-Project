@@ -10,6 +10,7 @@ import 'package:samids_web_app/src/services/attendance.services.dart';
 
 class StudentDashboardController with ChangeNotifier {
   final Student student;
+  List<Attendance> attendance = [];
   StudentDashboardController({required this.student});
 
   static void initialize(Student student) {
@@ -24,20 +25,24 @@ class StudentDashboardController with ChangeNotifier {
 
   Future<List<Attendance>> getAttendance() async {
     try {
-      print('gi call ko ');
       CRUDReturn response = await AttendanceService.getAll(
           studentNo: student.studentNo, date: DateTime.now());
-      if (response.success) {
-        for (var i = 0; i < response.data.length; i++) {
-          print(response.data[i]);
-        }
 
+      if (response.success) {
+        if (attendance.isNotEmpty) attendance.clear();
+
+        for (Map<String, dynamic> map in response.data) {
+          print(map);
+          attendance.add(Attendance.fromJson(map));
+        }
+        print(attendance);
         // List<Attendance> attendance = Attendance.fromJson(response.body);
-        return [];
+        return attendance;
       } else {
         return [];
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
+      print('StudentDashboardController getAttendance $e $stacktrace');
       return [];
     }
   }

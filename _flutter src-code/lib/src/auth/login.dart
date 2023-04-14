@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '2019020654';
+    _usernameController.text = '2004';
 
     _passwordController = TextEditingController();
     _passwordController.text = 'test123';
@@ -164,11 +164,36 @@ class _LoginScreenState extends State<LoginScreen> {
     return regExp.hasMatch(email);
   }
 
+  // Widget _buildMobileView(BuildContext context) {
+  //   return Stack(
+  //     children: [
+  //       Container(
+  //           color: Colors.white), // Add this line to set a white background
+  //       backgroundImageMobile,
+  //       Scaffold(
+  //         backgroundColor: Colors.transparent,
+  //         appBar: AppBar(
+  //           automaticallyImplyLeading: false,
+  //           backgroundColor: Colors.transparent,
+  //           elevation: 0,
+  //           title: const Text(
+  //             'SAMSS',
+  //             style:
+  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+  //           ),
+  //         ),
+  //         body: loginForumFieldMobile(context),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   Widget _buildMobileView(BuildContext context) {
     return Stack(
       children: [
         Container(
-            color: Colors.white), // Add this line to set a white background
+          color: Colors.white,
+        ),
         backgroundImageMobile,
         Scaffold(
           backgroundColor: Colors.transparent,
@@ -177,12 +202,15 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              'SAMSS',
+              'BiSAM',
               style:
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
             ),
           ),
-          body: loginForumFieldMobile(context),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: loginForumFieldMobile(context),
+          ),
         ),
       ],
     );
@@ -198,9 +226,8 @@ class _LoginScreenState extends State<LoginScreen> {
             automaticallyImplyLeading: false,
             backgroundColor: Colors.transparent,
             elevation: 0,
-            // remove the back button
             title: const Text(
-              'SAMS',
+              'BiSAM',
               style:
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
             ),
@@ -212,7 +239,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: 450,
                   height: 600,
-                  child: loginForumWeb(context),
+                  child: SingleChildScrollView(
+                    child: loginForumWeb(context),
+                  ),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.3,
@@ -224,6 +253,43 @@ class _LoginScreenState extends State<LoginScreen> {
       ],
     );
   }
+
+  // Widget _buildWebView(BuildContext context) {
+  //   return Stack(
+  //     children: [
+  //       backgroundImage,
+  //       Scaffold(
+  //         backgroundColor: Colors.transparent,
+  //         appBar: AppBar(
+  //           automaticallyImplyLeading: false,
+  //           backgroundColor: Colors.transparent,
+  //           elevation: 0,
+  //           // remove the back button
+  //           title: const Text(
+  //             'SAMS',
+  //             style:
+  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+  //           ),
+  //         ),
+  //         body: Center(
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               SizedBox(
+  //                 width: 450,
+  //                 height: 600,
+  //                 child: loginForumWeb(context),
+  //               ),
+  //               SizedBox(
+  //                 width: MediaQuery.of(context).size.width * 0.3,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Column loginForumWeb(context) {
     return Column(

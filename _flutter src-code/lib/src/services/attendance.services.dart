@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/services/DTO/add_attendance.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
@@ -32,17 +34,33 @@ class AttendanceService {
   }) async {
     try {
       Map<String, dynamic>? query = {};
-      if (date != null) query['date'] = date;
+      // if (date != null) query['date'] = date.toIso8601String();
       if (room != null) query['room'] = room;
-      if (studentNo != null) query['studentNo'] = studentNo;
+      if (studentNo != null) query['studentNo'] = studentNo.toString();
       if (remarks != null) query['remarks'] = remarks;
+      print("ndanceService getAll 1 $query");
+      final response =
+          await HttpService.get('$_baseUrl/Attendance', query: query);
 
-      final response = await HttpService.get(_baseUrl, query: query);
-      final jsonResponse = jsonDecode(response.body);
-      return CRUDReturn.fromJson(jsonResponse);
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');
+          final jsonResponse = jsonDecode(response.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
     } catch (e, stactrace) {
-      if (kDebugMode) print(' getAll $e $stactrace');
-
+      if (kDebugMode) print('AttendanceService getAll $e $stactrace');
       rethrow;
     }
   }

@@ -24,7 +24,7 @@ class AuthService {
       print(jsonResponse);
       return CRUDReturn.fromJson(jsonResponse);
     } catch (e, stacktrace) {
-      if (kDebugMode) print(' getStudentById $e $stacktrace');
+      if (kDebugMode) print('AuthService login $e $stacktrace');
       return CRUDReturn(success: false, data: e);
     }
   }

@@ -30,16 +30,18 @@ class StudentInfoCard extends StatelessWidget {
                 children: [
                   Text(
                     '${student.firstName} ${student.lastName}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w600,
+                      color: Theme.of(context).textTheme.headline6!.color,
                     ),
                   ),
                   Text(
                     student.course,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
+                      color: Theme.of(context).textTheme.subtitle1!.color,
                     ),
                   ),
                   const SizedBox(
@@ -47,9 +49,10 @@ class StudentInfoCard extends StatelessWidget {
                   ),
                   Text(
                     currentUser.loggedInUser?.email ?? 'No email',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w300,
+                      color: Theme.of(context).textTheme.caption!.color,
                     ),
                   ),
                 ],

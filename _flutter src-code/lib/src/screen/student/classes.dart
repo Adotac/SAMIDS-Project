@@ -12,7 +12,7 @@ class StudentClasses extends StatelessWidget {
       name: 'Computer Programming',
       code: 'CP101',
       timeSchedule: '1:30pm - 2:30pm',
-      daySchedule: 'MWF',
+      daySchedule: 'TTH',
       desc: 'Introduction to programming',
       teacher: 'John Doe',
       room: '101',
@@ -30,7 +30,16 @@ class StudentClasses extends StatelessWidget {
       name: 'Computer Programming',
       code: 'CP101',
       timeSchedule: '1:30pm - 2:30pm',
-      daySchedule: 'MWF',
+      daySchedule: 'TTH',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'S',
       desc: 'Introduction to programming',
       teacher: 'John Doe',
       room: '101',
@@ -44,6 +53,34 @@ class StudentClasses extends StatelessWidget {
       teacher: 'John Doe',
       room: '101',
     ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'F',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'TTH',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+    Subject(
+      name: 'Computer Programming',
+      code: 'CP101',
+      timeSchedule: '1:30pm - 2:30pm',
+      daySchedule: 'MW',
+      desc: 'Introduction to programming',
+      teacher: 'John Doe',
+      room: '101',
+    ),
+
     // Add more subjects here
   ];
 
@@ -91,12 +128,53 @@ class StudentClasses extends StatelessWidget {
     });
   }
 
+  bool _isSubjectToday(Subject subject) {
+    final DateTime now = DateTime.now();
+    final int today = now.weekday;
+    final String daySchedule = subject.daySchedule.toUpperCase();
+
+    if (today == DateTime.monday && daySchedule.contains('M')) {
+      return true;
+    } else if (today == DateTime.tuesday && daySchedule.contains('T')) {
+      return true;
+    } else if (today == DateTime.wednesday && daySchedule.contains('W')) {
+      return true;
+    } else if (today == DateTime.thursday && daySchedule.contains('H')) {
+      return true;
+    } else if (today == DateTime.friday && daySchedule.contains('F')) {
+      return true;
+    } else if (today == DateTime.saturday && daySchedule.contains('S')) {
+      return true;
+    }
+    return false;
+  }
+
+  Widget _buildClasses(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: subjects.length,
+      itemBuilder: (BuildContext context, int index) {
+        return ClassesListTile(
+          subject: subjects[index],
+          onTap: () => showSubjectDetails(context, subjects[index]),
+          enableShadow: _isSubjectToday(subjects[index]),
+        );
+      },
+    );
+  }
+
   void showSubjectDetails(BuildContext context, Subject subject) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(subject.name),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            subject.name,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: SingleChildScrollView(
             child: ListBody(
               children: [
@@ -122,19 +200,20 @@ class StudentClasses extends StatelessWidget {
     );
   }
 
-  Widget _buildClasses(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: subjects.length,
-      itemBuilder: (BuildContext context, int index) {
-        return ClassesListTile(
-          subject: subjects[index],
-          onTap: () => showSubjectDetails(context, subjects[index]),
-        );
-      },
-    );
-  }
+  // Widget _buildClasses(BuildContext context) {
+  //   return ListView.builder(
+  //     shrinkWrap: true,
+  //     physics: const NeverScrollableScrollPhysics(),
+  //     itemCount: subjects.length,
+  //     itemBuilder: (BuildContext context, int index) {
+  //       return ClassesListTile(
+
+  //         subject: subjects[index],
+  //         onTap: () => showSubjectDetails(context, subjects[index]),
+  //       );
+  //     },
+  //   );
+  // }
 
   // Widget _buildClasses(BuildContext context) {
   //   return Expanded(

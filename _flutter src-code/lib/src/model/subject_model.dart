@@ -20,33 +20,33 @@ class Subject {
   });
 
   static Subject fromJson(Map<String, dynamic> json) {
-  return Subject(
-    subjectID: json['SubjectID'],
-    subjectName: json['SubjectName'],
-    subjectDescription: json['SubjectDescription'],
-    students: json['Students'] != null
-        ? List<Student>.from(
-            json['Students'].map((x) => Student.fromJson(x)),
-          )
-        : null,
-    faculties: json['Faculties'] != null
-        ? List<Faculty>.from(
-            json['Faculties'].map((x) => Faculty.fromJson(x)),
-          )
-        : null,
-    subjectSchedules: json['SubjectSchedules'] != null
-        ? List<SubjectSchedule>.from(
-            json['SubjectSchedules'].map((x) => SubjectSchedule.fromJson(x)),
-          )
-        : null,
-  );
-}
+    return Subject(
+      subjectID: json['subjectID'],
+      subjectName: json['subjectName'],
+      subjectDescription: json['subjectDescription'],
+      students: json['students'] != null
+          ? List<Student>.from(
+              json['students'].map((x) => Student.fromJson(x)),
+            )
+          : null,
+      faculties: json['faculties'] != null
+          ? List<Faculty>.from(
+              json['faculties'].map((x) => Faculty.fromJson(x)),
+            )
+          : null,
+      subjectSchedules: json['subjectSchedules'] != null
+          ? List<SubjectSchedule>.from(
+              json['subjectSchedules'].map((x) => SubjectSchedule.fromJson(x)),
+            )
+          : null,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['SubjectID'] = subjectID;
-    data['SubjectName'] = subjectName;
-    data['SubjectDescription'] = subjectDescription;
+    data['subjectID'] = subjectID;
+    data['subjectName'] = subjectName;
+    data['subjectDescription'] = subjectDescription;
     if (students != null) {
       data['Students'] = students!.map((v) => v.toJson()).toList();
     }
@@ -54,7 +54,7 @@ class Subject {
       data['Faculties'] = faculties!.map((v) => v.toJson()).toList();
     }
     if (subjectSchedules != null) {
-      data['SubjectSchedules'] =
+      data['subjectSchedules'] =
           subjectSchedules!.map((v) => v.toJson()).toList();
     }
     return data;

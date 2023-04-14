@@ -30,19 +30,28 @@ class SettingsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            leading: Icon(Icons.lock),
-            title: Text('Change Password'),
+            leading: Icon(Icons.lock, color: Theme.of(context).iconTheme.color),
+            title: Text('Change Password',
+                style: Theme.of(context).textTheme.subtitle1),
             onTap: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Change Password'),
-                    content: const Text(
-                        'An email has been sent to your registered email address with instructions on how to change your password.'),
+                    title: Text('Change Password',
+                        style:
+                            TextStyle(color: Theme.of(context).primaryColor)),
+                    content: Text(
+                        'An email has been sent to your registered email address with instructions on how to change your password.',
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.bodyText1!.color)),
                     actions: [
                       TextButton(
-                        child: const Text('Close'),
+                        child: Text('Close',
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -54,8 +63,9 @@ class SettingsPage extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
+            leading:
+                Icon(Icons.logout, color: Theme.of(context).iconTheme.color),
+            title: Text('Logout', style: Theme.of(context).textTheme.subtitle1),
             onTap: () {
               // Implement the logout functionality here
             },

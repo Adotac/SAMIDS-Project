@@ -16,13 +16,15 @@ class StudentService {
   static const String _baseUrl = "https://localhost:7170/api";
 
   static Future<CRUDReturn> getStudents() async {
-    final response = await HttpService.get('$_baseUrl/students');
+    final response = await HttpService.get(
+      '$_baseUrl/Student',
+    );
     return CRUDReturn.fromJson(jsonDecode(response.body));
   }
 
   Future<CRUDReturn> getStudentById(int id) async {
     try {
-      final response = await HttpService.get('$_baseUrl/students/byId/$id');
+      final response = await HttpService.get('$_baseUrl/Student/?id=$id');
       return CRUDReturn.fromJson(jsonDecode(response.body));
     } catch (e, stacktrace) {
       if (kDebugMode) _logger.i(' getStudentById $e $stacktrace');

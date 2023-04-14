@@ -99,20 +99,25 @@ class StudentAttendance extends StatelessWidget {
     );
   }
 
-  Widget _attendanceBody(context) {
+  Widget _attendanceBody(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Card(
-        child: Column(children: [
-          SizedBox(height: 18),
-          _searchBar(context),
-          SizedBox(height: 8),
-          Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        child: Column(
+          children: [
+            SizedBox(height: 18),
+            _searchBar(context),
+            SizedBox(height: 8),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: DataTable(
+                headingRowColor: MaterialStateColor.resolveWith(
+                    (states) => Theme.of(context).backgroundColor),
+                dataRowColor: MaterialStateColor.resolveWith(
+                    (states) => Theme.of(context).scaffoldBackgroundColor),
                 columns: [
                   _dataColumn("Subject"),
                   _dataColumn("Room"),
@@ -122,8 +127,10 @@ class StudentAttendance extends StatelessWidget {
                   _dataColumn("Remarks"),
                 ],
                 rows: [for (int i = 0; i < 20; i++) _sampleDataRow(context)],
-              ))
-        ]),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
