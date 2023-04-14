@@ -311,22 +311,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
         itemCount: _sdController.attendance.length,
         itemBuilder: (BuildContext context, int index) {
           Attendance attendance = _sdController.attendance[index];
-
-          print(
-            attendance.subjectSchedule?.subject?.subjectName ??
-                'No subject name',
-          );
-          print(
-            attendance.subjectSchedule?.subject,
-          );
-
           return CustomListTile(
             title: attendance.subjectSchedule?.subject?.subjectName ??
                 'No subject name',
-            subtitle: getStatusText(attendance.remarks.name),
+            subtitle: _sdController.getStatusText(attendance.remarks.name),
             leadingIcon: Icon(getStatusIcon(attendance.remarks),
                 color: Theme.of(context).scaffoldBackgroundColor),
-            leadingColors: getStatusColor(attendance.remarks, context),
+            leadingColors:
+                _sdController.getStatusColor(attendance.remarks, context),
             trailingText: _sdController.formatTime(_getActualTime(attendance)),
             subTrailingText: attendance.subjectSchedule?.schedId.toString() ??
                 'No subject id',
@@ -354,7 +346,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
           (index) => CustomListTile(
             leadingColors: Colors.white,
             title: "Programming $index",
-            subtitle: getStatusText("On-Time"),
+            subtitle: _sdController.getStatusText("On-Time"),
             leadingIcon: Icon(
               Icons.access_alarm_sharp,
             ),
@@ -383,50 +375,8 @@ class _StudentDashboardState extends State<StudentDashboard> {
     }
   }
 
-  Color getStatusColor(Remarks remarks, BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    switch (remarks) {
-      case Remarks.onTime:
-        return Colors.green; // Modify with the desired color for onTime
-      case Remarks.late:
-        return Colors.orange; // Modify with the desired color for late
-      case Remarks.cutting:
-        return Colors
-            .yellow.shade700; // Modify with the desired color for cutting
-      case Remarks.absent:
-        return Colors.red
-            .withOpacity(0.5); // Modify with the desired color for absent
-    }
-  }
-
-  Text getStatusText(String status) {
-    final String lowercaseStatus = status.toLowerCase();
-    Color color;
-    switch (lowercaseStatus) {
-      case 'absent':
-        color = Colors.red;
-        break;
-      case 'cutting':
-        color = Colors.yellow.shade700;
-        break;
-      case 'ontime':
-        color = Colors.green;
-        break;
-      case 'late':
-        color = Colors.orange;
-        break;
-      default:
-        color = Colors.black;
-        break;
-    }
-    return Text(
-      status,
-      style: TextStyle(color: color),
-    );
-  }
-
   CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
-    double totalLogs = _sdController.allAttendance.length.toDouble();
+    double totalLogs = _sdController.allAttendanceList.length.toDouble();
     return CardSmall(
       isShadow: true,
       flexValue: flexValue,
@@ -453,7 +403,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
     return AnimatedBuilder(
       animation: _sdController,
       builder: (context, child) {
-        double totalLogs = _sdController.allAttendance.length.toDouble();
+        double totalLogs = _sdController.allAttendanceList.length.toDouble();
         return MobileSmallCard(
           isShadow: true,
           sideTitle: "Total logs",
@@ -487,7 +437,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         children: [
           CircularViewer(
             value: value,
-            maxValue: _sdController.allAttendance.length.toDouble(),
+            maxValue: _sdController.allAttendanceList.length.toDouble(),
             radius: radius,
             textStyle: TextStyle(fontSize: 20),
             color: Color(0xffEEEEEE),

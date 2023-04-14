@@ -14,7 +14,7 @@ import 'package:samids_web_app/src/services/attendance.services.dart';
 class StudentDashboardController with ChangeNotifier {
   final Student student;
   List<Attendance> attendance = [];
-  List<Attendance> allAttendance = [];
+  List<Attendance> allAttendanceList = [];
 
   double onTimeCount = 0;
   double lateCount = 0;
@@ -43,10 +43,10 @@ class StudentDashboardController with ChangeNotifier {
   }
 
   handEventJsonAttendanceAll(CRUDReturn result) {
-    if (allAttendance.isNotEmpty) allAttendance.clear();
+    if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
 
     for (Map<String, dynamic> map in result.data) {
-      allAttendance.add(Attendance.fromJson(map));
+      allAttendanceList.add(Attendance.fromJson(map));
     }
 
     notifyListeners();
@@ -85,15 +85,66 @@ class StudentDashboardController with ChangeNotifier {
   }
 
   String formatTime(DateTime dateTime) {
-    final time = TimeOfDay.fromDateTime(dateTime);
     final formattedTime = DateFormat('hh:mm a').format(dateTime);
     return formattedTime;
+  }
+
+  String formatDate(DateTime dateTime) {
+    final formattedDate = DateFormat('MMMM d, yyyy').format(dateTime);
+    return formattedDate;
+  }
+
+  Color getStatusColor(Remarks remarks, BuildContext context) {
+    switch (remarks) {
+      case Remarks.onTime:
+        return Colors.green; // Modify with the desired color for onTime
+      case Remarks.late:
+        return Colors.orange; // Modify with the desired color for late
+      case Remarks.cutting:
+        return Colors
+            .yellow.shade700; // Modify with the desired color for cutting
+      case Remarks.absent:
+        return Colors.red
+            .withOpacity(0.5); // Modify with the desired color for absent
+    }
+  }
+
+  Text getStatusText(String status) {
+    final String lowercaseStatus = status.toLowerCase();
+    Color color;
+    String text = '';
+    switch (lowercaseStatus) {
+      case 'absent':
+        color = Colors.red;
+        text = 'Absent';
+        break;
+      case 'cutting':
+        color = Colors.yellow.shade700;
+        text = 'Cutting';
+        break;
+      case 'ontime':
+        color = Colors.green;
+        text = 'On Time';
+        break;
+      case 'late':
+        color = Colors.orange;
+        text = 'Late';
+        break;
+      default:
+        color = Colors.black;
+        text = 'Unknown';
+        break;
+    }
+    return Text(
+      text,
+      style: TextStyle(color: color),
+    );
   }
 
   void getRemarksCount() {
     try {
       if (isCountCalculated) return;
-      for (Attendance attendance in allAttendance) {
+      for (Attendance attendance in allAttendanceList) {
         if (attendance.remarks == Remarks.late) lateCount += 1;
         if (attendance.remarks == Remarks.onTime) onTimeCount += 1;
         if (attendance.remarks == Remarks.absent) absentCount += 1;
