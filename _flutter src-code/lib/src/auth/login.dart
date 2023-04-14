@@ -1,38 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student.controller.dart';
 import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/services/DTO/login_user.dart';
 
+import '../model/student_model.dart';
 import '../widgets/responsive_builder.dart';
 
-class LoginScreen extends StatelessWidget {
-  late final TextEditingController _usernameController = TextEditingController();
-  late final TextEditingController _passwordController = TextEditingController();
+class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key});
 
   static const routeName = '/login';
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
-  final Widget backgroundImage = Expanded(
-    child: Image.asset(
-      fit: BoxFit.cover,
-      height: double.infinity,
-      width: double.infinity,
-      alignment: Alignment.center,
-      'assets/images/cloud_login_background.png',
-    ),
+class _LoginScreenState extends State<LoginScreen> {
+  late final TextEditingController _usernameController;
+  late final TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    _usernameController = TextEditingController();
+    _usernameController.text = '2004';
+
+    _passwordController = TextEditingController();
+    _passwordController.text = 'test123';
+    super.initState();
+  }
+
+  final Widget backgroundImage = Image.asset(
+    fit: BoxFit.cover,
+    height: double.infinity,
+    width: double.infinity,
+    alignment: Alignment.center,
+    'assets/images/cloud_login_background.png',
   );
 
-  final Widget backgroundImageMobile = Expanded(
-    child: Image.asset(
-      fit: BoxFit.cover,
-      height: double.infinity,
-      width: double.infinity,
-      alignment: const Alignment(.3, .1),
-      'assets/images/cloud_login_background.png',
-    ),
+  final Widget backgroundImageMobile = Image.asset(
+    fit: BoxFit.cover,
+    height: double.infinity,
+    width: double.infinity,
+    alignment: const Alignment(.3, .1),
+    'assets/images/cloud_login_background.png',
   );
 
   @override
@@ -48,12 +59,14 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
+  //add on init
   Future<void> _showResetPasswordDialog(BuildContext context) async {
     String email = '';
 
     await showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         title: Text(
@@ -71,7 +84,7 @@ class LoginScreen extends StatelessWidget {
               },
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
-                hintText: 'Enter your email',
+                hintText: 'Username',
               ),
             ),
           ],
@@ -88,6 +101,8 @@ class LoginScreen extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     title: Text(
                       'Password Reset',
                       style: TextStyle(
@@ -123,6 +138,8 @@ class LoginScreen extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     title: Text(
                       'Invalid Email',
                       style: TextStyle(
@@ -152,9 +169,36 @@ class LoginScreen extends StatelessWidget {
     return regExp.hasMatch(email);
   }
 
+  // Widget _buildMobileView(BuildContext context) {
+  //   return Stack(
+  //     children: [
+  //       Container(
+  //           color: Colors.white), // Add this line to set a white background
+  //       backgroundImageMobile,
+  //       Scaffold(
+  //         backgroundColor: Colors.transparent,
+  //         appBar: AppBar(
+  //           automaticallyImplyLeading: false,
+  //           backgroundColor: Colors.transparent,
+  //           elevation: 0,
+  //           title: const Text(
+  //             'SAMSS',
+  //             style:
+  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+  //           ),
+  //         ),
+  //         body: loginForumFieldMobile(context),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   Widget _buildMobileView(BuildContext context) {
     return Stack(
       children: [
+        Container(
+          color: Colors.white,
+        ),
         backgroundImageMobile,
         Scaffold(
           backgroundColor: Colors.transparent,
@@ -163,12 +207,15 @@ class LoginScreen extends StatelessWidget {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              'SAMSS',
+              'BiSAM',
               style:
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
             ),
           ),
-          body: loginForumFieldMobile(context),
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: loginForumFieldMobile(context),
+          ),
         ),
       ],
     );
@@ -184,9 +231,8 @@ class LoginScreen extends StatelessWidget {
             automaticallyImplyLeading: false,
             backgroundColor: Colors.transparent,
             elevation: 0,
-            // remove the back button
             title: const Text(
-              'SAMS',
+              'BiSAM',
               style:
                   TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
             ),
@@ -198,7 +244,9 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(
                   width: 450,
                   height: 600,
-                  child: loginForumWeb(context),
+                  child: SingleChildScrollView(
+                    child: loginForumWeb(context),
+                  ),
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.3,
@@ -210,6 +258,43 @@ class LoginScreen extends StatelessWidget {
       ],
     );
   }
+
+  // Widget _buildWebView(BuildContext context) {
+  //   return Stack(
+  //     children: [
+  //       backgroundImage,
+  //       Scaffold(
+  //         backgroundColor: Colors.transparent,
+  //         appBar: AppBar(
+  //           automaticallyImplyLeading: false,
+  //           backgroundColor: Colors.transparent,
+  //           elevation: 0,
+  //           // remove the back button
+  //           title: const Text(
+  //             'SAMS',
+  //             style:
+  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+  //           ),
+  //         ),
+  //         body: Center(
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               SizedBox(
+  //                 width: 450,
+  //                 height: 600,
+  //                 child: loginForumWeb(context),
+  //               ),
+  //               SizedBox(
+  //                 width: MediaQuery.of(context).size.width * 0.3,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Column loginForumWeb(context) {
     return Column(
@@ -243,7 +328,7 @@ class LoginScreen extends StatelessWidget {
                       decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Username',
-                          hintText: 'Enter your username'),
+                          hintText: 'Username'),
                     ),
                   ),
                   Padding(
@@ -266,20 +351,10 @@ class LoginScreen extends StatelessWidget {
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Theme.of(context).primaryColor,
                           foregroundColor: Colors.white),
-                      onPressed: () async{
-
-                        print("${_usernameController.text} ${_passwordController.text}");
-                        var success = await AuthController.instance.login(_usernameController.text, _passwordController.text);
-                        print(success);
-                        if(success){
-                          
-                          StudentDashboardController.initialize(AuthController.instance.loggedInUser!.student as Student);                        
-                        Navigator.pushNamed(
-                            context, StudentDashboard.routeName);
-                        }
-                        
+                      onPressed: () async {
+                        await _onLogin(context);
                       },
                       child: const Text("Continue"),
                     ),
@@ -298,6 +373,49 @@ class LoginScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _onLogin(BuildContext context) async {
+    try {
+      var success = await AuthController.instance
+          .login(_usernameController.text, _passwordController.text);
+      if (success) {
+        StudentDashboardController.initialize(
+            AuthController.instance.loggedInUser!.student as Student);
+
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          Navigator.pushNamed(context, StudentDashboard.routeName);
+        });
+      } else {
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            title: const Text('Error'),
+            content: Row(
+              children: const [
+                Icon(Icons.error, color: Colors.red),
+                SizedBox(width: 8),
+                Expanded(child: Text('Invalid username or password')),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _passwordController.clear();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Widget loginForumFieldMobile(BuildContext context) {
@@ -324,19 +442,21 @@ class LoginScreen extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Enter your email',
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                    hintText: 'Enter your username',
                     border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                const TextField(
+                TextField(
+                  controller: _passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Password',
                     hintText: 'Enter your password',
                     border: OutlineInputBorder(),
@@ -348,9 +468,12 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(
                   height: 50,
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/student-dashboard');
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white),
+                    onPressed: () async {
+                      await _onLogin(context);
                     },
                     child: const Text("Continue"),
                   ),

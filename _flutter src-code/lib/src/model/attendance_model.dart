@@ -2,6 +2,7 @@ import 'package:samids_web_app/src/model/device_model.dart';
 import 'package:samids_web_app/src/model/enum_values.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
+
 enum Remarks { onTime, late, cutting, absent }
 
 class Attendance {
@@ -29,20 +30,19 @@ class Attendance {
     return Attendance(
       attendanceId: json['attendanceId'],
       student:
-          json['Student'] != null ? Student.fromJson(json['Student']) : null,
-      subjectSchedule: json['SubjectSchedule'] != null
-          ? SubjectSchedule.fromJson(json['SubjectSchedule'])
+          json['student'] != null ? Student.fromJson(json['student']) : null,
+      subjectSchedule: json['subjectSchedule'] != null
+          ? SubjectSchedule.fromJson(json['subjectSchedule'])
           : null,
-      device:
-          json['Device'] != null ? Device.fromJson(json['Device']) : null,
-      date: json['Date'] != null ? DateTime.parse(json['Date']) : null,
-      actualTimeIn: json['ActualTimeIn'] != null
-          ? DateTime.parse(json['ActualTimeIn'])
+      device: json['device'] != null ? Device.fromJson(json['device']) : null,
+      date: json['date'] != null ? DateTime.parse(json['date']) : null,
+      actualTimeIn: json['actualTimeIn'] != null
+          ? DateTime.parse(json['actualTimeIn'])
           : null,
-      actualTimeOut: json['ActualTimeOut'] != null
-          ? DateTime.parse(json['ActualTimeOut'])
+      actualTimeOut: json['actualTimeOut'] != null
+          ? DateTime.parse(json['actualTimeOut'])
           : null,
-      remarks: remarksValues.map[json['Remarks']]!,
+      remarks: remarksValues.map[json['remarks']]!,
     );
   }
 
@@ -58,8 +58,8 @@ class Attendance {
     data['Remarks'] = remarksValues.reverse[remarks];
     return data;
   }
-
 }
+
 final remarksValues = EnumValues({
   0: Remarks.onTime,
   1: Remarks.late,

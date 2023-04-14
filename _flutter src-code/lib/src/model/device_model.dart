@@ -9,15 +9,15 @@ class Device {
 
   static Device fromJson(Map<String, dynamic> json) {
     return Device(
-      deviceId: json['DeviceId'],
-      room: json['Room'],
+      deviceId: json['deviceId'],
+      room: json['room'],
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['DeviceId'] = deviceId;
-    data['Room'] = room;
+    data['deviceId'] = deviceId;
+    data['room'] = room;
     return data;
   }
 }

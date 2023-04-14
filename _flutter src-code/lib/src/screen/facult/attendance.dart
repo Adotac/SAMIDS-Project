@@ -21,7 +21,6 @@ class AdminAttendance extends StatelessWidget {
   }
 
   Widget _attendanceBody(context) {
-    
     return Expanded(
         child: SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -80,14 +79,15 @@ class AdminAttendance extends StatelessWidget {
 
   Container _searchBar(context) {
     return Container(
+      color: Colors.red,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       height: 42,
-      width: MediaQuery.of(context).size.width * .30,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Colors.grey, width: 1)),
+      // width: MediaQuery.of(context).size.width * .30,
+      // decoration: BoxDecoration(
+      //     color: Colors.white,
+      //     shape: BoxShape.rectangle,
+      //     borderRadius: BorderRadius.circular(5),
+      //     border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
         autofocus: true,
         onSubmitted: (_textEditingController) {
@@ -98,7 +98,7 @@ class AdminAttendance extends StatelessWidget {
         controller: _textEditingController,
         decoration: const InputDecoration(
           suffixIcon: Icon(Icons.search_outlined),
-          suffixIconColor: Colors.grey,
+          // suffixIconColor: Colors.grey,
           border: InputBorder.none,
           hintText: 'Search',
         ),

@@ -1,10 +1,13 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 
-import 'package:samids_web_app/src/screen/my_app.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
+import 'package:samids_web_app/src/screen/settings.dart';
 import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
@@ -58,55 +61,145 @@ class MyApp extends StatelessWidget {
           // Define a light and dark color theme. Then, read the user's
           // preferred ThemeMode (light, dark, or system default) from the
           // SettingsController to display the correct theme.
+          // theme: ThemeData(
+          //   bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          //     backgroundColor: const Color(0xFFF5F6F9),
+          //     selectedItemColor: Colors.black,
+          //     // unselectedItemColor: Colors.grey[400],
+          //     elevation: 0.0,
+          //   ),
+          //   appBarTheme: ThemeData().appBarTheme.copyWith(
+          //         color: const Color(0xFFF5F6F9),
+          //         iconTheme: const IconThemeData(
+          //           color: Colors.black,
+          //         ),
+          //         titleTextStyle: const TextStyle(
+          //           color: Colors.black,
+          //           fontSize: 20,
+          //           fontWeight: FontWeight.bold,
+          //         ),
+          //         elevation: 0.1,
+          //       ),
+          //   scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+          //   cardTheme: const CardTheme(
+          //     margin: EdgeInsets.all(6),
+          //     elevation: 0.2,
+          //   ),
+          //   fontFamily: GoogleFonts.inter().fontFamily,
+          //   textTheme: const TextTheme(
+          //     titleLarge: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
+          // ),
+          // darkTheme: ThemeData.dark(),
           theme: ThemeData(
-            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: const Color(0xFFF5F6F9),
-              selectedItemColor: Colors.black,
-              // unselectedItemColor: Colors.grey[400],
+            inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Theme.of(context).primaryColor,
+                ),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+            ),
+            appBarTheme: AppBarTheme(
+              toolbarHeight: 80,
+              color: const Color(0xFFF5F6F9),
+              iconTheme: IconThemeData(
+                color: Colors.black,
+              ),
+              titleTextStyle: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              elevation: 0.1,
+            ),
+
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              selectedItemColor: Theme.of(context).primaryColor,
               elevation: 0.0,
             ),
-            appBarTheme: ThemeData().appBarTheme.copyWith(
-                  color: const Color(0xFFF5F6F9),
-                  iconTheme: const IconThemeData(
-                    color: Colors.black,
-                  ),
-                  titleTextStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  elevation: 0.1,
-                ),
-            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
-            cardTheme: const CardTheme(
+
+            cardTheme: CardTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                    20.0), // set circular border radius for Cards
+              ),
               margin: EdgeInsets.all(6),
               elevation: 0.2,
             ),
-            fontFamily: GoogleFonts.inter().fontFamily,
-            textTheme: const TextTheme(
-              titleLarge: TextStyle(
-                fontWeight: FontWeight.bold,
+            dividerColor: Theme.of(context)
+                .scaffoldBackgroundColor, // Set divider color to match scaffold color
+            dataTableTheme: DataTableThemeData(
+              dividerThickness: 2.0,
+              headingTextStyle: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold, // Set header font weight to bold
+                fontStyle: FontStyle.normal, // Set header font style to normal
               ),
             ),
+            fontFamily: GoogleFonts.inter().fontFamily,
+            textTheme: ThemeData.light().textTheme.copyWith(
+                  titleLarge: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF0D0D0D),
+                  ),
+                ),
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+                .copyWith(background: const Color(0xFFF5F6F9))
+                .copyWith(secondary: Color.fromARGB(255, 0, 0, 0)),
           ),
-          // darkTheme: ThemeData.dark(),
+
           themeMode: settingsController.themeMode,
           initialRoute: LoginScreen.routeName,
+          home: LoginScreen(),
 
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
           onGenerateRoute: (RouteSettings settings) {
             switch (settings.name) {
               case StudentDashboard.routeName:
-                return MaterialPageRoute(
-                    builder: (_) => const StudentDashboard());
+                return MaterialPageRoute(builder: (_) => StudentDashboard());
               case StudentAttendance.routeName:
-                return MaterialPageRoute(builder: (_) => StudentAttendance());
+                return MaterialPageRoute(
+                    builder: (_) => StudentAttendance(
+                          sdController: StudentDashboardController.instance,
+                        ));
+              case SettingsPage.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => SettingsPage(
+                          sdController: StudentDashboardController.instance,
+                        ));
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
               case StudentClasses.routeName:
                 return MaterialPageRoute(
-                    builder: (_) => const StudentClasses());
+                    builder: (_) => StudentClasses(
+                          sdController: StudentDashboardController.instance,
+                        ));
               default:
                 return MaterialPageRoute(builder: (_) => const PageNotFound());
             }

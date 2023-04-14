@@ -1,11 +1,15 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+
 import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
+import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
+import '../../controllers/student_dashboard.controller.dart';
+import '../../model/attendance_model.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
@@ -17,13 +21,24 @@ import 'package:intl/intl.dart';
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
   static const routeName = '/student-dashboard';
-  const StudentDashboard({super.key});
+  StudentDashboardController sdController = StudentDashboardController.instance;
+  StudentDashboard({super.key});
 
   @override
   State<StudentDashboard> createState() => _StudentDashboardState();
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
+  StudentDashboardController get _sdController => widget.sdController;
+  // add on init
+  @override
+  void initState() {
+    _sdController.getAttendanceToday();
+    _sdController.getAttendanceAll();
+
+    super.initState();
+  }
+
   Widget sampleDataAct = const ListTile(
     leading: Text("02:12pm"),
     title: Text("10023 - Programming 1"),
@@ -58,16 +73,28 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Widget _mobileView() {
-    return MobileView(
-      currentIndex: 0,
-      appBarTitle: 'Dashboard',
-      userName: 'Martin Erickson Lapetaje',
-      body: Column(
-        children: [
-          _mobileOverviewCard(2, 0),
-          _mobileRecentLogsCard(0),
-        ],
-      ),
+    return AnimatedBuilder(
+      animation: _sdController,
+      builder: (context, child) {
+        return MobileView(
+            currentIndex: 0,
+            appBarTitle: 'Dashboard',
+            userName:
+                '${_sdController.student.firstName} ${_sdController.student.lastName}',
+            body: _sdController.isCountCalculated
+                ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard(0)]
+                : [
+                    Spacer(),
+                    Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 4,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor, // Customize the color
+                        ),
+                      ),
+                    ),
+                  ]);
+      },
     );
   }
 
@@ -87,14 +114,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
       ),
       body: Row(
         children: [
-          _buildSideMenu(context),
+          SideMenu(selectedWidgetMarker: 0),
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    StudentInfoCard(),
+                    StudentInfoCard(student: _sdController.student),
                     SizedBox(height: 8),
                     Row(
                       children: [
@@ -105,10 +132,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(flex: 1, child: _recentLogsCard(context)),
-                        _myClassesCard(context)
-                      ],
+                      children: [_recentLogsCard(), _myClassesCard(context)],
                     ),
                     SizedBox(height: 8),
                   ],
@@ -116,53 +140,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSideMenu(BuildContext context) {
-    return Container(
-      width: 250,
-      color: Colors.grey[200],
-      child: Column(
-        children: [
-          SizedBox(height: 60), // Add space to adjust for the AppBar
-          ListTile(
-            leading: Icon(Icons.event_note_outlined),
-            title: Text('Dashboard'),
-            onTap: () {
-              // Navigate to Attendance Page
-              Navigator.pushNamed(context, StudentDashboard.routeName);
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.event_available_outlined,
-            ),
-            title: Text('Attendance'),
-            onTap: () {
-              Navigator.pushNamed(context, StudentAttendance.routeName);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.settings_outlined),
-            title: Text('Settings'),
-            onTap: () {
-              // Navigate to Settings Page
-              // Navigator.pushNamed(context, StudentDashboard.routeName);
-            },
-          ),
-          Spacer(),
-          ListTile(
-            leading: Icon(Icons.logout_outlined),
-            title: Text('Logout'),
-            onTap: () {
-              // Perform Logout action and navigate to Login Page
-              // Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-            },
-          ),
-          SizedBox(height: 20), // Add some space below the Logout option
         ],
       ),
     );
@@ -206,21 +183,21 @@ class _StudentDashboardState extends State<StudentDashboard> {
   // }
 
   // Widget _webView(BuildContext context) {
-  DataRow logsSampleDataRow(context) {
-    return DataRow(
-      cells: <DataCell>[
-        DataCell(Text('02:12pm')),
-        DataCell(Expanded(
-          child: Text(
-            textAlign: TextAlign.start,
-            '10023 - Programming 1',
-            overflow: TextOverflow.ellipsis,
-          ),
-        )),
-        DataCell(Text('On-Time')),
-      ],
-    );
-  }
+  // DataRow logsSampleDataRow(context) {
+  //   return DataRow(
+  //     cells: <DataCell>[
+  //       DataCell(Text('02:12pm')),
+  //       DataCell(Expanded(
+  //         child: Text(
+  //           textAlign: TextAlign.start,
+  //           '10023 - Programming 1',
+  //           overflow: TextOverflow.ellipsis,
+  //         ),
+  //       )),
+  //       DataCell(Text('On-Time')),
+  //     ],
+  //   );
+  // }
 
   DataRow classesSampleDataRow(context) {
     return DataRow(
@@ -241,36 +218,36 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget dataTableLogs(context) {
-    return SizedBox(
-      width: double.infinity,
-      child: DataTable(
-        dividerThickness: 0,
-        columnSpacing: 5,
-        columns: [
-          DataColumn(
-            label: Text(
-              'Time',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Subject',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Remark',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ],
-        rows: [for (int i = 0; i < 10; i++) logsSampleDataRow(context)],
-      ),
-    );
-  }
+  // Widget dataTableLogs(context) {
+  //   return SizedBox(
+  //     width: double.infinity,
+  //     child: DataTable(
+  //       dividerThickness: 0,
+  //       columnSpacing: 5,
+  //       columns: [
+  //         DataColumn(
+  //           label: Text(
+  //             'Time',
+  //             style: TextStyle(fontStyle: FontStyle.italic),
+  //           ),
+  //         ),
+  //         DataColumn(
+  //           label: Text(
+  //             'Subject',
+  //             style: TextStyle(fontStyle: FontStyle.italic),
+  //           ),
+  //         ),
+  //         DataColumn(
+  //           label: Text(
+  //             'Remark',
+  //             style: TextStyle(fontStyle: FontStyle.italic),
+  //           ),
+  //         ),
+  //       ],
+  //       rows: [for (int i = 0; i < 10; i++) logsSampleDataRow(context)],
+  //     ),
+  //   );
+  // }
 
   Widget dataTableClasses(context) {
     return SizedBox(
@@ -321,36 +298,50 @@ class _StudentDashboardState extends State<StudentDashboard> {
       isShadow: false,
       sideTitle: _formatCurrentDate(),
       title: "Recent Activity",
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => CustomListTile(
-            title: "Programming $index",
-            subtitle: getStatusText("On-Time"),
-            leadingIcon: Icons.access_alarm_sharp,
-            trailingText: "02:12pm",
-            subTrailingText: '10023',
-          ),
-        ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: _sdController.attendance.length,
+        itemBuilder: (BuildContext context, int index) {
+          Attendance attendance = _sdController.attendance[index];
+          return CustomListTile(
+            title: attendance.subjectSchedule?.subject?.subjectName ??
+                'No subject name',
+            subtitle: _sdController.getStatusText(attendance.remarks.name),
+            leadingIcon: Icon(getStatusIcon(attendance.remarks),
+                color: Theme.of(context).scaffoldBackgroundColor),
+            leadingColors:
+                _sdController.getStatusColor(attendance.remarks, context),
+            trailingText: _sdController.formatTime(_getActualTime(attendance)),
+            subTrailingText:
+                attendance.subjectSchedule?.room.toString() ?? 'No subject id',
+          );
+        },
       ),
     );
-    //  Row(
-
-    // ));
-    // dataTableLogs(context));
   }
 
-  Widget _recentLogsCard([flexValue = 1]) {
+  DateTime _getActualTime(Attendance attendance) =>
+      attendance.actualTimeOut != null
+          ? attendance.actualTimeOut!
+          : attendance.actualTimeIn != null
+              ? attendance.actualTimeIn!
+              : DateTime.now();
+
+  Widget _recentLogsCard() {
     return CardSmall(
+      flexValue: 1,
       isShadow: false,
       title: "Recent Activity",
       child: Column(
         children: List.generate(
           20,
           (index) => CustomListTile(
+            leadingColors: Colors.white,
             title: "Programming $index",
-            subtitle: getStatusText("On-Time"),
-            leadingIcon: Icons.access_alarm_sharp,
+            subtitle: _sdController.getStatusText("On-Time"),
+            leadingIcon: Icon(
+              Icons.access_alarm_sharp,
+            ),
             trailingText: "02:12pm",
             subTrailingText: '10023',
           ),
@@ -363,54 +354,21 @@ class _StudentDashboardState extends State<StudentDashboard> {
     // dataTableLogs(context));
   }
 
-  CardSmall _performanceCard(leadingFlex, [flexValue = 1]) {
-    return CardSmall(
-      flexValue: flexValue,
-      title: "Performance",
-      isShadow: true,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        // ignore: prefer_const_literals_to_create_immutables
-        children: [
-          DataNumber(
-              number: "Great!", description: "Rating", flex: leadingFlex),
-          DataNumber(number: "11%", description: "Late", flex: 1),
-          DataNumber(number: "5%", description: "Absent", flex: 1),
-          DataNumber(number: "4%", description: "Cutting", flex: 1),
-          DataNumber(number: "35%", description: "On-Time", flex: 1),
-        ],
-      ),
-      // sampleData: sampleDataActyiee,
-    );
-  }
-
-  Text getStatusText(String status) {
-    final String lowercaseStatus = status.toLowerCase();
-    Color color;
-    switch (lowercaseStatus) {
-      case 'absent':
-        color = Colors.red;
-        break;
-      case 'cutting':
-        color = Colors.yellow;
-        break;
-      case 'on-time':
-        color = Colors.green;
-        break;
-      case 'late':
-        color = Colors.orange;
-        break;
-      default:
-        color = Colors.black;
-        break;
+  IconData getStatusIcon(Remarks remarks) {
+    switch (remarks) {
+      case Remarks.onTime:
+        return Icons.timer_outlined;
+      case Remarks.late:
+        return Icons.schedule_outlined;
+      case Remarks.cutting:
+        return Icons.cancel_outlined;
+      case Remarks.absent:
+        return Icons.highlight_off_outlined;
     }
-    return Text(
-      status,
-      style: TextStyle(color: color),
-    );
   }
 
   CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
+    double totalLogs = _sdController.allAttendanceList.length.toDouble();
     return CardSmall(
       isShadow: true,
       flexValue: flexValue,
@@ -418,11 +376,15 @@ class _StudentDashboardState extends State<StudentDashboard> {
       child: Row(
         children: [
           DataNumber(
-              number: "55", description: "Total logs", flex: leadingFlex),
-          circularData(11, 'Absent', Colors.red),
-          circularData(05, 'Cutting', Colors.yellow),
-          circularData(04, 'On-Time', Colors.green),
-          circularData(35, 'Late', Colors.orange)
+              number: totalLogs.toString(),
+              description: "Total logs",
+              flex: leadingFlex),
+          Spacer(),
+          circularData(_sdController.absentCount, 'Absent', Colors.red),
+          circularData(
+              _sdController.cuttingCount, 'Cutting', Colors.yellow.shade700),
+          circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
+          circularData(_sdController.lateCount, 'Late', Colors.orange)
         ],
       ),
       // sampleData: sampleDataAct,
@@ -430,42 +392,52 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Widget _mobileOverviewCard(leadingFlex, [flexValue = 1]) {
-    return MobileSmallCard(
-        isShadow: true,
-        sideTitle: "Total logs",
-        sideTitleTrailer: '55',
-        title: "Overview",
-        child: Row(
-          children: [
-            circularData(11, 'Absent', Colors.red, 32),
-            circularData(05, 'Cutting', Colors.yellow, 32),
-            circularData(04, 'On-Time', Colors.green, 32),
-            circularData(35, 'Late', Colors.orange, 32),
-          ],
-        ));
-
-    // sampleData: sampleDataAct,
+    return AnimatedBuilder(
+      animation: _sdController,
+      builder: (context, child) {
+        double totalLogs = _sdController.allAttendanceList.length.toDouble();
+        return MobileSmallCard(
+          isShadow: true,
+          sideTitle: "Total logs",
+          sideTitleTrailer: totalLogs.toString(),
+          title: "Overview",
+          child: Row(
+            children: [
+              circularData(
+                  _sdController.absentCount, 'Absent', Colors.red, 32.0),
+              circularData(
+                  _sdController.cuttingCount, 'Cutting', Colors.yellow, 32.0),
+              circularData(
+                  _sdController.onTimeCount, 'On-Time', Colors.green, 32.0),
+              circularData(_sdController.lateCount, 'Late',
+                  Color.fromRGBO(255, 152, 0, 1), 32.0),
+            ],
+          ),
+        );
+      },
+    );
   }
 
-  Widget circularData(value, description, color, [radius = 40]) {
+  Widget circularData(value, description, color, [radius = 40.0]) {
+    print(_sdController.lateCount);
+    print(_sdController.onTimeCount);
+    print(_sdController.cuttingCount);
+    print(_sdController.absentCount);
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Flexible(
-        flex: 1,
-        child: Column(
-          children: [
-            CircularViewer(
-              value: value,
-              maxValue: 55,
-              radius: radius,
-              textStyle: TextStyle(fontSize: 20),
-              color: Color(0xffEEEEEE),
-              sliderColor: color,
-              unSelectedColor: Color.fromARGB(255, 255, 255, 255),
-            ),
-            Text(description),
-          ],
-        ),
+      child: Column(
+        children: [
+          CircularViewer(
+            value: value,
+            maxValue: _sdController.allAttendanceList.length.toDouble(),
+            radius: radius,
+            textStyle: TextStyle(fontSize: 20),
+            color: Color(0xffEEEEEE),
+            sliderColor: color,
+            unSelectedColor: Color.fromARGB(255, 255, 255, 255),
+          ),
+          Text(description),
+        ],
       ),
     );
   }

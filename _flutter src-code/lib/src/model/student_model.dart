@@ -63,4 +63,3 @@ final yearValues = EnumValues({
   2: Year.third,
   3: Year.fourth
 });
-
