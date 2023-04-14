@@ -15,13 +15,12 @@ class AuthService {
 
   static Future<CRUDReturn> login(UserDto credentials) async {
     try {
-      print(credentials.toJson());
       final response = await HttpService.post('$_baseUrl/login',
           body: credentials.toJson(),
           headers: {"Content-Type": "application/json"});
-      print('jsonResponse');
+
       final jsonResponse = jsonDecode(response.body);
-      print(jsonResponse);
+
       return CRUDReturn.fromJson(jsonResponse);
     } catch (e, stacktrace) {
       if (kDebugMode) print('AuthService login $e $stacktrace');

@@ -1,13 +1,15 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 class CustomListTile extends StatelessWidget {
-  final IconData leadingIcon;
+  final Icon leadingIcon;
   final String title;
   final Widget subtitle;
   final String trailingText;
   final String subTrailingText;
   final double spaceBetween = 6.0;
-
+  final Color leadingColors;
   const CustomListTile({
     Key? key,
     required this.leadingIcon,
@@ -15,6 +17,7 @@ class CustomListTile extends StatelessWidget {
     required this.subtitle,
     required this.trailingText,
     required this.subTrailingText,
+    required this.leadingColors,
   }) : super(key: key);
 
   @override
@@ -28,9 +31,9 @@ class CustomListTile extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
             ),
-            child: Icon(leadingIcon, color: Colors.white),
+            child: leadingIcon,
           ),
           const SizedBox(width: 16.0),
           Expanded(
@@ -66,7 +69,7 @@ class CustomListTile extends StatelessWidget {
                 subTrailingText,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).textTheme.caption?.color,
+                  color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
               ),
             ],

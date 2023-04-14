@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
@@ -26,17 +27,17 @@ class StudentDashboardController with ChangeNotifier {
   Future<List<Attendance>> getAttendance() async {
     try {
       CRUDReturn response = await AttendanceService.getAll(
-          studentNo: student.studentNo, date: DateTime.now());
+          studentNo: student.studentNo, date: DateTime(2023));
 
       if (response.success) {
         if (attendance.isNotEmpty) attendance.clear();
 
         for (Map<String, dynamic> map in response.data) {
-          print(map);
           attendance.add(Attendance.fromJson(map));
         }
-        print(attendance);
-        // List<Attendance> attendance = Attendance.fromJson(response.body);
+
+        // List<Attendance> attendance = Attendance.fromJson(response.body)
+        notifyListeners();
         return attendance;
       } else {
         return [];
@@ -45,5 +46,11 @@ class StudentDashboardController with ChangeNotifier {
       print('StudentDashboardController getAttendance $e $stacktrace');
       return [];
     }
+  }
+
+  String formatTime(DateTime dateTime) {
+    final time = TimeOfDay.fromDateTime(dateTime);
+    final formattedTime = DateFormat('hh:mm a').format(dateTime);
+    return formattedTime;
   }
 }

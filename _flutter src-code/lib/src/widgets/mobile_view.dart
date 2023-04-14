@@ -30,47 +30,53 @@ class MobileView extends StatefulWidget {
 }
 
 class _MobileViewState extends State<MobileView> {
-  BottomNavigationBar _buildBottomNavigationBar(context, int currentIndex) {
-    print('currentIndex: $currentIndex');
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(
-            Icons.dashboard_outlined,
-          ),
-          label: 'Dashboard ',
-        ),
-        BottomNavigationBarItem(
+  Widget _buildBottomNavigationBar(context, int currentIndex) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      ),
+      child: BottomNavigationBar(
+        currentIndex: currentIndex,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+        items: const [
+          BottomNavigationBarItem(
             icon: Icon(
-              Icons.event_available_outlined,
+              Icons.dashboard_outlined,
             ),
-            label: 'Attendance'),
-        BottomNavigationBarItem(
-          icon: Icon(
-            Icons.school_outlined,
+            label: 'Dashboard ',
           ),
-          label: 'Classes',
-        ),
-      ],
-      onTap: (int index) {
-        switch (index) {
-          case 0:
-            Navigator.of(context).popAndPushNamed(StudentDashboard.routeName);
-            break;
-          case 1:
-            Navigator.of(context).popAndPushNamed(StudentAttendance.routeName);
-            break;
-          case 2:
-            Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
-            break;
-          case 3:
-            Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
-            break;
-        }
-      },
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.event_available_outlined,
+              ),
+              label: 'Attendance'),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.school_outlined,
+            ),
+            label: 'Classes',
+          ),
+        ],
+        onTap: (int index) {
+          switch (index) {
+            case 0:
+              Navigator.of(context).popAndPushNamed(StudentDashboard.routeName);
+              break;
+            case 1:
+              Navigator.of(context)
+                  .popAndPushNamed(StudentAttendance.routeName);
+              break;
+            case 2:
+              Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
+              break;
+            case 3:
+              Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
+              break;
+          }
+        },
+      ),
     );
   }
 

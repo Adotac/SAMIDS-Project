@@ -94,6 +94,7 @@ class MyApp extends StatelessWidget {
           // ),
           // darkTheme: ThemeData.dark(),
           theme: ThemeData(
+            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
             appBarTheme: AppBarTheme(
               color: const Color(0xFFF5F6F9),
               iconTheme: IconThemeData(
@@ -106,15 +107,24 @@ class MyApp extends StatelessWidget {
               ),
               elevation: 0.1,
             ),
-            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-              backgroundColor: Color(0xFFF5F6F9),
-              selectedItemColor: Colors.black,
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              selectedItemColor: Theme.of(context).primaryColor,
               elevation: 0.0,
             ),
-            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
             cardTheme: const CardTheme(
               margin: EdgeInsets.all(6),
               elevation: 0.2,
+            ),
+            dividerColor: Theme.of(context)
+                .scaffoldBackgroundColor, // Set divider color to match scaffold color
+            dataTableTheme: DataTableThemeData(
+              dividerThickness: 2.0,
+              headingTextStyle: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold, // Set header font weight to bold
+                fontStyle: FontStyle.normal, // Set header font style to normal
+              ),
             ),
             fontFamily: GoogleFonts.inter().fontFamily,
             textTheme: ThemeData.light().textTheme.copyWith(

@@ -9,6 +9,7 @@ import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
 import '../../controllers/student_dashboard.controller.dart';
+import '../../model/attendance_model.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
@@ -72,17 +73,22 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Widget _mobileView() {
-    return MobileView(
-      currentIndex: 0,
-      appBarTitle: 'Dashboard',
-      userName:
-          '${_sdController.student.firstName} ${_sdController.student.lastName}',
-      body: Column(
-        children: [
-          _mobileOverviewCard(2, 0),
-          _mobileRecentLogsCard(0),
-        ],
-      ),
+    return AnimatedBuilder(
+      animation: _sdController,
+      builder: (context, child) {
+        return MobileView(
+          currentIndex: 0,
+          appBarTitle: 'Dashboard',
+          userName:
+              '${_sdController.student.firstName} ${_sdController.student.lastName}',
+          body: Column(
+            children: [
+              _mobileOverviewCard(2, 0),
+              _mobileRecentLogsCard(0),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -171,21 +177,21 @@ class _StudentDashboardState extends State<StudentDashboard> {
   // }
 
   // Widget _webView(BuildContext context) {
-  DataRow logsSampleDataRow(context) {
-    return DataRow(
-      cells: <DataCell>[
-        DataCell(Text('02:12pm')),
-        DataCell(Expanded(
-          child: Text(
-            textAlign: TextAlign.start,
-            '10023 - Programming 1',
-            overflow: TextOverflow.ellipsis,
-          ),
-        )),
-        DataCell(Text('On-Time')),
-      ],
-    );
-  }
+  // DataRow logsSampleDataRow(context) {
+  //   return DataRow(
+  //     cells: <DataCell>[
+  //       DataCell(Text('02:12pm')),
+  //       DataCell(Expanded(
+  //         child: Text(
+  //           textAlign: TextAlign.start,
+  //           '10023 - Programming 1',
+  //           overflow: TextOverflow.ellipsis,
+  //         ),
+  //       )),
+  //       DataCell(Text('On-Time')),
+  //     ],
+  //   );
+  // }
 
   DataRow classesSampleDataRow(context) {
     return DataRow(
@@ -206,36 +212,36 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget dataTableLogs(context) {
-    return SizedBox(
-      width: double.infinity,
-      child: DataTable(
-        dividerThickness: 0,
-        columnSpacing: 5,
-        columns: [
-          DataColumn(
-            label: Text(
-              'Time',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Subject',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Remark',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ],
-        rows: [for (int i = 0; i < 10; i++) logsSampleDataRow(context)],
-      ),
-    );
-  }
+  // Widget dataTableLogs(context) {
+  //   return SizedBox(
+  //     width: double.infinity,
+  //     child: DataTable(
+  //       dividerThickness: 0,
+  //       columnSpacing: 5,
+  //       columns: [
+  //         DataColumn(
+  //           label: Text(
+  //             'Time',
+  //             style: TextStyle(fontStyle: FontStyle.italic),
+  //           ),
+  //         ),
+  //         DataColumn(
+  //           label: Text(
+  //             'Subject',
+  //             style: TextStyle(fontStyle: FontStyle.italic),
+  //           ),
+  //         ),
+  //         DataColumn(
+  //           label: Text(
+  //             'Remark',
+  //             style: TextStyle(fontStyle: FontStyle.italic),
+  //           ),
+  //         ),
+  //       ],
+  //       rows: [for (int i = 0; i < 10; i++) logsSampleDataRow(context)],
+  //     ),
+  //   );
+  // }
 
   Widget dataTableClasses(context) {
     return SizedBox(
@@ -286,24 +292,42 @@ class _StudentDashboardState extends State<StudentDashboard> {
       isShadow: false,
       sideTitle: _formatCurrentDate(),
       title: "Recent Activity",
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => CustomListTile(
-            title: "Programming $index",
-            subtitle: getStatusText("On-Time"),
-            leadingIcon: Icons.access_alarm_sharp,
-            trailingText: "02:12pm",
-            subTrailingText: '10023',
-          ),
-        ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: _sdController.attendance.length,
+        itemBuilder: (BuildContext context, int index) {
+          Attendance attendance = _sdController.attendance[index];
+
+          print(
+            attendance.subjectSchedule?.subject?.subjectName ??
+                'No subject name',
+          );
+          print(
+            attendance.subjectSchedule?.subject,
+          );
+
+          return CustomListTile(
+            title: attendance.subjectSchedule?.subject?.subjectName ??
+                'No subject name',
+            subtitle: getStatusText(attendance.remarks.name),
+            leadingIcon: Icon(getStatusIcon(attendance.remarks),
+                color: Theme.of(context).scaffoldBackgroundColor),
+            leadingColors: getStatusColor(attendance.remarks, context),
+            trailingText: _sdController.formatTime(_getActualTime(attendance)),
+            subTrailingText: attendance.subjectSchedule?.schedId.toString() ??
+                'No subject id',
+          );
+        },
       ),
     );
-    //  Row(
-
-    // ));
-    // dataTableLogs(context));
   }
+
+  DateTime _getActualTime(Attendance attendance) =>
+      attendance.actualTimeOut != null
+          ? attendance.actualTimeOut!
+          : attendance.actualTimeIn != null
+              ? attendance.actualTimeIn!
+              : DateTime.now();
 
   Widget _recentLogsCard() {
     return CardSmall(
@@ -314,9 +338,12 @@ class _StudentDashboardState extends State<StudentDashboard> {
         children: List.generate(
           20,
           (index) => CustomListTile(
+            leadingColors: Colors.white,
             title: "Programming $index",
             subtitle: getStatusText("On-Time"),
-            leadingIcon: Icons.access_alarm_sharp,
+            leadingIcon: Icon(
+              Icons.access_alarm_sharp,
+            ),
             trailingText: "02:12pm",
             subTrailingText: '10023',
           ),
@@ -329,6 +356,35 @@ class _StudentDashboardState extends State<StudentDashboard> {
     // dataTableLogs(context));
   }
 
+  IconData getStatusIcon(Remarks remarks) {
+    switch (remarks) {
+      case Remarks.onTime:
+        return Icons.timer_outlined;
+      case Remarks.late:
+        return Icons.schedule_outlined;
+      case Remarks.cutting:
+        return Icons.cancel_outlined;
+      case Remarks.absent:
+        return Icons.highlight_off_outlined;
+    }
+  }
+
+  Color getStatusColor(Remarks remarks, BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    switch (remarks) {
+      case Remarks.onTime:
+        return Colors.green; // Modify with the desired color for onTime
+      case Remarks.late:
+        return Colors.orange; // Modify with the desired color for late
+      case Remarks.cutting:
+        return Colors
+            .yellow.shade700; // Modify with the desired color for cutting
+      case Remarks.absent:
+        return Colors.red
+            .withOpacity(0.5); // Modify with the desired color for absent
+    }
+  }
+
   Text getStatusText(String status) {
     final String lowercaseStatus = status.toLowerCase();
     Color color;
@@ -337,9 +393,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
         color = Colors.red;
         break;
       case 'cutting':
-        color = Colors.yellow;
+        color = Colors.yellow.shade700;
         break;
-      case 'on-time':
+      case 'ontime':
         color = Colors.green;
         break;
       case 'late':
@@ -366,7 +422,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               number: "55", description: "Total logs", flex: leadingFlex),
           Spacer(),
           circularData(11, 'Absent', Colors.red),
-          circularData(05, 'Cutting', Colors.yellow),
+          circularData(05, 'Cutting', Colors.yellow.shade700),
           circularData(04, 'On-Time', Colors.green),
           circularData(35, 'Late', Colors.orange)
         ],

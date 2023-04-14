@@ -34,14 +34,14 @@ class AttendanceService {
   }) async {
     try {
       Map<String, dynamic>? query = {};
-      // if (date != null) query['date'] = date.toIso8601String();
+      // if (date != null) query['date'] = date;
       if (room != null) query['room'] = room;
       if (studentNo != null) query['studentNo'] = studentNo.toString();
       if (remarks != null) query['remarks'] = remarks;
       print("ndanceService getAll 1 $query");
       final response =
           await HttpService.get('$_baseUrl/Attendance', query: query);
-
+      print("AttendanceService getAll 2 ${response.body}");
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');

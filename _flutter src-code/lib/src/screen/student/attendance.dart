@@ -55,7 +55,6 @@ class StudentAttendance extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          elevation: 1,
           child: _mobileAttendanceBody(context),
         ),
       ),
