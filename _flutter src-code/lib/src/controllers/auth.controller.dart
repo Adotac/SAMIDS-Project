@@ -24,8 +24,11 @@ class AuthController with ChangeNotifier {
       var credentials =
           UserDto.fromJson({'Username': username, 'Password': password});
       CRUDReturn result = await AuthService.login(credentials);
+
       if (result.success) {
         isLoggedIn = true;
+        if (kDebugMode)
+          _logger.i(' AuthController logins ${result.data['user']}');
         loggedInUser = User.fromJson(result.data['user']);
         notifyListeners();
         return true;

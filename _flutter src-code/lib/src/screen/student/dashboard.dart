@@ -33,10 +33,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
   // add on init
   @override
   void initState() {
-    print('sdController.getAttendance');
-    _sdController.getAttendance();
+    _sdController.getAttendanceToday();
+    _sdController.getAttendanceAll();
+
     super.initState();
-    print('sdController.getAttendance');
   }
 
   Widget sampleDataAct = const ListTile(
@@ -81,12 +81,26 @@ class _StudentDashboardState extends State<StudentDashboard> {
           appBarTitle: 'Dashboard',
           userName:
               '${_sdController.student.firstName} ${_sdController.student.lastName}',
-          body: Column(
-            children: [
-              _mobileOverviewCard(2, 0),
-              _mobileRecentLogsCard(0),
-            ],
-          ),
+          body: _sdController.isCountCalculated
+              ? Column(
+                  children: [
+                    _mobileOverviewCard(2, 0),
+                    _mobileRecentLogsCard(0),
+                  ],
+                )
+              : Column(
+                  children: [
+                    Spacer(),
+                    Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 4,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).primaryColor, // Customize the color
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
         );
       },
     );
@@ -412,6 +426,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
+    double totalLogs = _sdController.allAttendance.length.toDouble();
     return CardSmall(
       isShadow: true,
       flexValue: flexValue,
@@ -419,12 +434,15 @@ class _StudentDashboardState extends State<StudentDashboard> {
       child: Row(
         children: [
           DataNumber(
-              number: "55", description: "Total logs", flex: leadingFlex),
+              number: totalLogs.toString(),
+              description: "Total logs",
+              flex: leadingFlex),
           Spacer(),
-          circularData(11, 'Absent', Colors.red),
-          circularData(05, 'Cutting', Colors.yellow.shade700),
-          circularData(04, 'On-Time', Colors.green),
-          circularData(35, 'Late', Colors.orange)
+          circularData(_sdController.absentCount, 'Absent', Colors.red),
+          circularData(
+              _sdController.cuttingCount, 'Cutting', Colors.yellow.shade700),
+          circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
+          circularData(_sdController.lateCount, 'Late', Colors.orange)
         ],
       ),
       // sampleData: sampleDataAct,
@@ -432,31 +450,44 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Widget _mobileOverviewCard(leadingFlex, [flexValue = 1]) {
-    return MobileSmallCard(
-        isShadow: true,
-        sideTitle: "Total logs",
-        sideTitleTrailer: '55',
-        title: "Overview",
-        child: Row(
-          children: [
-            circularData(11.0, 'Absent', Colors.red, 32.0),
-            circularData(05.0, 'Cutting', Colors.yellow, 32.0),
-            circularData(04.0, 'On-Time', Colors.green, 32.0),
-            circularData(35.0, 'Late', Color.fromRGBO(255, 152, 0, 1), 32.0),
-          ],
-        ));
-
-    // sampleData: sampleDataAct,
+    return AnimatedBuilder(
+      animation: _sdController,
+      builder: (context, child) {
+        double totalLogs = _sdController.allAttendance.length.toDouble();
+        return MobileSmallCard(
+          isShadow: true,
+          sideTitle: "Total logs",
+          sideTitleTrailer: totalLogs.toString(),
+          title: "Overview",
+          child: Row(
+            children: [
+              circularData(
+                  _sdController.absentCount, 'Absent', Colors.red, 32.0),
+              circularData(
+                  _sdController.cuttingCount, 'Cutting', Colors.yellow, 32.0),
+              circularData(
+                  _sdController.onTimeCount, 'On-Time', Colors.green, 32.0),
+              circularData(_sdController.lateCount, 'Late',
+                  Color.fromRGBO(255, 152, 0, 1), 32.0),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget circularData(value, description, color, [radius = 40.0]) {
+    print(_sdController.lateCount);
+    print(_sdController.onTimeCount);
+    print(_sdController.cuttingCount);
+    print(_sdController.absentCount);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
           CircularViewer(
             value: value,
-            maxValue: 55,
+            maxValue: _sdController.allAttendance.length.toDouble(),
             radius: radius,
             textStyle: TextStyle(fontSize: 20),
             color: Color(0xffEEEEEE),
