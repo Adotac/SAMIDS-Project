@@ -149,7 +149,15 @@ class MyApp extends StatelessWidget {
               ),
               elevation: 0.1,
             ),
-
+            drawerTheme: DrawerThemeData(
+              elevation: 0.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(radius),
+                  bottomLeft: Radius.circular(radius),
+                ),
+              ),
+            ),
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               selectedItemColor: Theme.of(context).primaryColor,

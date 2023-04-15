@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
@@ -7,13 +8,15 @@ class WebView extends StatelessWidget {
   final Widget body;
   final int selectedWidgetMarker;
   final bool showBackButton;
+  final Widget? appBarActionWidget;
 
-  WebView({
+  const WebView({
     Key? key,
     required this.appBarTitle,
     required this.body,
     required this.selectedWidgetMarker,
     this.showBackButton = false,
+    this.appBarActionWidget,
   }) : super(key: key);
 
   Widget _buildNotificationsList(BuildContext context) {
@@ -34,23 +37,54 @@ class WebView extends StatelessWidget {
     );
   }
 
+  Widget _searchBar(BuildContext context) {
+    ThemeData currentTheme = Theme.of(context);
+    return Container(
+      width: 500,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: TextField(
+        onSubmitted: (textEditingController) {
+          if (kDebugMode) {
+            print(textEditingController.toString());
+          }
+        },
+        // controller: _textEditingController,
+        decoration: InputDecoration(
+          suffixIcon:
+              Icon(Icons.search_outlined, color: Theme.of(context).hintColor),
+          border: InputBorder.none,
+          hintText: 'Search',
+          hintStyle: TextStyle(color: currentTheme.hintColor),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(appBarTitle),
+        title: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(appBarTitle),
+              ),
+              if (appBarActionWidget != null) _searchBar(context),
+            ],
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none_outlined),
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return SizedBox(
-                    height: 250,
-                    child: _buildNotificationsList(context),
-                  );
+          Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.notifications_none_outlined),
+                onPressed: () {
+                  Scaffold.of(context).openEndDrawer();
                 },
               );
             },
@@ -62,6 +96,20 @@ class WebView extends StatelessWidget {
           SideMenu(selectedWidgetMarker: selectedWidgetMarker),
           Expanded(child: body),
         ],
+      ),
+      endDrawer: Drawer(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Text(
+                'Notifications',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            Expanded(child: _buildNotificationsList(context)),
+          ],
+        ),
       ),
     );
   }

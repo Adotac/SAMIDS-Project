@@ -160,60 +160,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
-    return DataRow(
-      cells: [
-        DataCell(
-          Text(
-            attendance.subjectSchedule?.subject?.subjectName ??
-                'No subject name',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        DataCell(
-          Text(
-            attendance.subjectSchedule?.room.toString() ?? 'No subject id',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        DataCell(
-          Text(
-            _sdController.formatTime(_getActualTime(attendance)),
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
-        ),
-        DataCell(
-          _sdController.getStatusText(attendance.remarks.name),
-        ),
-        // DataCell(
-        //   Text(
-        //     attendance.subjectSchedule?.subject?.subjectName ??
-        //         'No subject name',
-        //     style: TextStyle(fontSize: 14),
-        //   ),
-        // ),
-        // DataCell(
-        //   Row(
-        //     children: [
-        //       Icon(
-        //         getStatusIcon(attendance.remarks),
-        //         color: Theme.of(context).scaffoldBackgroundColor,
-        //       ),
-        //       SizedBox(width: 8),
-        //       _sdController.getStatusText(attendance.remarks.name)
-        //       // Text(
-        //       //  ,
-        //       //   style: TextStyle(fontSize: 14),
-        //       // ),
-        //     ],
-        //   ),
-        // ),
-      ],
-    );
-  }
-
   DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
     return DataRow(
       cells: [
@@ -315,6 +261,37 @@ class _StudentDashboardState extends State<StudentDashboard> {
       rows: _sdController.allAttendanceList
           .map((attendance) => _buildDataRowRecentLogs(context, attendance))
           .toList(),
+    );
+  }
+
+  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Text(
+            attendance.subjectSchedule?.subject?.subjectName ??
+                'No subject name',
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            attendance.subjectSchedule?.room.toString() ?? 'No subject id',
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            _sdController.formatTime(_getActualTime(attendance)),
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        ),
+        DataCell(
+          _sdController.getStatusText(attendance.remarks.name),
+        ),
+      ],
     );
   }
 
