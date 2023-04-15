@@ -15,8 +15,11 @@ import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
 import '../../widgets/mobile_view.dart';
+import '../../widgets/recent_logs_table.dart';
 import '../../widgets/title_medium_text.dart';
 import 'package:intl/intl.dart';
+
+import '../../widgets/web_view.dart';
 
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
@@ -39,24 +42,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
     super.initState();
   }
 
-  Widget sampleDataAct = const ListTile(
-    leading: Text("02:12pm"),
-    title: Text("10023 - Programming 1"),
-    trailing: Text("On-Time"),
-  );
-
-  Widget sampleDataClasses = const ListTile(
-    leading: Text("10:30am - 11:30am "),
-    title: Text(" 10023 - Programming 1"),
-    // subtitle: Text("10023"),
-    trailing: Text(
-      "On Going",
-      style: TextStyle(
-        color: Colors.green,
-      ),
-    ),
-  );
-
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
   }
@@ -72,6 +57,75 @@ class _StudentDashboardState extends State<StudentDashboard> {
     });
   }
 
+  Widget _webView() {
+    return WebView(
+      appBarTitle: "Dashboard",
+      selectedWidgetMarker: 0,
+      body: AnimatedBuilder(
+        animation: _sdController,
+        builder: (context, child) {
+          return !_sdController.isAllAttendanceCollected
+              ? Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).primaryColor, // Customize the color
+                    ),
+                  ),
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, right: 8.0, bottom: 8.0),
+                          child: Column(
+                            children: [
+                              // StudentInfoCard(student: _sdController.student),
+
+                              Row(
+                                children: [
+                                  Flexible(
+                                      flex: 1,
+                                      child: StudentInfoCard(
+                                          student: _sdController.student)),
+                                  Flexible(
+                                    flex: 1,
+                                    child: _overviewCard(5),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: _webRecentLogsCard(context)),
+                                    Expanded(
+                                        child: _webRecentLogsCard(context)),
+                                    // _myClassesCard(context)
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+        },
+      ),
+    );
+  }
+
   Widget _mobileView() {
     return AnimatedBuilder(
       animation: _sdController,
@@ -84,7 +138,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
             body: _sdController.isCountCalculated
                 ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard(0)]
                 : [
-                    Spacer(),
                     Center(
                       child: CircularProgressIndicator(
                         strokeWidth: 4,
@@ -98,106 +151,59 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget _webView() {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text("Dashboard"),
-        backgroundColor: const Color(0xFFF5F6F9),
-        iconTheme: const IconThemeData(color: Colors.black),
-        titleTextStyle: const TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  DataRow _buildDataRow(BuildContext context, Attendance attendance) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Text(
+            attendance.subjectSchedule?.subject?.subjectName ??
+                'No subject name',
+            style: TextStyle(fontSize: 14),
+          ),
         ),
-        elevation: 0.1,
-      ),
-      body: Row(
-        children: [
-          SideMenu(selectedWidgetMarker: 0),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    StudentInfoCard(student: _sdController.student),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _overviewCard(5),
-                        SizedBox(width: 8),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [_recentLogsCard(), _myClassesCard(context)],
-                    ),
-                    SizedBox(height: 8),
-                  ],
-                ),
-              ),
+        DataCell(
+          Text(
+            attendance.subjectSchedule?.room.toString() ?? 'No subject id',
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            _sdController.formatTime(_getActualTime(attendance)),
+            style: TextStyle(
+              fontSize: 14,
             ),
           ),
-        ],
-      ),
+        ),
+        DataCell(
+          _sdController.getStatusText(attendance.remarks.name),
+        ),
+        // DataCell(
+        //   Text(
+        //     attendance.subjectSchedule?.subject?.subjectName ??
+        //         'No subject name',
+        //     style: TextStyle(fontSize: 14),
+        //   ),
+        // ),
+        // DataCell(
+        //   Row(
+        //     children: [
+        //       Icon(
+        //         getStatusIcon(attendance.remarks),
+        //         color: Theme.of(context).scaffoldBackgroundColor,
+        //       ),
+        //       SizedBox(width: 8),
+        //       _sdController.getStatusText(attendance.remarks.name)
+        //       // Text(
+        //       //  ,
+        //       //   style: TextStyle(fontSize: 14),
+        //       // ),
+        //     ],
+        //   ),
+        // ),
+      ],
     );
   }
-
-  // Widget _webView() {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       automaticallyImplyLeading: false,
-  //       title: Text("Dashboard"),
-  //       backgroundColor: const Color(0xFFF5F6F9),
-  //       iconTheme: const IconThemeData(color: Colors.black),
-  //       titleTextStyle: const TextStyle(
-  //         color: Colors.black,
-  //         fontSize: 20,
-  //         fontWeight: FontWeight.bold,
-  //       ),
-  //       elevation: 0.1,
-  //     ),
-  //     body: SingleChildScrollView(
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(8.0),
-  //         child: Column(
-  //           children: [
-  //             StudentInfoCard(),
-  //             SizedBox(height: 8),
-  //             Row(
-  //               children: [
-  //                 _overviewCard(5),
-  //                 SizedBox(width: 8),
-  //               ],
-  //             ),
-  //             SizedBox(height: 8),
-  //             _recentLogsCard(context),
-  //             SizedBox(height: 8),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget _webView(BuildContext context) {
-  // DataRow logsSampleDataRow(context) {
-  //   return DataRow(
-  //     cells: <DataCell>[
-  //       DataCell(Text('02:12pm')),
-  //       DataCell(Expanded(
-  //         child: Text(
-  //           textAlign: TextAlign.start,
-  //           '10023 - Programming 1',
-  //           overflow: TextOverflow.ellipsis,
-  //         ),
-  //       )),
-  //       DataCell(Text('On-Time')),
-  //     ],
-  //   );
-  // }
 
   DataRow classesSampleDataRow(context) {
     return DataRow(
@@ -218,74 +224,46 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  // Widget dataTableLogs(context) {
-  //   return SizedBox(
-  //     width: double.infinity,
-  //     child: DataTable(
-  //       dividerThickness: 0,
-  //       columnSpacing: 5,
-  //       columns: [
-  //         DataColumn(
-  //           label: Text(
-  //             'Time',
-  //             style: TextStyle(fontStyle: FontStyle.italic),
-  //           ),
-  //         ),
-  //         DataColumn(
-  //           label: Text(
-  //             'Subject',
-  //             style: TextStyle(fontStyle: FontStyle.italic),
-  //           ),
-  //         ),
-  //         DataColumn(
-  //           label: Text(
-  //             'Remark',
-  //             style: TextStyle(fontStyle: FontStyle.italic),
-  //           ),
-  //         ),
-  //       ],
-  //       rows: [for (int i = 0; i < 10; i++) logsSampleDataRow(context)],
-  //     ),
-  //   );
-  // }
-
   Widget dataTableClasses(context) {
-    return SizedBox(
-      width: double.infinity,
-      child: DataTable(
-        dividerThickness: 0,
-        columnSpacing: 5,
-        columns: [
-          DataColumn(
-            label: Text(
-              'Time',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Subject',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-          DataColumn(
-            label: Text(
-              'Status',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ),
-        ],
-        rows: [for (int i = 0; i < 10; i++) classesSampleDataRow(context)],
-      ),
+    return DataTable(
+      columns: [
+        DataColumn(
+          label: Expanded(child: Text('Subject')),
+        ),
+        DataColumn(
+          label: Text('Room'),
+        ),
+        DataColumn(
+          label: Text('Time'),
+        ),
+        DataColumn(
+          label: Text('Remarks'),
+        ),
+      ],
+      rows: _sdController.allAttendanceList
+          .map((attendance) => _buildDataRow(context, attendance))
+          .toList(),
     );
   }
 
-  CardSmall _myClassesCard(context) {
+  Widget _myClassesCard(context) {
     return CardSmall(
       flexValue: 1,
       title: "My Classes",
       isShadow: false,
       child: dataTableClasses(context),
+    );
+  }
+
+  Widget _webRecentLogsCard(context) {
+    return Card(
+      child: CardSmall(
+        title: "Recent Activity",
+        isShadow: false,
+        child:
+            // SizedBox(width: 800, child: Text('No recent activity')),
+            dataTableClasses(context),
+      ),
     );
   }
 
@@ -367,27 +345,38 @@ class _StudentDashboardState extends State<StudentDashboard> {
     }
   }
 
-  CardSmall _overviewCard(leadingFlex, [flexValue = 1]) {
+  Widget _overviewCard(leadingFlex, [flexValue = 1]) {
     double totalLogs = _sdController.allAttendanceList.length.toDouble();
-    return CardSmall(
-      isShadow: true,
-      flexValue: flexValue,
-      title: "Overview",
-      child: Row(
-        children: [
-          DataNumber(
-              number: totalLogs.toString(),
-              description: "Total logs",
-              flex: leadingFlex),
-          Spacer(),
-          circularData(_sdController.absentCount, 'Absent', Colors.red),
-          circularData(
-              _sdController.cuttingCount, 'Cutting', Colors.yellow.shade700),
-          circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
-          circularData(_sdController.lateCount, 'Late', Colors.orange)
-        ],
+    return SizedBox(
+      height: 154,
+      child: Card(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TitleMediumText(
+                    title: "Overview",
+                  ),
+                  DataNumber(
+                      number: totalLogs.toString(),
+                      description: "Total logs",
+                      flex: leadingFlex),
+                ],
+              ),
+              Spacer(),
+              circularData(_sdController.absentCount, 'Absent', Colors.red),
+              circularData(_sdController.cuttingCount, 'Cutting',
+                  Colors.yellow.shade700),
+              circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
+              circularData(_sdController.lateCount, 'Late', Colors.orange)
+            ],
+          ),
+        ),
+        // sampleData: sampleDataAct,
       ),
-      // sampleData: sampleDataAct,
     );
   }
 

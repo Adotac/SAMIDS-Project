@@ -347,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   Container(
                     padding: const EdgeInsets.all(10),
-                    height: 60,
+                    height: 72,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(

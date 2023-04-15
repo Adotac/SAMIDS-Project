@@ -38,21 +38,16 @@ class WebView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(appBarTitle),
-        leading: showBackButton
-            ? IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () => Navigator.of(context).pop(),
-              )
-            : null,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications_none_outlined),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
                 builder: (BuildContext context) {
-                  return Container(
+                  return SizedBox(
                     height: 250,
                     child: _buildNotificationsList(context),
                   );
@@ -62,8 +57,12 @@ class WebView extends StatelessWidget {
           ),
         ],
       ),
-      body: body,
-      drawer: SideMenu(selectedWidgetMarker: selectedWidgetMarker),
+      body: Row(
+        children: [
+          SideMenu(selectedWidgetMarker: selectedWidgetMarker),
+          Expanded(child: body),
+        ],
+      ),
     );
   }
 }

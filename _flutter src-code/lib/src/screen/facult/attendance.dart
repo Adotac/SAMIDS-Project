@@ -31,9 +31,6 @@ class AdminAttendance extends StatelessWidget {
           SizedBox(height: 8),
           Container(
               width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
               child: DataTable(
                 columns: [
                   _dataColumn("Student ID"),
@@ -79,15 +76,14 @@ class AdminAttendance extends StatelessWidget {
 
   Container _searchBar(context) {
     return Container(
-      color: Colors.red,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       height: 42,
-      // width: MediaQuery.of(context).size.width * .30,
-      // decoration: BoxDecoration(
-      //     color: Colors.white,
-      //     shape: BoxShape.rectangle,
-      //     borderRadius: BorderRadius.circular(5),
-      //     border: Border.all(color: Colors.grey, width: 1)),
+      width: MediaQuery.of(context).size.width * .30,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
         autofocus: true,
         onSubmitted: (_textEditingController) {
@@ -98,7 +94,7 @@ class AdminAttendance extends StatelessWidget {
         controller: _textEditingController,
         decoration: const InputDecoration(
           suffixIcon: Icon(Icons.search_outlined),
-          // suffixIconColor: Colors.grey,
+          suffixIconColor: Colors.grey,
           border: InputBorder.none,
           hintText: 'Search',
         ),

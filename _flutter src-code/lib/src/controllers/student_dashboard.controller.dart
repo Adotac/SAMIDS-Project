@@ -61,7 +61,7 @@ class StudentDashboardController with ChangeNotifier {
     for (Map<String, dynamic> map in result.data) {
       allAttendanceList.add(Attendance.fromJson(map));
     }
-    isAllAttendanceCollected = true;
+
     notifyListeners();
   }
 
@@ -113,6 +113,7 @@ class StudentDashboardController with ChangeNotifier {
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
+        isAllAttendanceCollected = true;
         notifyListeners();
       }
     } catch (e, stacktrace) {

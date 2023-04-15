@@ -24,39 +24,22 @@ class CardSmall extends StatelessWidget {
           );
   }
 
-  Container _body() {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      decoration: ShapeDecoration(
-          color: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          shadows: isShadow
-              ? const [
-                  BoxShadow(
-                    spreadRadius: -2,
-                    blurRadius: 10,
-                    color: Colors.black26,
-                    offset: Offset(5, 8),
-                  ),
-                ]
-              : null),
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          // ignore: prefer_const_literals_to_create_immutables
-          children: [
-            title != ""
-                ? TitleMediumText(
-                    title: title,
-                  )
-                : const SizedBox(),
-            // for (int i = 0; i < 10; i++)
-            // ignore: prefer_const_constructors
-            child,
-          ],
-        ),
+  Widget _body() {
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        // ignore: prefer_const_literals_to_create_immutables
+        children: [
+          title != ""
+              ? TitleMediumText(
+                  title: title,
+                )
+              : const SizedBox(),
+          // for (int i = 0; i < 10; i++)
+          // ignore: prefer_const_constructors
+          child,
+        ],
       ),
     );
   }

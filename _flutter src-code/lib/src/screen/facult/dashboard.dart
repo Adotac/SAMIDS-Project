@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 
 import '../../constant/constant_values.dart';
-import '../../widgets/bar_line.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/data_number.dart';
 import '../../widgets/title_medium_text.dart';
@@ -156,9 +155,6 @@ class AdminDashboard extends StatelessWidget {
     return Flexible(
       flex: flexValue,
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-        ),
         child: Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.all(15),

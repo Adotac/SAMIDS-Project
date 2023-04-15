@@ -203,7 +203,6 @@ class _StudentAttendanceState extends State<StudentAttendance> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: currentTheme.dividerColor, width: 1),
       ),
       child: TextField(

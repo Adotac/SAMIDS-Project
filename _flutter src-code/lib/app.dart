@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
+  final radius = 10.0;
   const MyApp({
     super.key,
     required this.settingsController,
@@ -94,31 +95,43 @@ class MyApp extends StatelessWidget {
           // ),
           // darkTheme: ThemeData.dark(),
           theme: ThemeData(
+            cardTheme: CardTheme(
+              margin: EdgeInsets.only(left: 6, right: 6, bottom: 6),
+              elevation: 0.2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                    radius), // set circular border radius for Cards
+              ),
+            ),
+
             inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(radius),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.0),
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(radius),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: Theme.of(context).primaryColor,
                 ),
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(radius),
               ),
             ),
             scaffoldBackgroundColor: const Color(0xFFF5F6F9),
             dialogTheme: DialogTheme(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
+                borderRadius: BorderRadius.circular(radius),
               ),
             ),
             textButtonTheme: TextButtonThemeData(
               style: ButtonStyle(
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
               ),
@@ -143,14 +156,6 @@ class MyApp extends StatelessWidget {
               elevation: 0.0,
             ),
 
-            cardTheme: CardTheme(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                    20.0), // set circular border radius for Cards
-              ),
-              margin: EdgeInsets.all(6),
-              elevation: 0.2,
-            ),
             dividerColor: Theme.of(context)
                 .scaffoldBackgroundColor, // Set divider color to match scaffold color
             dataTableTheme: DataTableThemeData(
