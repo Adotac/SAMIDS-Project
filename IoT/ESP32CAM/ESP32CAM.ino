@@ -1,8 +1,4 @@
-#include "defines.h" // ignored by git for privacy purposes
 #include "esp32cam_Impl.h"
-
-#include <Arduino.h>
-#include <WiFi.h>
 
 extern "C"
 {
@@ -12,17 +8,23 @@ extern "C"
 #define ASYNC_TCP_SSL_ENABLED true
 #include <AsyncMQTT_ESP32.h>
 
-String deviceNumber = String("101");
-String deviceId = String(deviceNumber + "_CAM");
+// espcam_message myData;
+// esprfid_message rfid_Data;
+
+
+String deviceId = String("101");
 
 String topictemp = String("mqtt/image/" + deviceId); // publish to be read by API
-String subtopictemp = String("mqtt/RFID/attendance/" + deviceNumber); // from the RFID partner
+String topictemp2 = String("mqtt/attendance/" + deviceId); // publish to be read by deviceCAM
+String subtopictemp = String("mqtt/API/response/" + deviceId); // from the API
 
+uint8_t broadcastAddress[MACSIZE]= {MAC_ESP8266};
 
 #if ASYNC_TCP_SSL_ENABLED
   #define MQTT_SECURE true
 
-  const char *PubTopic = topictemp.c_str();
+  const char *ImageTopic = topictemp.c_str();
+  const char *AttendanceTopic = topictemp2.c_str();
   const char *SubTopic = subtopictemp.c_str();
 #endif
 
@@ -53,8 +55,9 @@ TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
 
 void connectToWifi(){
-  Serial.print("Connectiog to ");
- 
+  Serial.print("Connecting to ");
+  SendNow("Camera Init", false, false);
+
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   delay(1000);
   Serial.println(WIFI_SSID);
@@ -64,24 +67,12 @@ void connectToWifi(){
   }
 
   Serial.println("Wifi Connected!!");
-  // print the received signal strength:
-  // int32_t rssi = WiFi.RSSI();
-  // Serial.print(F(", Signal strength (RSSI):"));
-  // Serial.print(rssi);
-  // Serial.println(F(" dBm"));
-  // Serial.print("IP address: ");
-  // Serial.println(WiFi.localIP());
-}
-
-void printSeparationLine()
-{
-  Serial.println("************************************************");
 }
 
 void connectToMqtt()
 {
   Serial.println("Connecting to MQTT...");
-
+  SendNow("MQTT Init", false, false);
   mqttClient.connect();
 }
 
@@ -96,13 +87,12 @@ void onWifiEvent(WiFiEvent_t event){
       break;
   case SYSTEM_EVENT_STA_DISCONNECTED:
       Serial.println("WiFi lost connection");
+      SendNow("Camera disconnected wifi", false, false);
       xTimerStop(mqttReconnectTimer, 0); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
       xTimerStart(wifiReconnectTimer, 0);
       break;
   }
 }
-
-
 
 void onMqttConnect(bool sessionPresent)
 {
@@ -110,8 +100,6 @@ void onMqttConnect(bool sessionPresent)
   Serial.print(MQTT_HOST);
   Serial.print(", port: ");
   Serial.println(MQTT_PORT);
-  Serial.print("PubTopics: ");
-  Serial.println(PubTopic);
 
   printSeparationLine();
   Serial.print("Session present: ");
@@ -123,17 +111,11 @@ void onMqttConnect(bool sessionPresent)
   Serial.print("Subscribing at QoS 2, packetId: ");
   Serial.println(packetIdSub);
 
-  // mqttClient.publish(PubTopic1, 0, true, capturePhotoToJSON().c_str());
-  // Serial.println("Publishing JSON DATA at QoS 0");
-
-  // mqttClient.publish(PubTopic2, 0, true, );
-  // Serial.println("Publishing Image data buffer at QoS 0");
-
-  uint16_t packetIdPub1 = mqttClient.publish(PubTopic, 1, true, "ESP32 test sfsdf 2");
+  uint16_t packetIdPub1 = mqttClient.publish(AttendanceTopic, 1, true, "ESP32 test sfsdf 2");
   Serial.print("Publishing at QoS 1, packetId: ");
   Serial.println(packetIdPub1);
 
-  uint16_t packetIdPub2 = mqttClient.publish(PubTopic, 2, true, "ESP32 test 3");
+  uint16_t packetIdPub2 = mqttClient.publish(AttendanceTopic, 2, true, "ESP32 test 3");
   Serial.print("Publishing at QoS 2, packetId: ");
   Serial.println(packetIdPub2);
 
@@ -196,8 +178,42 @@ void onMqttPublish(const uint16_t& packetId)
 
 //-------------------------------------------------//
 
-//-------------------------------------------------//
+// Callback when data is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t  sendStatus) {
+  Serial.print("Last Packet Send Status: ");
+  if (sendStatus == ESP_NOW_SEND_SUCCESS ){
+    Serial.println("Delivery success");
+  }
+  else{
+    Serial.println("Delivery fail");
+  }
+}
 
+// Callback function executed when data is received
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  esprfid_message rfid_Data;
+
+  memcpy(&rfid_Data, incomingData, sizeof(rfid_Data));
+  Serial.print("Data received: ");
+  Serial.println(len);
+  Serial.print("Message Value: ");
+  Serial.println(rfid_Data.message);
+  Serial.print("Device ready flag: ");
+  Serial.println(rfid_Data.deviceFlag);
+
+  Serial.println();
+
+  // PUT CHECK AND CREATE ATTENDANCE ALGO HERE
+  // ACCESS THE FASTAPI HTTP GET REQUEST HERE
+
+  if(rfid_Data.deviceFlag){
+    uint16_t packetIdPub1 = mqttClient.publish(AttendanceTopic, 2, true, rfid_Data.message);
+    Serial.print("Publishing at QoS 2, packetId: ");
+    Serial.println(packetIdPub1);
+  }
+}
+
+//-------------------------------------------------//
 void sendDataPayload(){
   camera_fb_t *fb = NULL;
   // char* payloadArray = (char*) malloc(sizeof(char));  // Allocate memory for an array of pointers
@@ -223,7 +239,32 @@ void setup() {
   pinMode(FLASH_GPIO_NUM, OUTPUT);
   Serial.begin(115200);
 
+  // Set ESP32 as a Wi-Fi Station
+  WiFi.mode(WIFI_MODE_APSTA);
+  WiFi.disconnect();
+  delay(100);
+
   while (!Serial && millis() < 5000);
+
+    // Initilize ESP-NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+
+  esp_now_peer_info_t peerInfo;
+  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+  peerInfo.ifidx = WIFI_IF_AP;
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println("Failed to add peer");
+    return;
+  }
+
+  esp_now_register_send_cb(OnDataSent);
+  esp_now_register_recv_cb(OnDataRecv);
 
   Serial.print(F("\nStart WiFiMQTT on "));
   Serial.println(ARDUINO_BOARD);
@@ -248,7 +289,6 @@ void setup() {
   Serial.print("Device ID: ");
   Serial.println(deviceId);
 
-
   mqttClient.setKeepAlive(30);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
@@ -266,8 +306,10 @@ void setup() {
   connectToWifi();
 
   initCamera();
-
+  SendNow("Camera ready", false, true);
 }
+
+
 void loop() {
   static uint32_t prev_ms = millis();
 

@@ -136,27 +136,6 @@ uint8_t * captureBufferPhoto(camera_fb_t*& imagedata)
   return temp;
 }
 
-// void bufferDivider(uint8_t* buf, int len, uint8_t**& arr){
-//   int arr_size = 20;
-//   int buf_size = len/arr_size;
-
-//   for (int i = 0, l = len, bi = 0; i < arr_size; i++) {
-//     if(buf_size < l){
-//       arr[i] = (char*) malloc(buf_size * sizeof(char));  // Allocate memory for each string
-//       l -= buff_size;
-      
-
-//     }
-//     else{
-//       arr[i] = (char*) malloc(l * sizeof(char));  // Allocate memory for each string for the last buffer batch
-//       break;
-//     }
-
-    
-//   }
-
-// }
-
 void flash(int n)
 {
   // initialize digital pin ledPin as an output
@@ -166,5 +145,24 @@ void flash(int n)
   delay(n * 1000);
   digitalWrite(FLASH_GPIO_NUM, LOW);
   delay(n * 1000);
+}
+
+void printSeparationLine()
+{
+  Serial.println("************************************************");
+}
+
+//-----------------------FOR ESP NOW FUNCTIONALITIES--------------------------------//
+
+// Send message via ESP-NOW
+void SendNow(const char* msg, bool atf, bool df){
+  espcam_message myData;
+
+  strcpy(myData.message, msg);
+  myData.attendanceFlag = atf;
+  myData.deviceFlag = df;
+
+  
+  esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
 }
 
