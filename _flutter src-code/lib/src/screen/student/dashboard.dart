@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 
 import 'package:samids_web_app/src/screen/student/attendance.dart';
+import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
@@ -38,6 +40,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
   void initState() {
     _sdController.getAttendanceToday();
     _sdController.getAttendanceAll();
+    _sdController.getStudentClasses();
 
     super.initState();
   }
@@ -106,9 +109,15 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
-                                        child: _webRecentLogsCard(context)),
+                                      child: _webRecentLogsCard(
+                                        context,
+                                      ),
+                                    ),
                                     Expanded(
-                                        child: _webRecentLogsCard(context)),
+                                      child: _myClassesCard(
+                                        context,
+                                      ),
+                                    ),
                                     // _myClassesCard(context)
                                   ],
                                 ),
@@ -151,7 +160,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  DataRow _buildDataRow(BuildContext context, Attendance attendance) {
+  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
         DataCell(
@@ -205,6 +214,47 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
+  DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Text(
+            schedule.subject?.subjectName ?? 'No subject name',
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            schedule.room.toString(),
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            getTimeStartEnd(schedule),
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        ),
+        DataCell(
+          Text(
+            schedule.day.name,
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String getTimeStartEnd(SubjectSchedule subjectSchedule) {
+    final timeStart = _sdController.formatTime(subjectSchedule.timeStart);
+    final timeEnd = _sdController.formatTime(subjectSchedule.timeEnd);
+    return '$timeStart - $timeEnd';
+  }
+
   DataRow classesSampleDataRow(context) {
     return DataRow(
       cells: <DataCell>[
@@ -224,7 +274,29 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget dataTableClasses(context) {
+  Widget _dataTableClasses(context) {
+    return DataTable(
+      columns: [
+        DataColumn(
+          label: Expanded(child: Text('Subject')),
+        ),
+        DataColumn(
+          label: Text('Room'),
+        ),
+        DataColumn(
+          label: Text('Time'),
+        ),
+        DataColumn(
+          label: Text('Day'),
+        ),
+      ],
+      rows: _sdController.studentClasses
+          .map((attendance) => _buildDataRowClasses(context, attendance))
+          .toList(),
+    );
+  }
+
+  Widget _dataTableRecentLogs(context) {
     return DataTable(
       columns: [
         DataColumn(
@@ -241,17 +313,19 @@ class _StudentDashboardState extends State<StudentDashboard> {
         ),
       ],
       rows: _sdController.allAttendanceList
-          .map((attendance) => _buildDataRow(context, attendance))
+          .map((attendance) => _buildDataRowRecentLogs(context, attendance))
           .toList(),
     );
   }
 
   Widget _myClassesCard(context) {
-    return CardSmall(
-      flexValue: 1,
-      title: "My Classes",
-      isShadow: false,
-      child: dataTableClasses(context),
+    return Card(
+      child: CardSmall(
+        flexValue: 1,
+        title: "My Classes",
+        isShadow: false,
+        child: _dataTableClasses(context),
+      ),
     );
   }
 
@@ -262,7 +336,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         isShadow: false,
         child:
             // SizedBox(width: 800, child: Text('No recent activity')),
-            dataTableClasses(context),
+            _dataTableRecentLogs(context),
       ),
     );
   }
@@ -304,33 +378,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
           : attendance.actualTimeIn != null
               ? attendance.actualTimeIn!
               : DateTime.now();
-
-  Widget _recentLogsCard() {
-    return CardSmall(
-      flexValue: 1,
-      isShadow: false,
-      title: "Recent Activity",
-      child: Column(
-        children: List.generate(
-          20,
-          (index) => CustomListTile(
-            leadingColors: Colors.white,
-            title: "Programming $index",
-            subtitle: _sdController.getStatusText("On-Time"),
-            leadingIcon: Icon(
-              Icons.access_alarm_sharp,
-            ),
-            trailingText: "02:12pm",
-            subTrailingText: '10023',
-          ),
-        ),
-      ),
-    );
-    //  Row(
-
-    // ));
-    // dataTableLogs(context));
-  }
 
   IconData getStatusIcon(Remarks remarks) {
     switch (remarks) {

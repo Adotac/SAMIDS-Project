@@ -25,10 +25,14 @@ class _SideMenuState extends State<SideMenu> {
     required Function onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: _selectedIndex == index ? Colors.black : null),
+      leading: Icon(icon,
+          color:
+              _selectedIndex == index ? Theme.of(context).primaryColor : null),
       title: Text(
         title,
         style: TextStyle(
+          color:
+              _selectedIndex == index ? Theme.of(context).primaryColor : null,
           fontWeight: _selectedIndex == index ? FontWeight.bold : null,
         ),
       ),
