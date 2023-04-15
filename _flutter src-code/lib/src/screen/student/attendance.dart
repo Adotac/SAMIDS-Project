@@ -8,29 +8,49 @@ import 'package:flutter/foundation.dart';
 import 'package:samids_web_app/src/widgets/mobile_view.dart';
 
 import '../../model/attendance_model.dart';
+import '../../widgets/attendance_dialog_report.dart';
 import '../../widgets/attendance_tile.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/side_menu.dart';
+import '../../widgets/web_view.dart';
 
 class StudentAttendance extends StatefulWidget {
   final StudentDashboardController sdController;
 
   const StudentAttendance({
-    super.key,
+    Key? key,
     required this.sdController,
-  });
+  }) : super(key: key);
   static const routeName = '/student-attendance';
 
   @override
   State<StudentAttendance> createState() => _StudentAttendanceState();
 }
 
-class _StudentAttendanceState extends State<StudentAttendance> {
+class _StudentAttendanceState extends State<StudentAttendance>
+    with SingleTickerProviderStateMixin {
   final _textEditingController = TextEditingController();
+  late AnimationController _animationController;
   StudentDashboardController get _sdController => widget.sdController;
 
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,25 +66,18 @@ class _StudentAttendanceState extends State<StudentAttendance> {
   }
 
   Widget _webView(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SideMenu(selectedWidgetMarker: 1),
-          // Expanded(child: _attendanceBody(context)),
-        ],
-      ),
+    return WebView(
+      appBarTitle: "Attendance",
+      appBarActionWidget: _searchBar(context),
+      selectedWidgetMarker: 1,
+      body: AnimatedBuilder(
+          animation: _sdController,
+          builder: (context, child) {
+            return _webAttendanceBody(context);
+          }),
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Text('Attendance'),
-    );
-  }
-
-  // Widget _mobileView(BuildContext context) {
   Widget _mobileView(BuildContext context) {
     return MobileView(
       appBarOnly: true,
@@ -74,35 +87,177 @@ class _StudentAttendanceState extends State<StudentAttendance> {
     );
   }
 
-  // Widget _mobileAttendanceBody(BuildContext context) {
-  //   return Column(
-  //     children: [
-  //       SizedBox(height: 18),
-  //       _searchBar(context),
-  //       SizedBox(height: 8),
-  //       for (int i = 0; _sdController.allAttendanceList.length > i; i++)
-  //         AttendanceTile(
-  //           subject: _sdController.allAttendanceList[i].subjectSchedule?.subject
-  //                   ?.subjectName ??
-  //               'No Subject',
-  //           room: _sdController.allAttendanceList[i].subjectSchedule?.room ??
-  //               'No Room',
-  //           date: _sdController
-  //               .formatDate(_getActualTime(_sdController.allAttendanceList[i])),
-  //           timeIn: _sdController.allAttendanceList[i].actualTimeIn != null
-  //               ? _sdController.formatTime(
-  //                   _sdController.allAttendanceList[i].actualTimeIn!)
-  //               : 'No Time In',
-  //           timeOut: _sdController.allAttendanceList[i].actualTimeOut != null
-  //               ? _sdController.formatTime(
-  //                   _sdController.allAttendanceList[i].actualTimeOut!)
-  //               : 'No Time In',
-  //           remarks: _sdController
-  //               .getStatusText(_sdController.allAttendanceList[i].remarks.name),
-  //         ),
-  //     ],
-  //   );
-  // }
+  Widget _webAttendanceBody(BuildContext context) {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Card(child: _dataTableAttendance(context)),
+        ),
+      ),
+    );
+  }
+
+  Widget _dataTableAttendance(context) {
+    return SizedBox(
+      // width: MediaQuery.of(context).size.width * .8,
+      child: DataTable(
+        columns: const [
+          DataColumn(
+            numeric: true,
+            label: Text('Reference No.'),
+          ),
+          DataColumn(
+            label: Text('Subject'),
+          ),
+          DataColumn(
+            label: Text('Room'),
+          ),
+          DataColumn(
+            label: Text('Time in'),
+          ),
+          DataColumn(
+            label: Text('Time out'),
+          ),
+          DataColumn(
+            label: Text('Remarks'),
+          ),
+          DataColumn(
+            label: Text('Actions'),
+          ),
+        ],
+        rows: _sdController.allAttendanceList
+            .map((attendance) => _buildDataRowRecentLogs(context, attendance))
+            .toList(),
+      ),
+    );
+  }
+
+  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Text(
+            attendance.attendanceId.toString(),
+          ),
+        ),
+        DataCell(
+          Text(
+            attendance.subjectSchedule?.subject?.subjectName ??
+                'No subject name',
+          ),
+        ),
+        DataCell(
+          Text(
+            attendance.subjectSchedule?.room.toString() ?? 'No room code',
+          ),
+        ),
+        DataCell(
+          Text(
+            attendance.actualTimeIn != null
+                ? _sdController.formatTime(attendance.actualTimeIn!)
+                : 'No Time In',
+          ),
+        ),
+        DataCell(
+          Text(
+            attendance.actualTimeOut != null
+                ? _sdController.formatTime(attendance.actualTimeOut!)
+                : 'No Time Out',
+          ),
+        ),
+        DataCell(
+          _sdController.getStatusText(attendance.remarks.name),
+        ),
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                  onPressed: () => _showReportAttendanceDialog(context),
+                  icon: Icon(
+                    Icons.report_gmailerrorred_outlined,
+                    color: Theme.of(context).primaryColor,
+                  )),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showLoadingDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => true,
+          child: AlertDialog(
+            content: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text('Sending...'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showReportAttendanceDialog(BuildContext context) async {
+    TextEditingController _textFieldController = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Report Attendance Issue'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Please provide a brief description of the issue:',
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _textFieldController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter issue description',
+                    border: OutlineInputBorder(),
+                  ),
+                  minLines: 3,
+                  maxLines: 5,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () async {
+                // Process the submitted issue
+                Navigator.of(context).pop();
+                await _showLoadingDialog(context);
+                await Future.delayed(Duration(seconds: 2));
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   List<Widget> _mobileAttendanceBody(BuildContext context) {
     return [
@@ -138,63 +293,6 @@ class _StudentAttendanceState extends State<StudentAttendance> {
           : attendance.actualTimeIn != null
               ? attendance.actualTimeIn!
               : DateTime.now();
-  // Widget _mobileAttendanceBody(BuildContext context) {
-  //   return SingleChildScrollView(
-  //     child: ConstrainedBox(
-  //       constraints:
-  //           BoxConstraints(minHeight: MediaQuery.of(context).size.height),
-  //       child: IntrinsicHeight(
-  //         child: Column(
-  //           children: [
-  //             SizedBox(height: 18),
-  //             _searchBar(context),
-  //             SizedBox(height: 8),
-  //             Expanded(
-  //               child: ListView.builder(
-  //                 itemCount: _sdController.allAttendanceList.length,
-  //                 itemBuilder: (BuildContext context, int index) {
-  //                   return AttendanceTile(
-  //                     subject: '10023 - Programming 1',
-  //                     room: 'BCL3',
-  //                     date: 'March 05',
-  //                     timeIn: '02:12pm',
-  //                     timeOut: '03:16pm',
-  //                     remarks: 'On-Time',
-  //                   );
-  //                 },
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget _mobileAttendanceBody(BuildContext context) {
-  DataRow _sampleDataRow(context) {
-    return DataRow(
-      // ignore: prefer_const_literals_to_create_immutables
-      cells: <DataCell>[
-        DataCell(Text('10023 - Programming 1')),
-        // DataCell(Text('AD1234KA12')),
-        DataCell(Text('BCL3')),
-        DataCell(Text('March 05')),
-        DataCell(Text('02:12pm')),
-        DataCell(Text('03:16pm')),
-        DataCell(Text('On-Time')),
-      ],
-    );
-  }
-
-  DataColumn _dataColumn(title) {
-    return DataColumn(
-      label: Text(
-        title,
-        style: TextStyle(fontStyle: FontStyle.italic),
-      ),
-    );
-  }
 
   Widget _searchBar(BuildContext context) {
     ThemeData currentTheme = Theme.of(context);
@@ -203,13 +301,12 @@ class _StudentAttendanceState extends State<StudentAttendance> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: currentTheme.dividerColor, width: 1),
       ),
       child: TextField(
-        onSubmitted: (_textEditingController) {
+        onSubmitted: (textEditingController) {
           if (kDebugMode) {
-            print(_textEditingController.toString());
+            print(textEditingController.toString());
           }
         },
         controller: _textEditingController,

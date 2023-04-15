@@ -44,6 +44,21 @@ class StudentDashboardController with ChangeNotifier {
       GetIt.instance<StudentDashboardController>();
   static StudentDashboardController get instance =>
       GetIt.instance<StudentDashboardController>();
+  logout() {
+    isStudentClassesCollected = false;
+    isCountCalculated = false;
+    isAttendanceTodayCollected = false;
+    isAllAttendanceCollected = false;
+
+    onTimeCount = 0;
+    lateCount = 0;
+    absentCount = 0;
+    cuttingCount = 0;
+
+    attendance.clear();
+    allAttendanceList.clear();
+    studentClasses.clear();
+  }
 
   handEventJsonAttendance(CRUDReturn result) {
     if (attendance.isNotEmpty) attendance.clear();
@@ -61,7 +76,7 @@ class StudentDashboardController with ChangeNotifier {
     for (Map<String, dynamic> map in result.data) {
       allAttendanceList.add(Attendance.fromJson(map));
     }
-    isAllAttendanceCollected = true;
+
     notifyListeners();
   }
 
@@ -113,6 +128,7 @@ class StudentDashboardController with ChangeNotifier {
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
+        isAllAttendanceCollected = true;
         notifyListeners();
       }
     } catch (e, stacktrace) {

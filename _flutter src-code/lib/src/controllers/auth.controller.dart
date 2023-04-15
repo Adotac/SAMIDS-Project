@@ -19,6 +19,11 @@ class AuthController with ChangeNotifier {
   static AuthController get I => GetIt.instance<AuthController>();
   static AuthController get instance => GetIt.instance<AuthController>();
 
+  void setLoginToFalse() {
+    isLoggedIn = false;
+    notifyListeners();
+  }
+
   Future<bool> login(String username, String password) async {
     try {
       var credentials =

@@ -36,7 +36,6 @@ class ClassesListTile extends StatelessWidget {
                 ]
               : null,
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

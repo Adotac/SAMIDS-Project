@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/controllers/auth.controller.dart';
+import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
 
 import '../screen/student/attendance.dart';
 import '../screen/student/dashboard.dart';
 
 class SideMenu extends StatefulWidget {
-  SideMenu({Key? key, required this.selectedWidgetMarker}) : super(key: key);
+  final StudentDashboardController studentDashboardController =
+      StudentDashboardController.instance;
+  final AuthController authController = AuthController.instance;
+  SideMenu({
+    Key? key,
+    required this.selectedWidgetMarker,
+    // required this.studentDashboardController,
+    // required this.authController
+  }) : super(key: key);
   int selectedWidgetMarker;
   @override
   _SideMenuState createState() => _SideMenuState();
@@ -13,7 +25,10 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   int get _selectedIndex => widget.selectedWidgetMarker;
+  StudentDashboardController get _sdController =>
+      widget.studentDashboardController;
 
+  AuthController get _authController => widget.authController;
   set _selectedIndex(int index) {
     widget.selectedWidgetMarker = index;
   }
@@ -25,10 +40,14 @@ class _SideMenuState extends State<SideMenu> {
     required Function onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: _selectedIndex == index ? Colors.black : null),
+      leading: Icon(icon,
+          color:
+              _selectedIndex == index ? Theme.of(context).primaryColor : null),
       title: Text(
         title,
         style: TextStyle(
+          color:
+              _selectedIndex == index ? Theme.of(context).primaryColor : null,
           fontWeight: _selectedIndex == index ? FontWeight.bold : null,
         ),
       ),
@@ -83,7 +102,12 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Logout',
             index: 3,
             onTap: () {
-              // Perform Logout action and navigate to Login Page
+              _authController.logout();
+              _sdController.dispose();
+              GetIt.instance.unregister<StudentDashboardController>();
+
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  LoginScreen.routeName, (Route<dynamic> route) => false);
             },
           ),
           SizedBox(height: 20),

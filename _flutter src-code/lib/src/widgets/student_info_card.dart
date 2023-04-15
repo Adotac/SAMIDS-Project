@@ -11,30 +11,35 @@ class StudentInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.grey.shade200,
-              radius: 54,
-            ),
-            const SizedBox(
-              width: 15,
-            ),
-            Expanded(
-              child: Column(
+    return SizedBox(
+      height: 154,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.grey.shade200,
+                radius: 54,
+              ),
+              const SizedBox(
+                width: 15,
+              ),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    '${student.firstName} ${student.lastName}',
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.headline6!.color,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '${student.firstName} ${student.lastName}',
+                        style: TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.headline6!.color,
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
                     student.course,
@@ -57,8 +62,8 @@ class StudentInfoCard extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
