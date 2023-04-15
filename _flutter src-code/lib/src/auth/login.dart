@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
-import 'package:samids_web_app/src/screen/student/dashboard.dart';
-import 'package:samids_web_app/src/services/DTO/login_user.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 
 import '../model/student_model.dart';
 import '../widgets/responsive_builder.dart';
@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               } else {
-                // show invalid email error
+                Navigator.popAndPushNamed(context, FacultyDashboard.routeName);
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
@@ -168,30 +168,6 @@ class _LoginScreenState extends State<LoginScreen> {
     RegExp regExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return regExp.hasMatch(email);
   }
-
-  // Widget _buildMobileView(BuildContext context) {
-  //   return Stack(
-  //     children: [
-  //       Container(
-  //           color: Colors.white), // Add this line to set a white background
-  //       backgroundImageMobile,
-  //       Scaffold(
-  //         backgroundColor: Colors.transparent,
-  //         appBar: AppBar(
-  //           automaticallyImplyLeading: false,
-  //           backgroundColor: Colors.transparent,
-  //           elevation: 0,
-  //           title: const Text(
-  //             'SAMSS',
-  //             style:
-  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-  //           ),
-  //         ),
-  //         body: loginForumFieldMobile(context),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Widget _buildMobileView(BuildContext context) {
     return Stack(
@@ -259,43 +235,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Widget _buildWebView(BuildContext context) {
-  //   return Stack(
-  //     children: [
-  //       backgroundImage,
-  //       Scaffold(
-  //         backgroundColor: Colors.transparent,
-  //         appBar: AppBar(
-  //           automaticallyImplyLeading: false,
-  //           backgroundColor: Colors.transparent,
-  //           elevation: 0,
-  //           // remove the back button
-  //           title: const Text(
-  //             'SAMS',
-  //             style:
-  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-  //           ),
-  //         ),
-  //         body: Center(
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               SizedBox(
-  //                 width: 450,
-  //                 height: 600,
-  //                 child: loginForumWeb(context),
-  //               ),
-  //               SizedBox(
-  //                 width: MediaQuery.of(context).size.width * 0.3,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Column loginForumWeb(context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -325,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: EdgeInsets.all(10),
                     child: TextField(
                       controller: _usernameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Username',
                           hintText: 'Username'),
@@ -336,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Password',
                           hintText: 'Enter your secure password'),
@@ -379,14 +318,20 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       var success = await AuthController.instance
           .login(_usernameController.text, _passwordController.text);
+      print(success);
       if (success) {
-        StudentDashboardController.initialize(
+        DataController.initialize(
             AuthController.instance.loggedInUser!.student as Student);
 
         WidgetsBinding.instance!.addPostFrameCallback((_) {
-          Navigator.pushNamed(context, StudentDashboard.routeName);
+          Navigator.pushNamed(context, FacultyDashboard.routeName);
         });
       } else {
+        FacultyController.initialize();
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          Navigator.pushNamed(context, FacultyDashboard.routeName);
+        });
+
         if (!mounted) return;
         showDialog(
           context: context,

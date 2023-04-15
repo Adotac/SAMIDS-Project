@@ -6,9 +6,10 @@ import 'package:flutter/foundation.dart';
 
 import '../../widgets/card_small.dart';
 
-class AdminAttendance extends StatelessWidget {
+class FacultyAttendance extends StatelessWidget {
+  static const routeName = '/faculty-attendance';
   final _textEditingController = TextEditingController();
-  AdminAttendance({super.key});
+  FacultyAttendance({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class AdminAttendance extends StatelessWidget {
           SizedBox(height: 18),
           _searchBar(context),
           SizedBox(height: 8),
-          Container(
+          SizedBox(
               width: MediaQuery.of(context).size.width,
               child: DataTable(
                 columns: [

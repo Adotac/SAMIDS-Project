@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +15,7 @@ import '../../widgets/side_menu.dart';
 import '../../widgets/web_view.dart';
 
 class StudentAttendance extends StatefulWidget {
-  final StudentDashboardController sdController;
+  final DataController sdController;
 
   const StudentAttendance({
     Key? key,
@@ -31,7 +31,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
     with SingleTickerProviderStateMixin {
   final _textEditingController = TextEditingController();
   late AnimationController _animationController;
-  StudentDashboardController get _sdController => widget.sdController;
+  DataController get _sdController => widget.sdController;
 
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);

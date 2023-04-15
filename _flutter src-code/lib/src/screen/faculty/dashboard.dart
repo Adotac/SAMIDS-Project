@@ -24,17 +24,18 @@ import 'package:intl/intl.dart';
 import '../../widgets/web_view.dart';
 
 // ignore: must_be_immutable
-class StudentDashboard extends StatefulWidget {
+class FacultyDashboard extends StatefulWidget {
   static const routeName = '/student-dashboard';
-  final DataController sdController;
-  const StudentDashboard({super.key, required this.sdController});
+  final DataController dataController;
+
+  const FacultyDashboard({super.key, required this.dataController});
 
   @override
-  State<StudentDashboard> createState() => _StudentDashboardState();
+  State<FacultyDashboard> createState() => _FacultyDashboardState();
 }
 
-class _StudentDashboardState extends State<StudentDashboard> {
-  DataController get _sdController => widget.sdController;
+class _FacultyDashboardState extends State<FacultyDashboard> {
+  DataController get _sdController => widget.dataController;
   // add on init
   @override
   void initState() {
@@ -373,37 +374,81 @@ class _StudentDashboardState extends State<StudentDashboard> {
     }
   }
 
-  Widget _overviewCard(leadingFlex, [flexValue = 1]) {
+  Widget _overviewCard(leadingFlex) {
     double totalLogs = _sdController.allAttendanceList.length.toDouble();
     return SizedBox(
-      height: 154,
+      height: 220, // Increase height to accommodate new fields
       child: Card(
         child: Container(
           padding: EdgeInsets.all(16.0),
-          child: Row(
+          child: Column(
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              Row(
                 children: [
                   TitleMediumText(
                     title: "Overview",
                   ),
-                  DataNumber(
-                      number: totalLogs.toString(),
-                      description: "Total logs",
-                      flex: leadingFlex),
+                  Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      // TODO: Implement show class list functionality
+                    },
+                    child: Text('Show Class List'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // TODO: Implement cancel class functionality
+                    },
+                    child: Text('Cancel Class'),
+                  ),
                 ],
               ),
-              Spacer(),
-              circularData(_sdController.absentCount, 'Absent', Colors.red),
-              circularData(_sdController.cuttingCount, 'Cutting',
-                  Colors.yellow.shade700),
-              circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
-              circularData(_sdController.lateCount, 'Late', Colors.orange)
+              SizedBox(height: 8.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Class Room Code:'),
+                        Text('Class Name:'),
+                        Text('Class Time:'),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('12345'), // Replace with actual class room code
+                        Text('Math'), // Replace with actual class name
+                        Text(
+                            '9:30am - 10:30am'), // Replace with actual class time
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.0),
+              Row(
+                children: [
+                  DataNumber(
+                    number: totalLogs.toString(),
+                    description: "Total logs",
+                    flex: leadingFlex,
+                  ),
+                  Spacer(),
+                  circularData(_sdController.absentCount, 'Absent', Colors.red),
+                  circularData(_sdController.cuttingCount, 'Cutting',
+                      Colors.yellow.shade700),
+                  circularData(
+                      _sdController.onTimeCount, 'On-Time', Colors.green),
+                  circularData(_sdController.lateCount, 'Late', Colors.orange),
+                ],
+              ),
             ],
           ),
         ),
-        // sampleData: sampleDataAct,
       ),
     );
   }

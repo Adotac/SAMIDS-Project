@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 
 import 'src/api/api_controller.dart';
 import 'src/settings/settings_controller.dart';

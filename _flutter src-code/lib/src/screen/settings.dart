@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
@@ -8,7 +8,7 @@ import '../widgets/mobile_view.dart';
 
 class SettingsPage extends StatelessWidget {
   static const routeName = '/settings';
-  final StudentDashboardController sdController;
+  final DataController sdController;
   const SettingsPage({
     Key? key,
     required this.sdController,

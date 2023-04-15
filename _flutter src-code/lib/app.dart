@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/faculty/attendance.dart';
+import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
@@ -193,30 +196,40 @@ class MyApp extends StatelessWidget {
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
           onGenerateRoute: (RouteSettings settings) {
+            print(settings.name);
             switch (settings.name) {
+              case FacultyDashboard.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => FacultyDashboard(
+                          dataController: DataController.instance,
+                        ));
+              case FacultyAttendance.routeName:
+                return MaterialPageRoute(
+                  builder: (_) => FacultyAttendance(),
+                );
+
               case StudentDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => StudentDashboard(
-                          sdController: StudentDashboardController.instance,
+                          sdController: DataController.instance,
                         ));
-
               case StudentAttendance.routeName:
                 return MaterialPageRoute(
                     builder: (_) => StudentAttendance(
-                          sdController: StudentDashboardController.instance,
+                          sdController: DataController.instance,
                         ));
               case SettingsPage.routeName:
                 return MaterialPageRoute(
                     builder: (_) => SettingsPage(
-                          sdController: StudentDashboardController.instance,
+                          sdController: DataController.instance,
                         ));
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
-              case StudentClasses.routeName:
-                return MaterialPageRoute(
-                    builder: (_) => StudentClasses(
-                          sdController: StudentDashboardController.instance,
-                        ));
+              // case StudentClasses.routeName:
+              //   return MaterialPageRoute(
+              //       builder: (_) => StudentClasses(
+              //             sdController: StudentViewController.instance,
+              //           ));
               default:
                 return MaterialPageRoute(builder: (_) => const PageNotFound());
             }

@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
+import 'package:samids_web_app/src/model/faculty_model.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/model/subject_model.dart';
@@ -17,7 +18,7 @@ import 'package:samids_web_app/src/services/attendance.services.dart';
 
 import '../services/student.services.dart';
 
-class StudentDashboardController with ChangeNotifier {
+class FacultyController with ChangeNotifier {
   final Student student;
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
@@ -33,17 +34,12 @@ class StudentDashboardController with ChangeNotifier {
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
 
-  StudentDashboardController({required this.student});
+  FacultyController({required this.student});
 
-  static void initialize(Student student) {
-    GetIt.instance.registerSingleton<StudentDashboardController>(
-        StudentDashboardController(student: student));
-  }
+  static void initialize() {}
 
-  static StudentDashboardController get I =>
-      GetIt.instance<StudentDashboardController>();
-  static StudentDashboardController get instance =>
-      GetIt.instance<StudentDashboardController>();
+  static FacultyController get I => GetIt.instance<FacultyController>();
+  static FacultyController get instance => GetIt.instance<FacultyController>();
   logout() {
     isStudentClassesCollected = false;
     isCountCalculated = false;
