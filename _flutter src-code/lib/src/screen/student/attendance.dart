@@ -88,16 +88,19 @@ class _StudentAttendanceState extends State<StudentAttendance>
   }
 
   Widget _webAttendanceBody(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return Align(
+      alignment: Alignment.topLeft,
       child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Expanded(child: Card(child: _dataTableRecentLogs(context))),
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Card(child: _dataTableAttendance(context)),
+        ),
       ),
     );
   }
 
-  Widget _dataTableRecentLogs(context) {
+  Widget _dataTableAttendance(context) {
     return SizedBox(
       // width: MediaQuery.of(context).size.width * .8,
       child: DataTable(

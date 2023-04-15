@@ -26,8 +26,8 @@ import '../../widgets/web_view.dart';
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
   static const routeName = '/student-dashboard';
-  StudentDashboardController sdController = StudentDashboardController.instance;
-  StudentDashboard({super.key});
+  final StudentDashboardController sdController;
+  const StudentDashboard({super.key, required this.sdController});
 
   @override
   State<StudentDashboard> createState() => _StudentDashboardState();
@@ -76,59 +76,63 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     ),
                   ),
                 )
-              : Row(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, right: 8.0, bottom: 8.0),
-                          child: Column(
-                            children: [
-                              // StudentInfoCard(student: _sdController.student),
+              : Container(
+                  alignment: Alignment.topCenter,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8.0, right: 8.0, bottom: 8.0),
+                            child: Column(
+                              children: [
+                                // StudentInfoCard(student: _sdController.student),
 
-                              Row(
-                                children: [
-                                  Flexible(
-                                      flex: 1,
-                                      child: StudentInfoCard(
-                                          student: _sdController.student)),
-                                  Flexible(
-                                    flex: 1,
-                                    child: _overviewCard(5),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                Row(
                                   children: [
-                                    Expanded(
-                                      child: _webRecentLogsCard(
-                                        context,
-                                      ),
+                                    Flexible(
+                                        flex: 1,
+                                        child: StudentInfoCard(
+                                            student: _sdController.student)),
+                                    Flexible(
+                                      flex: 1,
+                                      child: _overviewCard(5),
                                     ),
-                                    Expanded(
-                                      child: _myClassesCard(
-                                        context,
-                                      ),
-                                    ),
-                                    // _myClassesCard(context)
                                   ],
                                 ),
-                              ),
-                              SizedBox(height: 8),
-                            ],
+                                SizedBox(height: 8),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: _webRecentLogsCard(
+                                          context,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: _myClassesCard(
+                                          context,
+                                        ),
+                                      ),
+                                      // _myClassesCard(context)
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
         },
       ),

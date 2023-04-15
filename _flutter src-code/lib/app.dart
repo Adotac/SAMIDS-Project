@@ -195,7 +195,11 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: (RouteSettings settings) {
             switch (settings.name) {
               case StudentDashboard.routeName:
-                return MaterialPageRoute(builder: (_) => StudentDashboard());
+                return MaterialPageRoute(
+                    builder: (_) => StudentDashboard(
+                          sdController: StudentDashboardController.instance,
+                        ));
+
               case StudentAttendance.routeName:
                 return MaterialPageRoute(
                     builder: (_) => StudentAttendance(

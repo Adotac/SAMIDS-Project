@@ -44,6 +44,21 @@ class StudentDashboardController with ChangeNotifier {
       GetIt.instance<StudentDashboardController>();
   static StudentDashboardController get instance =>
       GetIt.instance<StudentDashboardController>();
+  logout() {
+    isStudentClassesCollected = false;
+    isCountCalculated = false;
+    isAttendanceTodayCollected = false;
+    isAllAttendanceCollected = false;
+
+    onTimeCount = 0;
+    lateCount = 0;
+    absentCount = 0;
+    cuttingCount = 0;
+
+    attendance.clear();
+    allAttendanceList.clear();
+    studentClasses.clear();
+  }
 
   handEventJsonAttendance(CRUDReturn result) {
     if (attendance.isNotEmpty) attendance.clear();
