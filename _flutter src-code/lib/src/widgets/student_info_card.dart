@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
-import 'package:samids_web_app/src/widgets/card_small.dart';
 
 import '../controllers/auth.controller.dart';
 
 class StudentInfoCard extends StatelessWidget {
   final currentUser = AuthController.instance;
-  final Student student;
-  StudentInfoCard({Key? key, required this.student}) : super(key: key);
+  final Student user;
+  StudentInfoCard({Key? key, required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 154,
+    return Container(
+      constraints: const BoxConstraints(
+        maxHeight: 100,
+      ),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                 backgroundColor: Colors.grey.shade200,
@@ -29,23 +32,32 @@ class StudentInfoCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        '${student.firstName} ${student.lastName}',
-                        style: TextStyle(
-                          fontSize: 21,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.headline6!.color,
-                        ),
+                  RichText(
+                    text: TextSpan(
+                      text: '${user.firstName} ${user.lastName} ',
+                      style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.headline6!.color,
                       ),
-                    ],
+                      children: [
+                        TextSpan(
+                          text: '[${user.rfid}]',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Text(
-                    student.course,
+                    "Department of Computer Studies",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w400,
+                      // ignore: deprecated_member_use
                       color: Theme.of(context).textTheme.subtitle1!.color,
                     ),
                   ),

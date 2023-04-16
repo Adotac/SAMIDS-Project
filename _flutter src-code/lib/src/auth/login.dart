@@ -3,6 +3,7 @@ import 'package:samids_web_app/src/controllers/auth.controller.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
+import 'package:samids_web_app/src/screen/student/dashboard.dart';
 
 import '../model/student_model.dart';
 import '../widgets/responsive_builder.dart';
@@ -324,12 +325,12 @@ class _LoginScreenState extends State<LoginScreen> {
             AuthController.instance.loggedInUser!.student as Student);
 
         WidgetsBinding.instance!.addPostFrameCallback((_) {
-          Navigator.pushNamed(context, FacultyDashboard.routeName);
+          Navigator.pushNamed(context, StudentDashboard.routeName);
         });
       } else {
         FacultyController.initialize();
         WidgetsBinding.instance!.addPostFrameCallback((_) {
-          Navigator.pushNamed(context, FacultyDashboard.routeName);
+          Navigator.pushNamed(context, StudentDashboard.routeName);
         });
 
         if (!mounted) return;

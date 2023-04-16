@@ -18,7 +18,7 @@ class SettingsPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: StudentInfoCard(
-        student: sdController.student,
+        user: sdController.student,
       ),
     );
   }

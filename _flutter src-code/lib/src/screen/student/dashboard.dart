@@ -94,7 +94,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                     Flexible(
                                         flex: 1,
                                         child: StudentInfoCard(
-                                            student: _sdController.student)),
+                                            user: _sdController.student)),
                                     Flexible(
                                       flex: 1,
                                       child: _overviewCard(5),
@@ -395,11 +395,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ],
               ),
               Spacer(),
-              circularData(_sdController.absentCount, 'Absent', Colors.red),
-              circularData(_sdController.cuttingCount, 'Cutting',
+              _circularData(_sdController.absentCount, 'Absent', Colors.red),
+              _circularData(_sdController.cuttingCount, 'Cutting',
                   Colors.yellow.shade700),
-              circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
-              circularData(_sdController.lateCount, 'Late', Colors.orange)
+              _circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
+              _circularData(_sdController.lateCount, 'Late', Colors.orange)
             ],
           ),
         ),
@@ -420,13 +420,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
           title: "Overview",
           child: Row(
             children: [
-              circularData(
+              _circularData(
                   _sdController.absentCount, 'Absent', Colors.red, 32.0),
-              circularData(
+              _circularData(
                   _sdController.cuttingCount, 'Cutting', Colors.yellow, 32.0),
-              circularData(
+              _circularData(
                   _sdController.onTimeCount, 'On-Time', Colors.green, 32.0),
-              circularData(_sdController.lateCount, 'Late',
+              _circularData(_sdController.lateCount, 'Late',
                   Color.fromRGBO(255, 152, 0, 1), 32.0),
             ],
           ),
@@ -435,11 +435,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget circularData(value, description, color, [radius = 40.0]) {
-    print(_sdController.lateCount);
-    print(_sdController.onTimeCount);
-    print(_sdController.cuttingCount);
-    print(_sdController.absentCount);
+  Widget _circularData(value, description, color, [radius = 40.0]) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(

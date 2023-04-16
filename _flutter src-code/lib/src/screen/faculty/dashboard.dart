@@ -36,6 +36,7 @@ class FacultyDashboard extends StatefulWidget {
 
 class _FacultyDashboardState extends State<FacultyDashboard> {
   DataController get _sdController => widget.dataController;
+
   // add on init
   @override
   void initState() {
@@ -62,83 +63,125 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   }
 
   Widget _webView() {
-    return WebView(
-      appBarTitle: "Dashboard",
-      selectedWidgetMarker: 0,
-      body: AnimatedBuilder(
-        animation: _sdController,
-        builder: (context, child) {
-          return !_sdController.isAllAttendanceCollected
-              ? Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor, // Customize the color
+    return AnimatedBuilder(
+      animation: _sdController,
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return WebView(
+              appBarTitle: 'Dashboard',
+              selectedWidgetMarker: 0,
+              body: Column(
+                children: [
+                  SizedBox(height: 16.0),
+                  Expanded(
+                    child: GridView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: 12.0),
+                      itemCount: _sdController.allAttendanceList.length + 2,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        // crossAxisSpacing: 16.0,
+                        // mainAxisSpacing: 16.0,
+                        childAspectRatio: constraints.maxWidth /
+                            2 / // divide by crossAxisCount
+                            245, // height of the _overviewCard
+                      ),
+                      itemBuilder: (BuildContext context, int index) {
+                        if (index == 0) {
+                          return StudentInfoCard(user: _sdController.student);
+                        }
+                        if (index == 1) {
+                          return StudentInfoCard(user: _sdController.student);
+                        } else {
+                          return _overviewCard(1, context);
+                        }
+                      },
                     ),
                   ),
-                )
-              : Container(
-                  alignment: Alignment.topCenter,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 8.0, right: 8.0, bottom: 8.0),
-                            child: Column(
-                              children: [
-                                // StudentInfoCard(student: _sdController.student),
-
-                                Row(
-                                  children: [
-                                    Flexible(
-                                        flex: 1,
-                                        child: StudentInfoCard(
-                                            student: _sdController.student)),
-                                    Flexible(
-                                      flex: 1,
-                                      child: _overviewCard(5),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: _webRecentLogsCard(
-                                          context,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: _myClassesCard(
-                                          context,
-                                        ),
-                                      ),
-                                      // _myClassesCard(context)
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-        },
-      ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
+
+  //  WebView(
+  //   appBarTitle: "Dashboard",
+  //   selectedWidgetMarker: 0,
+  //   body: AnimatedBuilder(
+  //     animation: _sdController,
+  //     builder: (context, child) {
+  // return !_sdController.isAllAttendanceCollected
+  //     ? Center(
+  //         child: CircularProgressIndicator(
+  //           strokeWidth: 4,
+  //           valueColor: AlwaysStoppedAnimation<Color>(
+  //             Theme.of(context).primaryColor, // Customize the color
+  //           ),
+  //         ),
+  //       )
+  //     : Container(
+  //               alignment: Alignment.topCenter,
+  //               child: Row(
+  //                 children: [
+  //                   Expanded(
+  //                     child: SingleChildScrollView(
+  //                       child: Padding(
+  //                         padding: const EdgeInsets.only(
+  //                             left: 8.0, right: 8.0, bottom: 8.0),
+  //                         child: Column(
+  //                           children: [
+
+  //                             Row(
+  //                               children: [
+  //                                 Flexible(
+  //                                     flex: 1,
+  // child: StudentInfoCard(
+  //     user: _sdController.student)),
+  //                                 Flexible(
+  //                                   flex: 1,
+  //                                   child: _overviewCard(5, context),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                             SizedBox(height: 8),
+  //                             Padding(
+  //                               padding: const EdgeInsets.symmetric(
+  //                                   horizontal: 8.0),
+  //                               child: Row(
+  //                                 crossAxisAlignment:
+  //                                     CrossAxisAlignment.start,
+  //                                 mainAxisAlignment:
+  //                                     MainAxisAlignment.spaceBetween,
+  //                                 children: [
+  //                                   Expanded(
+  //                                     child: _webRecentLogsCard(
+  //                                       context,
+  //                                     ),
+  //                                   ),
+  //                                   Expanded(
+  //                                     child: _myClassesCard(
+  //                                       context,
+  //                                     ),
+  //                                   ),
+  //                                   // _myClassesCard(context)
+  //                                 ],
+  //                               ),
+  //                             ),
+  //                             SizedBox(height: 8),
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             );
+  //     },
+  //   ),
+  // );
 
   Widget _mobileView() {
     return AnimatedBuilder(
@@ -374,82 +417,150 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     }
   }
 
-  Widget _overviewCard(leadingFlex) {
+  Widget _overviewCard(leadingFlex, BuildContext context) {
     double totalLogs = _sdController.allAttendanceList.length.toDouble();
-    return SizedBox(
-      height: 220, // Increase height to accommodate new fields
-      child: Card(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  TitleMediumText(
-                    title: "Overview",
-                  ),
-                  Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      // TODO: Implement show class list functionality
-                    },
-                    child: Text('Show Class List'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // TODO: Implement cancel class functionality
-                    },
-                    child: Text('Cancel Class'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
+    return StatefulBuilder(builder: (context, setState) {
+      return SizedBox(
+        height: 290, // Increase height to accommodate new fields
+        child: Card(
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Subject Name Overview',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        // TODO: Implement show class list functionality
+                      },
+                      child: Text('Show Class List'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        showCancelClassDialog(context);
+                      },
+                      child: Text('Cancel Class'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // TODO: Implement show attenda list functionality
+                      },
+                      child: Text('Show Attendance List'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Class Room Code:'),
-                        Text('Class Name:'),
-                        Text('Class Time:'),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text('Code:'),
+                                Text('Name:'),
+                                Text('Time:'),
+                                Text('Dates:'),
+                              ],
+                            ),
+                            SizedBox(width: 8.0),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                    '12345'), // Replace with actual class room code
+                                Text('Math'), // Replace with actual class name
+                                Text(
+                                    '9:30am - 10:30am'), // Replace with actual class time
+                                Text('MWF'), // Replace with actual class dates
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.0),
+                        DataNumber(
+                          number: totalLogs.toString(),
+                          description: "Total logs",
+                          flex: leadingFlex,
+                        ),
                       ],
                     ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text('12345'), // Replace with actual class room code
-                        Text('Math'), // Replace with actual class name
-                        Text(
-                            '9:30am - 10:30am'), // Replace with actual class time
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.0),
-              Row(
-                children: [
-                  DataNumber(
-                    number: totalLogs.toString(),
-                    description: "Total logs",
-                    flex: leadingFlex,
-                  ),
-                  Spacer(),
-                  circularData(_sdController.absentCount, 'Absent', Colors.red),
-                  circularData(_sdController.cuttingCount, 'Cutting',
-                      Colors.yellow.shade700),
-                  circularData(
-                      _sdController.onTimeCount, 'On-Time', Colors.green),
-                  circularData(_sdController.lateCount, 'Late', Colors.orange),
-                ],
-              ),
-            ],
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              circularData(_sdController.absentCount, 'Absent',
+                                  Colors.red),
+                              circularData(_sdController.cuttingCount,
+                                  'Cutting', Colors.yellow.shade700),
+                              circularData(_sdController.onTimeCount, 'On-Time',
+                                  Colors.green),
+                              circularData(_sdController.lateCount, 'Late',
+                                  Colors.orange),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(height: 16.0),
+              ],
+            ),
           ),
         ),
-      ),
+      );
+    });
+  }
+
+  Future<void> showCancelClassDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController _textFieldController = TextEditingController();
+        return AlertDialog(
+          title: Text('Cancel Class'),
+          content: TextField(
+            controller: _textFieldController,
+            decoration: InputDecoration(
+              hintText: 'Enter reason for cancellation',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                // TODO: Implement cancel class functionality
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -481,10 +592,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   }
 
   Widget circularData(value, description, color, [radius = 40.0]) {
-    print(_sdController.lateCount);
-    print(_sdController.onTimeCount);
-    print(_sdController.cuttingCount);
-    print(_sdController.absentCount);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -497,6 +604,9 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             color: Color(0xffEEEEEE),
             sliderColor: color,
             unSelectedColor: Color.fromARGB(255, 255, 255, 255),
+          ),
+          SizedBox(
+            height: 4.0,
           ),
           Text(description),
         ],
