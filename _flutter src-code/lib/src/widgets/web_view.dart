@@ -92,6 +92,8 @@ class WebView extends StatelessWidget {
         ],
       ),
       body: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SideMenu(
             selectedWidgetMarker: selectedWidgetMarker,

@@ -16,6 +16,7 @@ import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:samids_web_app/src/settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
@@ -218,14 +219,16 @@ class MyApp extends StatelessWidget {
                 return MaterialPageRoute(
                     builder: (_) => SettingsPage(
                           sdController: DataController.instance,
+                          settingsController:
+                              settingsController, // Add this line
                         ));
               case LoginScreen.routeName:
                 return MaterialPageRoute(builder: (_) => LoginScreen());
-              // case StudentClasses.routeName:
-              //   return MaterialPageRoute(
-              //       builder: (_) => StudentClasses(
-              //             sdController: StudentViewController.instance,
-              //           ));
+              case StudentClasses.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => StudentClasses(
+                          sdController: DataController.instance,
+                        ));
               default:
                 return MaterialPageRoute(builder: (_) => const PageNotFound());
             }

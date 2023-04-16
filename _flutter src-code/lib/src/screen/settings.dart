@@ -4,21 +4,32 @@ import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
 import '../model/student_model.dart';
+import '../settings/settings_controller.dart';
 import '../widgets/mobile_view.dart';
+import '../widgets/web_view.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
   final DataController sdController;
+
+  final SettingsController settingsController;
   const SettingsPage({
     Key? key,
     required this.sdController,
+    required this.settingsController,
   }) : super(key: key);
 
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  SettingsController get settingsController => widget.settingsController;
   Widget _buildUserInformation(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: StudentInfoCard(
-        user: sdController.student,
+        user: widget.sdController.student,
       ),
     );
   }
@@ -72,6 +83,33 @@ class SettingsPage extends StatelessWidget {
               // Implement the logout functionality here
             },
           ),
+          ListTile(
+            leading: Icon(Icons.brightness_6,
+                color: Theme.of(context).iconTheme.color),
+            title: Text('Theme', style: Theme.of(context).textTheme.subtitle1),
+            trailing: DropdownButton<ThemeMode>(
+              value: settingsController.themeMode,
+              onChanged: (ThemeMode? newValue) {
+                if (newValue != null) {
+                  settingsController.updateThemeMode(newValue);
+                }
+              },
+              items: const [
+                DropdownMenuItem(
+                  value: ThemeMode.system,
+                  child: Text('System'),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.dark,
+                  child: Text('Dark'),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.light,
+                  child: Text('Light'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -79,12 +117,13 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
-            showBottomNavBar: false,
+            showBottomNavBar: true,
             appBarOnly: true,
-            currentIndex: 1, // Assuming settings page has index 3
+            currentIndex: 3, // Assuming settings page has index 1
             appBarTitle: "Settings",
             userName: "",
             body: [
@@ -92,13 +131,13 @@ class SettingsPage extends StatelessWidget {
               _buildSettingsList(context),
             ]);
       } else {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("Settings"),
-          ),
+        return WebView(
+          appBarTitle: "Settings",
+          selectedWidgetMarker: 2, // Assuming settings page has index 1
           body: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              // mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 _buildUserInformation(context),
                 _buildSettingsList(context),

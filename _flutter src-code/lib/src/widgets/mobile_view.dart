@@ -45,7 +45,7 @@ class _MobileViewState extends State<MobileView> {
             icon: Icon(
               Icons.dashboard_outlined,
             ),
-            label: 'Dashboard ',
+            label: 'Dashboard',
           ),
           BottomNavigationBarItem(
               icon: Icon(
@@ -57,6 +57,12 @@ class _MobileViewState extends State<MobileView> {
               Icons.school_outlined,
             ),
             label: 'Classes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.settings_outlined,
+            ),
+            label: 'Settings',
           ),
         ],
         onTap: (int index) {
@@ -72,8 +78,10 @@ class _MobileViewState extends State<MobileView> {
               Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
               break;
             case 3:
-              Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
+              Navigator.of(context).popAndPushNamed(SettingsPage.routeName);
               break;
+            default:
+              Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
           }
         },
       ),
