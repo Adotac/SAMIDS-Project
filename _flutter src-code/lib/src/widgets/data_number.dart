@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 
 class DataNumber extends StatelessWidget {
-  final int flex;
   final String number;
   final String description;
   const DataNumber(
-      {super.key,
-      required this.flex,
-      required this.number,
-      required this.description});
+      {super.key, required this.number, required this.description});
 
   @override
   Widget build(BuildContext context) {

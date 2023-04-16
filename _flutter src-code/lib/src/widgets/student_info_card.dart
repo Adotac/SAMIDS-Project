@@ -7,7 +7,10 @@ import '../controllers/auth.controller.dart';
 class StudentInfoCard extends StatelessWidget {
   final currentUser = AuthController.instance;
   final Student user;
-  StudentInfoCard({Key? key, required this.user}) : super(key: key);
+  bool isFaculty;
+
+  StudentInfoCard({Key? key, required this.user, this.isFaculty = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +44,18 @@ class StudentInfoCard extends StatelessWidget {
                         color: Theme.of(context).textTheme.headline6!.color,
                       ),
                       children: [
-                        TextSpan(
-                          text: '[${user.rfid}]',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
+                        isFaculty
+                            ? TextSpan(
+                                text: 'Faculty',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              )
+                            : const TextSpan(
+                                text: '',
+                              ),
                       ],
                     ),
                   ),

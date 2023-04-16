@@ -3,22 +3,19 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 
-import 'package:samids_web_app/src/screen/student/attendance.dart';
-import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
-import 'package:samids_web_app/src/widgets/side_menu.dart';
+
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
 import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
-import '../../widgets/app_bar.dart';
+
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
 import '../../widgets/mobile_view.dart';
-import '../../widgets/recent_logs_table.dart';
-import '../../widgets/title_medium_text.dart';
+
 import 'package:intl/intl.dart';
 
 import '../../widgets/web_view.dart';
@@ -73,10 +70,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
               selectedWidgetMarker: 0,
               body: Column(
                 children: [
-                  SizedBox(height: 16.0),
                   Expanded(
                     child: GridView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: 12.0),
                       itemCount: _sdController.allAttendanceList.length + 2,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -84,16 +79,17 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                         // mainAxisSpacing: 16.0,
                         childAspectRatio: constraints.maxWidth /
                             2 / // divide by crossAxisCount
-                            245, // height of the _overviewCard
+                            251, // height of the _overviewCard
                       ),
                       itemBuilder: (BuildContext context, int index) {
                         if (index == 0) {
-                          return StudentInfoCard(user: _sdController.student);
+                          return StudentInfoCard(
+                              user: _sdController.student, isFaculty: true);
                         }
                         if (index == 1) {
                           return StudentInfoCard(user: _sdController.student);
                         } else {
-                          return _overviewCard(1, context);
+                          return _overviewCard(index - 2, context);
                         }
                       },
                     ),
@@ -106,82 +102,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       },
     );
   }
-
-  //  WebView(
-  //   appBarTitle: "Dashboard",
-  //   selectedWidgetMarker: 0,
-  //   body: AnimatedBuilder(
-  //     animation: _sdController,
-  //     builder: (context, child) {
-  // return !_sdController.isAllAttendanceCollected
-  //     ? Center(
-  //         child: CircularProgressIndicator(
-  //           strokeWidth: 4,
-  //           valueColor: AlwaysStoppedAnimation<Color>(
-  //             Theme.of(context).primaryColor, // Customize the color
-  //           ),
-  //         ),
-  //       )
-  //     : Container(
-  //               alignment: Alignment.topCenter,
-  //               child: Row(
-  //                 children: [
-  //                   Expanded(
-  //                     child: SingleChildScrollView(
-  //                       child: Padding(
-  //                         padding: const EdgeInsets.only(
-  //                             left: 8.0, right: 8.0, bottom: 8.0),
-  //                         child: Column(
-  //                           children: [
-
-  //                             Row(
-  //                               children: [
-  //                                 Flexible(
-  //                                     flex: 1,
-  // child: StudentInfoCard(
-  //     user: _sdController.student)),
-  //                                 Flexible(
-  //                                   flex: 1,
-  //                                   child: _overviewCard(5, context),
-  //                                 ),
-  //                               ],
-  //                             ),
-  //                             SizedBox(height: 8),
-  //                             Padding(
-  //                               padding: const EdgeInsets.symmetric(
-  //                                   horizontal: 8.0),
-  //                               child: Row(
-  //                                 crossAxisAlignment:
-  //                                     CrossAxisAlignment.start,
-  //                                 mainAxisAlignment:
-  //                                     MainAxisAlignment.spaceBetween,
-  //                                 children: [
-  //                                   Expanded(
-  //                                     child: _webRecentLogsCard(
-  //                                       context,
-  //                                     ),
-  //                                   ),
-  //                                   Expanded(
-  //                                     child: _myClassesCard(
-  //                                       context,
-  //                                     ),
-  //                                   ),
-  //                                   // _myClassesCard(context)
-  //                                 ],
-  //                               ),
-  //                             ),
-  //                             SizedBox(height: 8),
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             );
-  //     },
-  //   ),
-  // );
 
   Widget _mobileView() {
     return AnimatedBuilder(
@@ -243,9 +163,11 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  String getTimeStartEnd(SubjectSchedule subjectSchedule) {
-    final timeStart = _sdController.formatTime(subjectSchedule.timeStart);
-    final timeEnd = _sdController.formatTime(subjectSchedule.timeEnd);
+  String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
+    final timeStart =
+        _sdController.formatTime(subjectSchedule?.timeStart ?? DateTime.now());
+    final timeEnd =
+        _sdController.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
     return '$timeStart - $timeEnd';
   }
 
@@ -417,11 +339,11 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     }
   }
 
-  Widget _overviewCard(leadingFlex, BuildContext context) {
+  Widget _overviewCard(index, BuildContext context) {
+    Attendance attendance = _sdController.allAttendanceList[index];
     double totalLogs = _sdController.allAttendanceList.length.toDouble();
     return StatefulBuilder(builder: (context, setState) {
       return SizedBox(
-        height: 290, // Increase height to accommodate new fields
         child: Card(
           child: Container(
             padding: EdgeInsets.all(16.0),
@@ -434,7 +356,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Subject Name Overview',
+                      '${attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject'}',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -472,7 +394,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text('Code:'),
-                                Text('Name:'),
                                 Text('Time:'),
                                 Text('Dates:'),
                               ],
@@ -482,21 +403,21 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
+                                Text(attendance.subjectSchedule?.room
+                                        .toString() ??
+                                    'No Room'), // Replace with actual class room code
                                 Text(
-                                    '12345'), // Replace with actual class room code
-                                Text('Math'), // Replace with actual class name
-                                Text(
-                                    '9:30am - 10:30am'), // Replace with actual class time
-                                Text('MWF'), // Replace with actual class dates
+                                  getTimeStartEnd(attendance.subjectSchedule),
+                                ),
+                                Text('${attendance.subjectSchedule?.day.name}'),
                               ],
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 6.0),
                         DataNumber(
                           number: totalLogs.toString(),
                           description: "Total logs",
-                          flex: leadingFlex,
                         ),
                       ],
                     ),
@@ -590,6 +511,84 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       },
     );
   }
+// Widget _webView() {
+//     return WebView(
+//       appBarTitle: "Dashboard",
+//       selectedWidgetMarker: 0,
+//       body: AnimatedBuilder(
+//         animation: _sdController,
+//         builder: (context, child) {
+//           return !_sdController.isAllAttendanceCollected
+//               ? Center(
+//                   child: CircularProgressIndicator(
+//                     strokeWidth: 4,
+//                     valueColor: AlwaysStoppedAnimation<Color>(
+//                       Theme.of(context).primaryColor, // Customize the color
+//                     ),
+//                   ),
+//                 )
+//               : Container(
+//                   alignment: Alignment.topCenter,
+//                   child: Row(
+//                     children: [
+//                       Expanded(
+//                         child: SingleChildScrollView(
+//                           child: Padding(
+//                             padding: const EdgeInsets.only(
+//                                 left: 8.0, right: 8.0, bottom: 8.0),
+//                             child: Column(
+//                               children: [
+//                                 // StudentInfoCard(student: _sdController.student),
+
+//                                 Row(
+//                                   children: [
+//                                     Flexible(
+//                                         flex: 1,
+//                                         child: StudentInfoCard(
+//                                             user: _sdController.student)),
+//                                     Flexible(
+//                                       flex: 1,
+//                                       child: _overviewCard(5,context),
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 SizedBox(height: 8),
+//                                 Padding(
+//                                   padding: const EdgeInsets.symmetric(
+//                                       horizontal: 8.0),
+//                                   child: Row(
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.start,
+//                                     mainAxisAlignment:
+//                                         MainAxisAlignment.spaceBetween,
+//                                     children: [
+//                                       Expanded(
+//                                         child: _webRecentLogsCard(
+//                                           context,
+//                                         ),
+//                                       ),
+//                                       Expanded(
+//                                         child: _myClassesCard(
+//                                           context,
+//                                         ),
+//                                       ),
+//                                       // _myClassesCard(context)
+//                                     ],
+//                                   ),
+//                                 ),
+//                                 SizedBox(height: 8),
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//         },
+//       ),
+//     );
+//   }
 
   Widget circularData(value, description, color, [radius = 40.0]) {
     return Padding(

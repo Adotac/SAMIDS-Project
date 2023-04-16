@@ -3,6 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/faculty/attendance.dart';
+import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
 
 import '../screen/student/attendance.dart';
@@ -75,7 +77,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Dashboard',
             index: 0,
             onTap: () {
-              Navigator.popAndPushNamed(context, StudentDashboard.routeName);
+              Navigator.popAndPushNamed(context, FacultyDashboard.routeName);
             },
           ),
           _buildListTile(
@@ -83,7 +85,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Attendance',
             index: 1,
             onTap: () {
-              Navigator.popAndPushNamed(context, StudentAttendance.routeName);
+              Navigator.popAndPushNamed(context, FacultyAttendance.routeName);
             },
           ),
           _buildListTile(
@@ -94,7 +96,7 @@ class _SideMenuState extends State<SideMenu> {
               Navigator.popAndPushNamed(context, SettingsPage.routeName);
             },
           ),
-          Spacer(),
+          const Spacer(),
           _buildListTile(
             icon: Icons.logout_outlined,
             title: 'Logout',
@@ -108,7 +110,7 @@ class _SideMenuState extends State<SideMenu> {
                   LoginScreen.routeName, (Route<dynamic> route) => false);
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

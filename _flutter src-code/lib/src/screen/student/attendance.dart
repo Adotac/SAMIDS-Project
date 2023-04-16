@@ -30,7 +30,6 @@ class StudentAttendance extends StatefulWidget {
 class _StudentAttendanceState extends State<StudentAttendance>
     with SingleTickerProviderStateMixin {
   final _textEditingController = TextEditingController();
-  late AnimationController _animationController;
   DataController get _sdController => widget.sdController;
 
   bool isMobile(BoxConstraints constraints) {
@@ -40,16 +39,10 @@ class _StudentAttendanceState extends State<StudentAttendance>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -129,13 +122,13 @@ class _StudentAttendanceState extends State<StudentAttendance>
           ),
         ],
         rows: _sdController.allAttendanceList
-            .map((attendance) => _buildDataRowRecentLogs(context, attendance))
+            .map((attendance) => _buildAttendanceRow(context, attendance))
             .toList(),
       ),
     );
   }
 
-  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
+  DataRow _buildAttendanceRow(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
         DataCell(

@@ -11,6 +11,7 @@ import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
 import '../../controllers/student_controller.dart';
+
 import '../../model/attendance_model.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
@@ -389,17 +390,17 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     title: "Overview",
                   ),
                   DataNumber(
-                      number: totalLogs.toString(),
-                      description: "Total logs",
-                      flex: leadingFlex),
+                    number: totalLogs.toString(),
+                    description: "Total logs",
+                  ),
                 ],
               ),
               Spacer(),
-              _circularData(_sdController.absentCount, 'Absent', Colors.red),
-              _circularData(_sdController.cuttingCount, 'Cutting',
+              circularData(_sdController.absentCount, 'Absent', Colors.red),
+              circularData(_sdController.cuttingCount, 'Cutting',
                   Colors.yellow.shade700),
-              _circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
-              _circularData(_sdController.lateCount, 'Late', Colors.orange)
+              circularData(_sdController.onTimeCount, 'On-Time', Colors.green),
+              circularData(_sdController.lateCount, 'Late', Colors.orange)
             ],
           ),
         ),
@@ -407,7 +408,84 @@ class _StudentDashboardState extends State<StudentDashboard> {
       ),
     );
   }
+// Widget _webView() {
+//     return WebView(
+//       appBarTitle: "Dashboard",
+//       selectedWidgetMarker: 0,
+//       body: AnimatedBuilder(
+//         animation: _sdController,
+//         builder: (context, child) {
+//           return !_sdController.isAllAttendanceCollected
+//               ? Center(
+//                   child: CircularProgressIndicator(
+//                     strokeWidth: 4,
+//                     valueColor: AlwaysStoppedAnimation<Color>(
+//                       Theme.of(context).primaryColor, // Customize the color
+//                     ),
+//                   ),
+//                 )
+//               : Container(
+//                   alignment: Alignment.topCenter,
+//                   child: Row(
+//                     children: [
+//                       Expanded(
+//                         child: SingleChildScrollView(
+//                           child: Padding(
+//                             padding: const EdgeInsets.only(
+//                                 left: 8.0, right: 8.0, bottom: 8.0),
+//                             child: Column(
+//                               children: [
+//                                 // StudentInfoCard(student: _sdController.student),
 
+//                                 Row(
+//                                   children: [
+//                                     Flexible(
+//                                         flex: 1,
+//                                         child: StudentInfoCard(
+//                                             user: _sdController.student)),
+//                                     Flexible(
+//                                       flex: 1,
+//                                       child: _overviewCard(5),
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 SizedBox(height: 8),
+//                                 Padding(
+//                                   padding: const EdgeInsets.symmetric(
+//                                       horizontal: 8.0),
+//                                   child: Row(
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.start,
+//                                     mainAxisAlignment:
+//                                         MainAxisAlignment.spaceBetween,
+//                                     children: [
+//                                       Expanded(
+//                                         child: _webRecentLogsCard(
+//                                           context,
+//                                         ),
+//                                       ),
+//                                       Expanded(
+//                                         child: _myClassesCard(
+//                                           context,
+//                                         ),
+//                                       ),
+//                                       // _myClassesCard(context)
+//                                     ],
+//                                   ),
+//                                 ),
+//                                 SizedBox(height: 8),
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//         },
+//       ),
+//     );
+//   }
   Widget _mobileOverviewCard(leadingFlex, [flexValue = 1]) {
     return AnimatedBuilder(
       animation: _sdController,
@@ -420,13 +498,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
           title: "Overview",
           child: Row(
             children: [
-              _circularData(
+              circularData(
                   _sdController.absentCount, 'Absent', Colors.red, 32.0),
-              _circularData(
+              circularData(
                   _sdController.cuttingCount, 'Cutting', Colors.yellow, 32.0),
-              _circularData(
+              circularData(
                   _sdController.onTimeCount, 'On-Time', Colors.green, 32.0),
-              _circularData(_sdController.lateCount, 'Late',
+              circularData(_sdController.lateCount, 'Late',
                   Color.fromRGBO(255, 152, 0, 1), 32.0),
             ],
           ),
@@ -435,7 +513,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget _circularData(value, description, color, [radius = 40.0]) {
+  Widget circularData(value, description, color, [radius = 40.0]) {
+    print(_sdController.lateCount);
+    print(_sdController.onTimeCount);
+    print(_sdController.cuttingCount);
+    print(_sdController.absentCount);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(

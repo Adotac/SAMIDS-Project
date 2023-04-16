@@ -50,8 +50,8 @@ class _StudentClassesState extends State<StudentClasses> {
               ),
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
+                children: const [
+                  Padding(
                     padding:
                         EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
                     child: Text(
@@ -61,8 +61,8 @@ class _StudentClassesState extends State<StudentClasses> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16.0, horizontal: 16),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
                     child: Text(
                       'Total Units: 18',
                       style:
