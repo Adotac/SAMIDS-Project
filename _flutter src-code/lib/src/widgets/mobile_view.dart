@@ -31,60 +31,77 @@ class MobileView extends StatefulWidget {
 
 class _MobileViewState extends State<MobileView> {
   Widget _buildBottomNavigationBar(context, int currentIndex) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(20),
-        topRight: Radius.circular(20),
+    // Get the current theme's brightness
+    Brightness brightness = Theme.of(context).brightness;
+
+    // Set the unselected item color based on the current theme's brightness
+    Color unselectedItemColor =
+        brightness == Brightness.dark ? Colors.white : Colors.black;
+
+    Color selectedItemColor = Theme.of(context).primaryColor;
+
+    // Define selected icons
+    List<IconData> selectedIcons = [
+      Icons.dashboard,
+      Icons.event_available,
+      Icons.school,
+      Icons.settings,
+    ];
+
+    // Define unselected icons
+    List<IconData> unselectedIcons = [
+      Icons.dashboard_outlined,
+      Icons.event_available_outlined,
+      Icons.school_outlined,
+      Icons.settings_outlined,
+    ];
+
+    // Define labels
+    List<String> labels = [
+      'Dashboard',
+      'Attendance',
+      'Classes',
+      'Settings',
+    ];
+
+    List<BottomNavigationBarItem> items = List.generate(
+      4,
+      (index) => BottomNavigationBarItem(
+        icon: Icon(
+          currentIndex == index ? selectedIcons[index] : unselectedIcons[index],
+          color:
+              currentIndex == index ? selectedItemColor : unselectedItemColor,
+        ),
+        label: labels[index],
       ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.dashboard_outlined,
-            ),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.event_available_outlined,
-              ),
-              label: 'Attendance'),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.school_outlined,
-            ),
-            label: 'Classes',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.settings_outlined,
-            ),
-            label: 'Settings',
-          ),
-        ],
-        onTap: (int index) {
-          switch (index) {
-            case 0:
-              Navigator.of(context).popAndPushNamed(StudentDashboard.routeName);
-              break;
-            case 1:
-              Navigator.of(context)
-                  .popAndPushNamed(StudentAttendance.routeName);
-              break;
-            case 2:
-              Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
-              break;
-            case 3:
-              Navigator.of(context).popAndPushNamed(SettingsPage.routeName);
-              break;
-            default:
-              Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
-          }
-        },
-      ),
+    );
+
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      // selectedLabelStyle:
+      //     TextStyle(fontWeight: FontWeight.bold, color: selectedItemColor),
+      // unselectedLabelStyle:
+      //     TextStyle(fontWeight: FontWeight.normal, color: unselectedItemColor),
+      selectedItemColor: selectedItemColor,
+      items: items,
+      onTap: (int index) {
+        switch (index) {
+          case 0:
+            Navigator.of(context).popAndPushNamed(StudentDashboard.routeName);
+            break;
+          case 1:
+            Navigator.of(context).popAndPushNamed(StudentAttendance.routeName);
+            break;
+          case 2:
+            Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
+            break;
+          case 3:
+            Navigator.of(context).popAndPushNamed(SettingsPage.routeName);
+            break;
+          default:
+            Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
+        }
+      },
     );
   }
 
