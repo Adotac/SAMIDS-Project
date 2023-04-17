@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 
@@ -72,7 +73,17 @@ class WebView extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(appBarTitle),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/BiSAM_logo.png',
+                      height: 40,
+                      width: 40,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(appBarTitle),
+                  ],
+                ),
               ),
               if (appBarActionWidget != null) _searchBar(context),
             ],
@@ -100,7 +111,7 @@ class WebView extends StatelessWidget {
           ),
           Expanded(child: body),
         ],
-      ),
+      ), //
       endDrawer: Drawer(
         child: Column(
           children: [
