@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../controllers/student_controller.dart';
+import '../../controllers/data_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/card_small.dart';

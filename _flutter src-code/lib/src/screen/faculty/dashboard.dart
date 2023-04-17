@@ -8,7 +8,7 @@ import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
-import '../../controllers/student_controller.dart';
+import '../../controllers/data_controller.dart';
 import '../../model/attendance_model.dart';
 
 import '../../widgets/card_small.dart';

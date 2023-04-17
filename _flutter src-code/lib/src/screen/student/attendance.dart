@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/controllers/data_controller.dart';
 
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';

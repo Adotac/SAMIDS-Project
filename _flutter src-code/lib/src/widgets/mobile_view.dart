@@ -105,6 +105,24 @@ class _MobileViewState extends State<MobileView> {
     );
   }
 
+  Widget _buildNotificationsList(BuildContext context) {
+    // Dummy data for notifications
+    List<String> notifications = [
+      'Notification 1',
+      'Notification 2',
+      'Notification 3',
+    ];
+
+    return ListView.builder(
+      itemCount: notifications.length,
+      itemBuilder: (BuildContext context, int index) {
+        return ListTile(
+          title: Text(notifications[index]),
+        );
+      },
+    );
+  }
+
   String _getGreeting() {
     var hour = DateTime.now().hour;
     if (hour < 12) {
@@ -158,12 +176,38 @@ class _MobileViewState extends State<MobileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: Drawer(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Text(
+                'Notifications',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            Expanded(child: _buildNotificationsList(context)),
+          ],
+        ),
+      ),
       bottomNavigationBar: Visibility(
         visible: widget.showBottomNavBar,
         child: _buildBottomNavigationBar(context, widget.currentIndex),
       ),
       appBar: widget.appBarOnly
           ? AppBar(
+              actions: [
+                Builder(
+                  builder: (BuildContext context) {
+                    return IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                    );
+                  },
+                ),
+              ],
               automaticallyImplyLeading: false,
               leadingWidth: 48,
               title: Text(widget.appBarTitle),
@@ -176,6 +220,18 @@ class _MobileViewState extends State<MobileView> {
           : CustomScrollView(
               slivers: [
                 SliverAppBar(
+                  actions: [
+                    Builder(
+                      builder: (BuildContext context) {
+                        return IconButton(
+                          icon: const Icon(Icons.notifications_outlined),
+                          onPressed: () {
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                        );
+                      },
+                    ),
+                  ],
                   leading: IconButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed(SettingsPage.routeName);

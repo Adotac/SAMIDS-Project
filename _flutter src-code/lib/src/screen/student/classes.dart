@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../controllers/student_controller.dart';
+import '../../controllers/data_controller.dart';
 import '../../model/Subject_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/classes_tile_list.dart';

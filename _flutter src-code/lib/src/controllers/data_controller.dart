@@ -107,13 +107,17 @@ class DataController with ChangeNotifier {
   }
 
   void handleEventJsonStudentClasses(CRUDReturn result) {
-    if (studentClasses.isNotEmpty) studentClasses.clear();
-    for (Map<String, dynamic> map in result.data) {
-      studentClasses.add(SubjectSchedule.fromJson(map));
-    }
+    try {
+      if (studentClasses.isNotEmpty) studentClasses.clear();
+      for (Map<String, dynamic> map in result.data) {
+        studentClasses.add(SubjectSchedule.fromJson(map));
+      }
 
-    isStudentClassesCollected = true;
-    notifyListeners();
+      isStudentClassesCollected = true;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonStudentClasses $e $stacktrace');
+    }
   }
 
   Future<void> getAttendanceAll() async {

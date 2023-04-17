@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/controllers/data_controller.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';

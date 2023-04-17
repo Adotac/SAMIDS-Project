@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../controllers/student_controller.dart';
+import '../controllers/data_controller.dart';
 import '../model/attendance_model.dart'; // Import your controller
 
 class ActivityLogsTable extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/controllers/data_controller.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
