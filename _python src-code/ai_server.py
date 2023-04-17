@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 from fastapi import FastAPI
@@ -16,6 +17,10 @@ app = FastAPI()
 async def root():
     return {"message": "Hello, World!"}
 
+@app.get("/connected")
+async def root():
+    return {"message": "Connected to server"}
+
 @app.get("/test")
 async def test():
     response = requests.get(url + "/api/Student", headers=headers, verify=False)
@@ -24,5 +29,7 @@ async def test():
         print(data)
     else:
         print("Error:", response.status_code)
+
+
 
 

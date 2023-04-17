@@ -155,14 +155,14 @@ void printSeparationLine()
 //-----------------------FOR ESP NOW FUNCTIONALITIES--------------------------------//
 
 // Send message via ESP-NOW
-void SendNow(const char* msg, bool atf, bool df){
-  espcam_message myData;
-
+void SendNow(espcam_message &myData, const char* msg, bool atf, bool df, bool device) {
   strcpy(myData.message, msg);
   myData.attendanceFlag = atf;
-  myData.deviceFlag = df;
+  myData.displayFlag = df;
+  myData.deviceFlag = device;
 
-  
   esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+  delay(2000);
 }
+
 

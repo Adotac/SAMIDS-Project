@@ -7,9 +7,11 @@
 
 #include <WiFi.h>
 #include <esp_now.h>
+#include <HTTPClient.h>
 
 #include "esp_camera.h"
 #include "esp_timer.h"
+#include "esp_wifi.h"
 
 #include "Arduino.h"
 #include "soc/soc.h" // Disable brownout problems
@@ -41,19 +43,25 @@
 
 // ledPin refers to ESP32-CAM GPIO 4 (flashlight)
 #define FLASH_GPIO_NUM 4
+#define RED_LED 33
 
 #define MACSIZE 6
+#define MSG_SIZE 32
+
+#define WIFICHANNEL 0
+
 extern uint8_t broadcastAddress[MACSIZE];
 
-// Define a data structure
 typedef struct ESPCAM_MESSAGE {
-  char message[32];
+  char message[MSG_SIZE];
   bool attendanceFlag;
   bool deviceFlag;
+  bool displayFlag;
 } espcam_message;
 
+
 typedef struct ESPRFID_MESSAGE {
-  char message[32];
+  char message[MSG_SIZE];
   bool deviceFlag;
 } esprfid_message;
 
@@ -66,5 +74,5 @@ void printSeparationLine();
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t  sendStatus);
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len);
-void SendNow(const char* msg, bool atf, bool df);
+void SendNow(espcam_message &myData, const char* msg, bool atf, bool df, bool device);
 #endif

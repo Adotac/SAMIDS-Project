@@ -14,6 +14,7 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 2000;  // send readings timer
 
 bool camDevice = false;
+String tag = "";
 
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
@@ -43,13 +44,31 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   camDevice = cam_data.deviceFlag;
   // After recieve put some logic on circuit to visualize result
 
-  if(!cam_data.deviceFlag){
-    setLCD("Booting up...", 0, 0, true);
+  if(!camDevice){
+
+  }
+
+  if(cam_data.displayFlag){
+    if(cam_data.attendanceFlag){ //edit condition to check after recieving JSON DATA
+      setLCD(" ACCESS GRANTED ", 0, 0, true);
+      setLCD(tag.c_str(), 2, 1, false);
+    }
+    else{
+      char firstHalf[17] = {0}; // Initialize with null-terminators
+      char secondHalf[17] = {0}; // Initialize with null-terminators
+
+      // Copy the original array into two halves
+      strncpy(firstHalf, cam_data.message, 15);
+      strncpy(secondHalf, &cam_data.message[15], 15);
+
+      setLCD(firstHalf, 0, 0, true);
+      setLCD(secondHalf, 0, 1, true);
+    }
+
   }
 
 }
- 
-String tag = "";
+
 
 void setup() {
   Serial.begin(115200);
@@ -72,6 +91,8 @@ void setup() {
     return;
   }
 
+  esp_now_set_peer_channel(broadcastAddress, WIFICHANNEL);
+
   // Once ESPNow is successfully Init, we will register for Send CB to
   // get the status of Trasnmitted packet
   esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
@@ -80,37 +101,41 @@ void setup() {
   esp_now_register_send_cb(OnDataSent);
   esp_now_register_recv_cb(OnDataRecv);
 
-
-
   // Initialize RFID
   SPI.begin();
   rfid.PCD_Init();
 
   Serial.println("ESP8226 now has started!!");
   setLCD("Device Ready!", 0, 0, true);
-  delay(2000);
+  delay(1000);
 }
 
 void loop() {
-  delay(300);
-  setLCD(" Face at Camera ", 0, 0, true);
-  setLCD(" and Scan RFID ", 1, 1, false);
-
-
-  // Display card UID on LCD
-  if(!RFID_Scanner()){
-    if((millis() - lastTime) > timerDelay)
-    {
-      Serial.println("No Message");
+  if(camDevice){
+    delay(350);
+    setLCD(" Face at Camera ", 0, 0, true);
+    setLCD(" and Scan RFID ", 1, 1, false);
+    
+    // Display card UID on LCD
+    if(!RFID_Scanner()){
+      if((millis() - lastTime) > timerDelay)
+      {
+        Serial.println("No Message");
+      }
     }
+    else{
+      SendNow(tag.c_str(), camDevice);
+    }
+
+    tag = "";
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
+
   }
   else{
-    SendNow(tag.c_str(), true);
+    setLCD("Synchronizing...", 0, 0, true);
+    delay(1000);
   }
-
-  tag = "";
-  rfid.PICC_HaltA();
-  rfid.PCD_StopCrypto1();
 
 }
 
@@ -125,10 +150,7 @@ bool RFID_Scanner(){
     Serial.print("Sending tag: ");
     Serial.println(tag);
 
-    if(true){ //edit condition to check after recieving JSON DATA
-      setLCD(" ACCESS GRANTED ", 0, 0, true);
-      setLCD(tag.c_str(), 2, 1, false);
-    }
+
     return true;
   }
 

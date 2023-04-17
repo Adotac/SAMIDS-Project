@@ -7,16 +7,23 @@
 #include <ESP8266WiFi.h>
 #include <espnow.h>
 
+#include <Arduino.h>
+#include <cstring>
+
 #ifndef esp32cam_Impl_h
 
 #define MACSIZE 6
+#define MSG_SIZE 32
 
-extern uint8_t broadcastAddress[6];
+#define WIFICHANNEL 0
+
+extern uint8_t broadcastAddress[MACSIZE];
 
 typedef struct ESPCAM_MESSAGE {
-  char message[32];
+  char message[MSG_SIZE];
   bool attendanceFlag;
   bool deviceFlag;
+  bool displayFlag;
 } espcam_message;
 
 typedef struct ESPRFID_MESSAGE {
