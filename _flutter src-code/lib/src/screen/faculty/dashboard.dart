@@ -131,6 +131,41 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
+  void _showAttendanceDialog(BuildContext context, String title) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('$title   Attendance '),
+          content: SizedBox(
+            child: Card(
+              child: DataTable(
+                columns: [
+                  DataColumn(
+                    label: Expanded(child: Text('Subject')),
+                  ),
+                  DataColumn(
+                    label: Text('Room'),
+                  ),
+                  DataColumn(
+                    label: Text('Time'),
+                  ),
+                  DataColumn(
+                    label: Text('Remarks'),
+                  ),
+                ],
+                rows: _sdController.allAttendanceList
+                    .map((attendance) =>
+                        _buildDataRowRecentLogs(context, attendance))
+                    .toList(),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
     return DataRow(
       cells: [
@@ -271,8 +306,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   Widget _myClassesCard(context) {
     return Card(
       child: CardSmall(
-        flexValue: 1,
-        title: "My Classes",
+        title: "Class List",
         isShadow: false,
         child: _dataTableClasses(context),
       ),
@@ -342,6 +376,22 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     }
   }
 
+  void _showMyClassesDialog(BuildContext context, title) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('$title   Class List '),
+          content: _dataTableClasses(context),
+        );
+      },
+    );
+  }
+
+  String getSubjectName(attendance) {
+    return attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject';
+  }
+
   Widget _overviewCard(index, BuildContext context) {
     Attendance attendance = _sdController.allAttendanceList[index];
     double totalLogs = _sdController.allAttendanceList.length.toDouble();
@@ -359,29 +409,38 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      attendance.subjectSchedule?.subject?.subjectName ??
-                          'No Subject',
+                      getSubjectName(attendance),
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     Spacer(),
                     TextButton(
                       onPressed: () {
-                        // TODO: Implement show class list functionality
+                        _showMyClassesDialog(
+                            context,
+                            attendance.subjectSchedule?.subject?.subjectName ??
+                                'No Subject');
                       },
-                      child: Text('Show Class List'),
+                      child: Text('Class List'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _showAttendanceDialog(
+                            context,
+                            attendance.subjectSchedule?.subject?.subjectName ??
+                                'No Subject');
+                      },
+                      child: Text('Attendance List'),
                     ),
                     TextButton(
                       onPressed: () {
                         showCancelClassDialog(context);
                       },
-                      child: Text('Cancel Class'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // TODO: Implement show attenda list functionality
-                      },
-                      child: Text('Show Attendance List'),
+                      child: Text(
+                        'Cancel Class',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error),
+                      ),
                     ),
                   ],
                 ),

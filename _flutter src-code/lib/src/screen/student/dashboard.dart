@@ -165,6 +165,39 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
+  Widget _myClassesCard(context) {
+    return Card(
+      child: CardSmall(
+        flexValue: 1,
+        title: "My Classes",
+        isShadow: false,
+        child: _dataTableClasses(context),
+      ),
+    );
+  }
+
+  Widget _dataTableClasses(context) {
+    return DataTable(
+      columns: [
+        DataColumn(
+          label: Expanded(child: Text('Subject')),
+        ),
+        DataColumn(
+          label: Text('Room'),
+        ),
+        DataColumn(
+          label: Text('Time'),
+        ),
+        DataColumn(
+          label: Text('Day'),
+        ),
+      ],
+      rows: _sdController.studentClasses
+          .map((attendance) => _buildDataRowClasses(context, attendance))
+          .toList(),
+    );
+  }
+
   DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
     return DataRow(
       cells: [
@@ -225,28 +258,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget _dataTableClasses(context) {
-    return DataTable(
-      columns: [
-        DataColumn(
-          label: Expanded(child: Text('Subject')),
-        ),
-        DataColumn(
-          label: Text('Room'),
-        ),
-        DataColumn(
-          label: Text('Time'),
-        ),
-        DataColumn(
-          label: Text('Day'),
-        ),
-      ],
-      rows: _sdController.studentClasses
-          .map((attendance) => _buildDataRowClasses(context, attendance))
-          .toList(),
-    );
-  }
-
   Widget _dataTableRecentLogs(context) {
     return DataTable(
       columns: [
@@ -297,17 +308,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
           _sdController.getStatusText(attendance.remarks.name),
         ),
       ],
-    );
-  }
-
-  Widget _myClassesCard(context) {
-    return Card(
-      child: CardSmall(
-        flexValue: 1,
-        title: "My Classes",
-        isShadow: false,
-        child: _dataTableClasses(context),
-      ),
     );
   }
 
