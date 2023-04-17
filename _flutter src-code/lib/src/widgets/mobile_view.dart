@@ -5,6 +5,7 @@ import '../screen/settings.dart';
 import '../screen/student/attendance.dart';
 import '../screen/student/classes.dart';
 import '../screen/student/dashboard.dart';
+import 'notification_tile_list.dart';
 
 class MobileView extends StatefulWidget {
   final List<Widget> body;
@@ -107,18 +108,28 @@ class _MobileViewState extends State<MobileView> {
 
   Widget _buildNotificationsList(BuildContext context) {
     // Dummy data for notifications
-    List<String> notifications = [
-      'Notification 1',
-      'Notification 2',
-      'Notification 3',
+    List<NotificationTile> notifications = const [
+      NotificationTile(
+        facultyName: 'John Doe',
+        content: 'Your attendance has been marked.',
+        time: '5 minutes ago',
+      ),
+      NotificationTile(
+        facultyName: 'John Doe',
+        content: 'Your attendance has been marked.',
+        time: '5 minutes ago',
+      ),
+      NotificationTile(
+        facultyName: 'John Doe',
+        content: 'Your attendance has been marked.',
+        time: '5 minutes ago',
+      ),
     ];
 
     return ListView.builder(
       itemCount: notifications.length,
       itemBuilder: (BuildContext context, int index) {
-        return ListTile(
-          title: Text(notifications[index]),
-        );
+        return notifications[index];
       },
     );
   }
@@ -180,7 +191,7 @@ class _MobileViewState extends State<MobileView> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 18.0),
+              padding: const EdgeInsets.symmetric(vertical: 18.0),
               child: Text(
                 'Notifications',
                 style: Theme.of(context).textTheme.titleLarge,
@@ -208,6 +219,14 @@ class _MobileViewState extends State<MobileView> {
                   },
                 ),
               ],
+              leading: Container(
+                margin: const EdgeInsets.only(left: 16),
+                child: Image.asset(
+                  'assets/images/BiSAM.png',
+                  height: 24,
+                  width: 24,
+                ),
+              ),
               automaticallyImplyLeading: false,
               leadingWidth: 48,
               title: Text(widget.appBarTitle),
@@ -232,11 +251,13 @@ class _MobileViewState extends State<MobileView> {
                       },
                     ),
                   ],
-                  leading: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(SettingsPage.routeName);
-                    },
-                    icon: const Icon(Icons.settings_outlined),
+                  leading: Container(
+                    margin: const EdgeInsets.only(left: 16),
+                    child: Image.asset(
+                      'assets/images/BiSAM.png',
+                      height: 24,
+                      width: 24,
+                    ),
                   ),
                   leadingWidth: 48,
                   automaticallyImplyLeading: false,

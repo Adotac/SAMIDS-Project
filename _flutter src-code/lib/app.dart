@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/data_controller.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
@@ -99,15 +100,15 @@ class MyApp extends StatelessWidget {
           // ),
           // darkTheme: ThemeData.dark(),
           theme: ThemeData(
+            scaffoldBackgroundColor: const Color(0xFFF2F2F2),
+            primaryColor: const Color(0xFF0597F2),
             cardTheme: CardTheme(
-              margin: EdgeInsets.only(left: 6, right: 6, bottom: 6),
               elevation: 0.2,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
                     radius), // set circular border radius for Cards
               ),
             ),
-
             inputDecorationTheme: InputDecorationTheme(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(radius),
@@ -125,7 +126,7 @@ class MyApp extends StatelessWidget {
                 borderRadius: BorderRadius.circular(radius),
               ),
             ),
-            scaffoldBackgroundColor: const Color(0xFFF5F6F9),
+
             dialogTheme: DialogTheme(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(radius),
@@ -142,7 +143,7 @@ class MyApp extends StatelessWidget {
             ),
             appBarTheme: AppBarTheme(
               toolbarHeight: 80,
-              color: const Color(0xFFF5F6F9),
+              color: const Color(0xFFF2F2F2),
               iconTheme: IconThemeData(
                 color: Colors.black,
               ),
@@ -187,7 +188,8 @@ class MyApp extends StatelessWidget {
                 ),
             colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
                 .copyWith(background: const Color(0xFFF5F6F9))
-                .copyWith(secondary: Color.fromARGB(255, 0, 0, 0)),
+                .copyWith(secondary: Color.fromARGB(255, 0, 0, 0))
+                .copyWith(secondary: const Color(0xFF2D5873)),
           ),
 
           themeMode: settingsController.themeMode,

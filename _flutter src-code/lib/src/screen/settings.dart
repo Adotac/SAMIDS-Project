@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/controllers/data_controller.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
+import '../auth/login.dart';
+import '../controllers/auth.controller.dart';
 import '../model/student_model.dart';
 import '../settings/settings_controller.dart';
 import '../widgets/mobile_view.dart';
@@ -11,9 +14,11 @@ import '../widgets/web_view.dart';
 class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
   final DataController sdController;
+  final DataController studentDashboardController = DataController.instance;
+  final AuthController authController = AuthController.instance;
 
   final SettingsController settingsController;
-  const SettingsPage({
+  SettingsPage({
     Key? key,
     required this.sdController,
     required this.settingsController,
@@ -24,13 +29,13 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  DataController get _sdController => widget.studentDashboardController;
+
+  AuthController get _authController => widget.authController;
   SettingsController get settingsController => widget.settingsController;
   Widget _buildUserInformation(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: StudentInfoCard(
-        user: widget.sdController.student,
-      ),
+    return StudentInfoCard(
+      user: widget.sdController.student,
     );
   }
 
@@ -75,13 +80,22 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
-          ListTile(
-            leading:
-                Icon(Icons.logout, color: Theme.of(context).iconTheme.color),
-            title: Text('Logout', style: Theme.of(context).textTheme.subtitle1),
-            onTap: () {
-              // Implement the logout functionality here
-            },
+          Visibility(
+            visible: MediaQuery.of(context).size.width <= 450,
+            child: ListTile(
+              leading:
+                  Icon(Icons.logout, color: Theme.of(context).iconTheme.color),
+              title:
+                  Text('Logout', style: Theme.of(context).textTheme.subtitle1),
+              onTap: () {
+                _authController.logout();
+                _sdController.dispose();
+                GetIt.instance.unregister<DataController>();
+
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    LoginScreen.routeName, (Route<dynamic> route) => false);
+              },
+            ),
           ),
           ListTile(
             leading: Icon(Icons.brightness_6,

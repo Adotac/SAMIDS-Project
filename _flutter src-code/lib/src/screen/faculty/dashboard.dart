@@ -71,27 +71,30 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
               body: Column(
                 children: [
                   Expanded(
-                    child: GridView.builder(
-                      itemCount: _sdController.allAttendanceList.length + 2,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        // crossAxisSpacing: 16.0,
-                        // mainAxisSpacing: 16.0,
-                        childAspectRatio: constraints.maxWidth /
-                            2 / // divide by crossAxisCount
-                            251, // height of the _overviewCard
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: GridView.builder(
+                        itemCount: _sdController.allAttendanceList.length + 2,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          // crossAxisSpacing: 16.0,
+                          // mainAxisSpacing: 16.0,
+                          childAspectRatio: constraints.maxWidth /
+                              2 / // divide by crossAxisCount
+                              256, // height of the _overviewCard
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index == 0) {
+                            return StudentInfoCard(
+                                user: _sdController.student, isFaculty: true);
+                          }
+                          if (index == 1) {
+                            return StudentInfoCard(user: _sdController.student);
+                          } else {
+                            return _overviewCard(index - 2, context);
+                          }
+                        },
                       ),
-                      itemBuilder: (BuildContext context, int index) {
-                        if (index == 0) {
-                          return StudentInfoCard(
-                              user: _sdController.student, isFaculty: true);
-                        }
-                        if (index == 1) {
-                          return StudentInfoCard(user: _sdController.student);
-                        } else {
-                          return _overviewCard(index - 2, context);
-                        }
-                      },
                     ),
                   ),
                 ],
@@ -356,7 +359,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject'}',
+                      attendance.subjectSchedule?.subject?.subjectName ??
+                          'No Subject',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),

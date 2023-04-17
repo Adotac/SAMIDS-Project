@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
+import 'package:samids_web_app/src/widgets/notification_tile_list.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 
 class WebView extends StatelessWidget {
@@ -22,18 +23,28 @@ class WebView extends StatelessWidget {
 
   Widget _buildNotificationsList(BuildContext context) {
     // Dummy data for notifications
-    List<String> notifications = [
-      'Notification 1',
-      'Notification 2',
-      'Notification 3',
+    List<NotificationTile> notifications = const [
+      NotificationTile(
+        facultyName: 'John Doe',
+        content: 'Your attendance has been marked.',
+        time: '5 minutes ago',
+      ),
+      NotificationTile(
+        facultyName: 'John Doe',
+        content: 'Your attendance has been marked.',
+        time: '5 minutes ago',
+      ),
+      NotificationTile(
+        facultyName: 'John Doe',
+        content: 'Your attendance has been marked.',
+        time: '5 minutes ago',
+      ),
     ];
 
     return ListView.builder(
       itemCount: notifications.length,
       itemBuilder: (BuildContext context, int index) {
-        return ListTile(
-          title: Text(notifications[index]),
-        );
+        return notifications[index];
       },
     );
   }
@@ -76,7 +87,7 @@ class WebView extends StatelessWidget {
                 child: Row(
                   children: [
                     Image.asset(
-                      'assets/images/BiSAM_logo.png',
+                      'assets/images/BiSAM.png',
                       height: 40,
                       width: 40,
                     ),
