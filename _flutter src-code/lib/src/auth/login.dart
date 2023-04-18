@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '2004';
+    _usernameController.text = '46382';
 
     _passwordController = TextEditingController();
     _passwordController.text = 'test123';
@@ -135,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               } else {
-                Navigator.popAndPushNamed(context, FacultyDashboard.routeName);
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
@@ -321,17 +320,31 @@ class _LoginScreenState extends State<LoginScreen> {
           .login(_usernameController.text, _passwordController.text);
       print(success);
       if (success) {
+        int userType = AuthController.instance.loggedInUser!.type.index;
         DataController.initialize(
             AuthController.instance.loggedInUser!.student as Student);
 
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
-          Navigator.pushNamed(context, StudentDashboard.routeName);
-        });
+        if (userType == 0) {
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Navigator.pushNamed(context, StudentDashboard.routeName);
+          });
+        } else if (userType == 1) {
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Navigator.pushNamed(context, FacultyDashboard.routeName);
+          });
+        }
+        // // else if(AuthController.instance.loggedInUser!.type == 2 ) {
+        // //   WidgetsBinding.instance!.addPostFrameCallback((_) {
+        // //     Navigator.pushNamed(context, AdminDashboard.routeName);
+        // //   });
+        // }
       } else {
-        FacultyController.initialize();
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
-          Navigator.pushNamed(context, StudentDashboard.routeName);
-        });
+        // DataController.initialize(
+        //     AuthController.instance.loggedInUser!.student as Student);
+
+        // WidgetsBinding.instance!.addPostFrameCallback((_) {
+        //   Navigator.pushNamed(context, StudentDashboard.routeName);
+        // });
 
         if (!mounted) return;
         showDialog(

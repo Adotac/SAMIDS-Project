@@ -77,7 +77,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
     return Container(
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.all(16.0),
-      width: MediaQuery.of(context).size.width * .9,
+      width: MediaQuery.of(context).size.width * 0.9,
       child: DataTable(
         columns: [
           _dataColumn("Student ID"),

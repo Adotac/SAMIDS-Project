@@ -15,8 +15,7 @@ class StudentInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints:
-          const BoxConstraints(maxHeight: 142, minWidth: double.infinity),
+      constraints: const BoxConstraints(minWidth: double.infinity),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(16),

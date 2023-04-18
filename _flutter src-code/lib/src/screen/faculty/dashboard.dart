@@ -5,17 +5,17 @@ import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
 import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
-
+import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
 import '../../controllers/data_controller.dart';
 import '../../model/attendance_model.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
 import '../../widgets/mobile_view.dart';
-
 import 'package:intl/intl.dart';
 
 import '../../widgets/web_view.dart';
@@ -69,40 +69,105 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
               appBarTitle: 'Dashboard',
               selectedWidgetMarker: 0,
               body: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Padding(
+                  Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: GridView.builder(
-                        itemCount: _sdController.allAttendanceList.length + 2,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          // crossAxisSpacing: 16.0,
-                          // mainAxisSpacing: 16.0,
-                          childAspectRatio: constraints.maxWidth /
-                              2 / // divide by crossAxisCount
-                              256, // height of the _overviewCard
-                        ),
-                        itemBuilder: (BuildContext context, int index) {
-                          if (index == 0) {
-                            return StudentInfoCard(
-                                user: _sdController.student, isFaculty: true);
-                          }
-                          if (index == 1) {
-                            return StudentInfoCard(user: _sdController.student);
-                          } else {
-                            return _overviewCard(index - 2, context);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: [
+                                // StudentInfoCard(
+                                //     user: _sdController.student,
+                                //     isFaculty: true),
+                                buildLineChart(context),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: _myScheduleClass(),
+                          )
+                        ],
+                      )),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: _buildGridView(constraints),
+                  )),
                 ],
               ),
             );
           },
         );
       },
+    );
+  }
+
+  GridView _buildGridView(BoxConstraints constraints) {
+    return GridView.builder(
+      itemCount: _sdController.allAttendanceList.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        // crossAxisSpacing: 16.0,
+        // mainAxisSpacing: 16.0,
+        childAspectRatio: constraints.maxWidth /
+            2 / // divide by crossAxisCount
+            256, // height of the _overviewCard
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        return _overviewCard(index, context);
+      },
+    );
+  }
+
+  Widget buildLineChart(BuildContext context) {
+    return SizedBox(
+      height: 400,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: LineChart(
+            LineChartData(
+              lineTouchData: LineTouchData(
+                handleBuiltInTouches: true,
+                touchTooltipData: LineTouchTooltipData(
+                  tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+                ),
+              ),
+              gridData: FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(show: false),
+              minX: 0,
+              maxX: 3,
+              minY: 0,
+              maxY: 4,
+              lineBarsData: [
+                LineChartBarData(
+                  spots: [
+                    FlSpot(0, _sdController.absentCount.toDouble()),
+                    FlSpot(1, _sdController.cuttingCount.toDouble()),
+                    FlSpot(2, _sdController.onTimeCount.toDouble()),
+                    FlSpot(3, _sdController.lateCount.toDouble()),
+                  ],
+                  isCurved: true,
+                  curveSmoothness: 0.3,
+                  color: Colors.blue, // Use a single color for the line
+                  barWidth: 2,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(show: true),
+                  belowBarData: BarAreaData(show: false),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -231,18 +296,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   Widget _dataTableClasses(context) {
     return DataTable(
       columns: [
-        DataColumn(
-          label: Expanded(child: Text('Subject')),
-        ),
-        DataColumn(
-          label: Text('Room'),
-        ),
-        DataColumn(
-          label: Text('Time'),
-        ),
-        DataColumn(
-          label: Text('Day'),
-        ),
+        customDataColumn(label: Text('Subject'), flex: 3),
+        customDataColumn(label: Text('Room'), flex: 1),
+        customDataColumn(label: Text('Time'), flex: 1),
+        customDataColumn(label: Text('Day'), flex: 1),
       ],
       rows: _sdController.studentClasses
           .map((attendance) => _buildDataRowClasses(context, attendance))
@@ -269,6 +326,15 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       rows: _sdController.allAttendanceList
           .map((attendance) => _buildDataRowRecentLogs(context, attendance))
           .toList(),
+    );
+  }
+
+  DataColumn customDataColumn({required Widget label, int flex = 1}) {
+    return DataColumn(
+      label: Expanded(
+        flex: flex,
+        child: label,
+      ),
     );
   }
 
@@ -303,14 +369,31 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  Widget _myClassesCard(context) {
+  Widget _myScheduleClass() {
     return Card(
-      child: CardSmall(
-        title: "Class List",
-        isShadow: false,
-        child: _dataTableClasses(context),
+        child: Container(
+      width: MediaQuery.of(context).size.width * 0.4,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Subject Schedule',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '1st Semester - 2023',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(height: 16),
+          Container(width: double.infinity, child: _dataTableClasses(context)),
+        ],
       ),
-    );
+    ));
   }
 
   Widget _webRecentLogsCard(context) {
@@ -431,16 +514,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                                 'No Subject');
                       },
                       child: Text('Attendance List'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        showCancelClassDialog(context);
-                      },
-                      child: Text(
-                        'Cancel Class',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.error),
-                      ),
                     ),
                   ],
                 ),
@@ -574,84 +647,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       },
     );
   }
-// Widget _webView() {
-//     return WebView(
-//       appBarTitle: "Dashboard",
-//       selectedWidgetMarker: 0,
-//       body: AnimatedBuilder(
-//         animation: _sdController,
-//         builder: (context, child) {
-//           return !_sdController.isAllAttendanceCollected
-//               ? Center(
-//                   child: CircularProgressIndicator(
-//                     strokeWidth: 4,
-//                     valueColor: AlwaysStoppedAnimation<Color>(
-//                       Theme.of(context).primaryColor, // Customize the color
-//                     ),
-//                   ),
-//                 )
-//               : Container(
-//                   alignment: Alignment.topCenter,
-//                   child: Row(
-//                     children: [
-//                       Expanded(
-//                         child: SingleChildScrollView(
-//                           child: Padding(
-//                             padding: const EdgeInsets.only(
-//                                 left: 8.0, right: 8.0, bottom: 8.0),
-//                             child: Column(
-//                               children: [
-//                                 // StudentInfoCard(student: _sdController.student),
-
-//                                 Row(
-//                                   children: [
-//                                     Flexible(
-//                                         flex: 1,
-//                                         child: StudentInfoCard(
-//                                             user: _sdController.student)),
-//                                     Flexible(
-//                                       flex: 1,
-//                                       child: _overviewCard(5,context),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 SizedBox(height: 8),
-//                                 Padding(
-//                                   padding: const EdgeInsets.symmetric(
-//                                       horizontal: 8.0),
-//                                   child: Row(
-//                                     crossAxisAlignment:
-//                                         CrossAxisAlignment.start,
-//                                     mainAxisAlignment:
-//                                         MainAxisAlignment.spaceBetween,
-//                                     children: [
-//                                       Expanded(
-//                                         child: _webRecentLogsCard(
-//                                           context,
-//                                         ),
-//                                       ),
-//                                       Expanded(
-//                                         child: _myClassesCard(
-//                                           context,
-//                                         ),
-//                                       ),
-//                                       // _myClassesCard(context)
-//                                     ],
-//                                   ),
-//                                 ),
-//                                 SizedBox(height: 8),
-//                               ],
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//         },
-//       ),
-//     );
-//   }
 
   Widget circularData(value, description, color, [radius = 40.0]) {
     return Padding(
@@ -675,4 +670,47 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       ),
     );
   }
+}
+
+class Header extends StatelessWidget {
+  const Header({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Container(color: Colors.red);
+}
+
+class Navigation extends StatelessWidget {
+  const Navigation({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Container(color: Colors.purple);
+}
+
+class Content extends StatelessWidget {
+  const Content({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Container(color: Colors.grey[300]);
+}
+
+class Sidebar extends StatelessWidget {
+  const Sidebar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) =>
+      Container(color: Colors.grey[600], width: 184);
+}
+
+class Footer extends StatelessWidget {
+  const Footer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Container(color: Colors.deepPurple);
+}
+
+class Ad extends StatelessWidget {
+  const Ad({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Container(color: Colors.deepOrange);
 }
