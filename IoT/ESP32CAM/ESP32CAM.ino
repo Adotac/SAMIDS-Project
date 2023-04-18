@@ -1,26 +1,23 @@
-
 #include "esp32cam_Impl.h"
 
-// espcam_message myData;
-// esprfid_message rfid_Data;
+extern "C"
+{
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h"
+}
+#define ASYNC_TCP_SSL_ENABLED true
+#include <AsyncMQTT_ESP32.h>
+String deviceNumber = String("101");
+String deviceId = String(deviceNumber + "_CAM");
 
+const char* subtopic = String("mqtt/attendance/" + deviceId).c_str(); // publish to be read by deviceCAM
+const char* camtopic = String("mqtt/DEVICE/" + deviceNumber).c_str(); // publish to send device state
 
-String deviceId = String("101");
-
-String topictemp = String("mqtt/image/" + deviceId); // publish to be read by API
-String topictemp2 = String("mqtt/attendance/" + deviceId); // publish to be read by deviceCAM
-String subtopictemp = String("mqtt/API/response/" + deviceId); // from the API
-
-uint8_t broadcastAddress[MACSIZE]= {MAC_ESP8266};
-
-const char *ImageTopic = topictemp.c_str();
-const char *AttendanceTopic = topictemp2.c_str();
-const char *SubTopic = subtopictemp.c_str();
-
-bool rfidDevice = false;
+bool deviceFlag = false;
 bool retrySend = false;
 
-espcam_message espData;
+espcam_message myData;
+String payloadJSON = "";
 
 // ===================
 // Select camera model
@@ -44,6 +41,8 @@ espcam_message espData;
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 
+AsyncMqttClient mqttClient;
+TimerHandle_t mqttReconnectTimer;
 TimerHandle_t wifiReconnectTimer;
 
 void connectToWifi(){
@@ -70,10 +69,16 @@ void onWifiEvent(WiFiEvent_t event){
       break;
   case SYSTEM_EVENT_STA_DISCONNECTED:
       Serial.println("WiFi lost connection");
-      rfidDevice = false;
-      Serial.println("Camera disconnected wifi");
-      SendNow(espData, "Camera disconnected wifi", false, true, rfidDevice);
+      deviceFlag = false;
+      // Serial.println("Camera disconnected wifi");
 
+      espcamToJson(myData, payloadJSON, "Camera disconnected wifi", false, true, deviceFlag);
+      uint16_t packetIdPubCam = mqttClient.publish(camtopic, 2, false, "test");
+      Serial.print("Publishing at QoS 2, packetId: ");
+      Serial.println(packetIdPubCam);
+      Serial.println(myData.message);
+
+      xTimerStop(mqttReconnectTimer, 0); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
       xTimerStart(wifiReconnectTimer, 0);
 
       break;
@@ -82,39 +87,91 @@ void onWifiEvent(WiFiEvent_t event){
 
 //-------------------------------------------------//
 
-// Callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t  sendStatus) {
-  Serial.print("Last Packet Send Status: ");
-  if (sendStatus == ESP_NOW_SEND_SUCCESS ){
-    Serial.println("Delivery success");
-    retrySend = false;
-  }
-  else{
-    Serial.println("Delivery fail");
-    retrySend = true;
+void connectToMqtt()
+{
+  Serial.println("Connecting to MQTT...");
+
+  mqttClient.connect();
+}
+
+void onMqttConnect(bool sessionPresent)
+{
+  Serial.print("Connected to MQTT broker: ");
+  Serial.print(MQTT_HOST);
+  Serial.print(", port: ");
+  Serial.println(MQTT_PORT);
+  // Serial.print("PubTopics: ");
+  // Serial.println(camtopic);
+
+  printSeparationLine();
+  Serial.print("Session present: ");
+  Serial.println(sessionPresent);
+
+  // sendDataPayload();
+
+  uint16_t packetIdSub = mqttClient.subscribe(subtopic, 2);
+  Serial.print("Subscribing at QoS 2, packetId: ");
+  Serial.println(packetIdSub);
+
+  printSeparationLine();
+}
+
+void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
+{
+  (void) reason;
+
+  Serial.println("Disconnected from MQTT.");
+
+  if (WiFi.isConnected())
+  {
+    xTimerStart(mqttReconnectTimer, 0);
   }
 }
 
-// Callback function executed when data is received
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  esprfid_message rfid_Data;
+void onMqttSubscribe(const uint16_t packetId, const uint8_t qos) {
+  Serial.println("Subscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+  Serial.print("  qos: ");
+  Serial.println(qos);
+}
 
-  memcpy(&rfid_Data, incomingData, sizeof(rfid_Data));
-  Serial.print("Data received: ");
+
+void onMqttUnsubscribe(const uint16_t packetId) {
+  Serial.println("Unsubscribe acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+}
+
+
+void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, const size_t len, const size_t index, const size_t total) {
+  Serial.println("Publish received.");
+  Serial.print("  topic: ");
+  Serial.println(topic);
+  Serial.print("  qos: ");
+  Serial.println(properties.qos);
+  Serial.print("  dup: ");
+  Serial.println(properties.dup);
+  Serial.print("  retain: ");
+  Serial.println(properties.retain);
+  Serial.print("  len: ");
   Serial.println(len);
-  Serial.print("Message Value: ");
-  Serial.println(rfid_Data.message);
-  Serial.print("Deisplay flag: ");
-  Serial.println(rfid_Data.deviceFlag);
+  Serial.print("  index: ");
+  Serial.println(index);
+  Serial.print("  total: ");
+  Serial.println(total);
 
-  Serial.println();
-
-  rfidDevice = rfid_Data.deviceFlag;
-
-  // PUT CHECK AND CREATE ATTENDANCE ALGO HERE
-  // ACCESS THE FASTAPI HTTP GET REQUEST HERE
-  // sendRequest();
+  //condition recieving attendance id
 }
+
+void onMqttPublish(const uint16_t& packetId)
+{
+  Serial.println("Publish acknowledged.");
+  Serial.print("  packetId: ");
+  Serial.println(packetId);
+}
+
+//-------------------------------------------------//
 
 //-------------------------------------------------//
 void sendDataPayload(){
@@ -144,56 +201,69 @@ void setup() {
   Serial.begin(115200);
   wifi_ps_type_t(WIFI_PS_NONE);
 
-  // Set ESP32 as a Wi-Fi Station
-  WiFi.mode(WIFI_MODE_APSTA);
-  WiFi.disconnect();
-  delay(100);
-
   while (!Serial && millis() < 5000);
 
-    // Initilize ESP-NOW
-  if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
-  }
+  Serial.print(F("\nStart WiFiMQTT on "));
+  Serial.println(ARDUINO_BOARD);
+  Serial.println(ASYNC_MQTT_ESP32_VERSION);
 
-  esp_now_peer_info_t peerInfo;
-  memcpy(peerInfo.peer_addr, broadcastAddress, MACSIZE);
-  peerInfo.channel = WIFICHANNEL;
-  peerInfo.encrypt = false;
-  peerInfo.ifidx = WIFI_IF_AP;
+  // Serial.println("Camera init");
 
-  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-    Serial.println("Failed to add peer");
-    return;
-  }
-
-  esp_now_register_send_cb(OnDataSent);
-  esp_now_register_recv_cb(OnDataRecv);
-
-  Serial.println("Camera init");
-  SendNow(espData, "Camera Init", false, true, rfidDevice);
+  uint16_t packetIdPubCam;
+  
+  espcamToJson(myData, payloadJSON, "Camera init", false, true, deviceFlag);
+  packetIdPubCam = mqttClient.publish(camtopic, 2, false, payloadJSON.c_str());
+  Serial.print("Publishing at QoS 2, packetId: ");
+  Serial.println(packetIdPubCam);
+  Serial.println(myData.message);
 
   Serial.print(F("\nStart Wifi on "));
   Serial.println(ARDUINO_BOARD);
 
+  mqttReconnectTimer = xTimerCreate("mqttTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0,
+                                    reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   wifiReconnectTimer = xTimerCreate("wifiTimer", pdMS_TO_TICKS(2000), pdFALSE, (void*)0,
                                     reinterpret_cast<TimerCallbackFunction_t>(connectToWifi));
 
   WiFi.onEvent(onWifiEvent);
 
+  mqttClient.onConnect(onMqttConnect);
+  mqttClient.onDisconnect(onMqttDisconnect);
+  mqttClient.onSubscribe(onMqttSubscribe);
+  mqttClient.onUnsubscribe(onMqttUnsubscribe);
+  mqttClient.onMessage(onMqttMessage);
+  mqttClient.onPublish(onMqttPublish);
+
+  mqttClient.setClientId(deviceId.c_str());
+
   Serial.print("Device ID: ");
   Serial.println(deviceId);
 
+  mqttClient.setKeepAlive(500);
+  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
   connectToWifi();
 
-  initCamera();
+  if(initCamera()){
+    Serial.println("Camera initialized");
+    
+    deviceFlag = true;
 
-  rfidDevice = true;
+    espcamToJson(myData, payloadJSON, "Camera Ready", false, true, deviceFlag);
+    packetIdPubCam = mqttClient.publish(camtopic, 2, false, payloadJSON.c_str());
+    Serial.print("Publishing at QoS 2, packetId: ");
+    Serial.println(packetIdPubCam);
 
-  Serial.println("Camera ready");
-  SendNow(espData, "Camera ready", false, true, rfidDevice);
+    Serial.println(myData.message);
+  }
+  else{
+    espcamToJson(myData, payloadJSON, "Camera Failed", false, true, deviceFlag); 
+    packetIdPubCam = mqttClient.publish(camtopic, 2, false, payloadJSON.c_str());
+    Serial.print("Publishing at QoS 2, packetId: ");
+    Serial.println(packetIdPubCam);
+    Serial.println(myData.message);
+    return;
+  }
 }
 
 
@@ -208,9 +278,7 @@ void loop() {
     digitalWrite(RED_LED, LOW);  // Turn off the red LED
     delay(1000);   
     // SendNow(espData.message, espData.attendanceFlag, espData.displayFlag, espData.deviceFlag);
-
-    SendNow(espData, espData.message, espData.attendanceFlag, espData.displayFlag, espData.deviceFlag);
-}
+  }
 
   if (millis() > prev_ms + 30000)
   {
@@ -228,10 +296,12 @@ void sendRequest(){
     int httpCode = http.GET();
 
     if (httpCode > 0) {
+      retrySend = true;
       String payload = http.getString();
       Serial.println("HTTP Response code: " + String(httpCode));
       Serial.println("Payload: " + payload);
     } else {
+      retrySend = false;
       Serial.println("Error on HTTP request");
     }
 

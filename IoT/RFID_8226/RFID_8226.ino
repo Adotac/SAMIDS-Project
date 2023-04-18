@@ -6,6 +6,13 @@ uint8_t broadcastAddress[MACSIZE] = {MAC_ESP32CAM};
 constexpr uint8_t RST_PIN = D3;     // Configurable, see typical pin layout above
 constexpr uint8_t SS_PIN = D4;     // Configurable, see typical pin layout above
 
+String deviceNumber = String("101");
+String deviceId = String(deviceNumber + "_RFID");
+
+String pubtopic = String("mqtt/RFID/attendance/" + deviceNumber); // publish to be read by deviceCAM
+String subtopic = String("mqtt/API/response/" + deviceId); // from the API
+String camtopic = String("mqtt/DEVICE/" + deviceNumber);
+
 // Create instances
 MFRC522 rfid(SS_PIN, RST_PIN);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -13,62 +20,94 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 unsigned long lastTime = 0;  
 unsigned long timerDelay = 2000;  // send readings timer
 
-bool camDevice = false;
+bool deviceFlag = false;
 String tag = "";
 
-// Callback when data is sent
-void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
-  Serial.print("Last Packet Send Status: ");
-  if (sendStatus == 0){
-    Serial.println("Delivery success");
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup_wifi() {
+
+  delay(10);
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(WIFI_SSID);
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
   }
-  else{
-    Serial.println("Delivery fail");
-  }
+
+  randomSeed(micros());
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
-// Callback function executed when data is received
-void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
-  espcam_message cam_data;
 
-  memcpy(&cam_data, incomingData, sizeof(cam_data));
-  Serial.print("Data received: ");
-  Serial.println(len);
-  Serial.print("Message Value: ");
-  Serial.println(cam_data.message);
-  Serial.print("Attendance flag: ");
-  Serial.println(cam_data.attendanceFlag);
-  Serial.print("Device ready flag: ");
-  Serial.println(cam_data.deviceFlag);
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
 
-  camDevice = cam_data.deviceFlag;
-  // After recieve put some logic on circuit to visualize result
+  String jsonPayload;
+  for (int i = 0; i < length; i++) {
+    jsonPayload += (char)payload[i];
+  }
+  Serial.print(jsonPayload);
+  Serial.print("] ");
 
-  if(!camDevice){
+  Serial.println();
 
+  espcam_message receivedData;
+  espcamFromJson(jsonPayload, receivedData);
+
+  deviceFlag = receivedData.deviceFlag;
+
+  if(receivedData.attendanceFlag){
+    //display shet
+    setLCD("Attendance", 0, 0, true);
+    setLCD("Recorded", 0, 1, false);
   }
 
-  if(cam_data.displayFlag){
-    if(cam_data.attendanceFlag){ //edit condition to check after recieving JSON DATA
-      setLCD(" ACCESS GRANTED ", 0, 0, true);
-      setLCD(tag.c_str(), 2, 1, false);
-    }
-    else{
-      char firstHalf[17] = {0}; // Initialize with null-terminators
-      char secondHalf[17] = {0}; // Initialize with null-terminators
-
-      // Copy the original array into two halves
-      strncpy(firstHalf, cam_data.message, 15);
-      strncpy(secondHalf, &cam_data.message[15], 15);
-
-      setLCD(firstHalf, 0, 0, true);
-      setLCD(secondHalf, 0, 1, true);
-    }
-
-  }
+  // // Switch on the LED if an 1 was received as first character
+  // if ((char)payload[0] == '1') {
+  //   digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
+  //   // but actually the LED is on; this is because
+  //   // it is active low on the ESP-01)
+  // } else {
+  //   digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
+  // }
 
 }
 
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Create a random client ID
+    // Attempt to connect
+    if (client.connect(deviceId.c_str())) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      client.publish("mqtt/IDLE/connect", deviceNumber.c_str());
+      // ... and resubscribe
+      client.subscribe(camtopic.c_str());
+      client.subscribe(subtopic.c_str());
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -78,28 +117,11 @@ void setup() {
   lcd.backlight();
   setLCD("Booting up...", 0, 0, true);
 
-  // Set device as a Wi-Fi Station
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-
+  setup_wifi(); 
   while (!Serial && millis() < 5000);
-  delay(500);
-
-  // Init ESP-NOW
-  if (esp_now_init() != 0) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
-  }
-
-  esp_now_set_peer_channel(broadcastAddress, WIFICHANNEL);
-
-  // Once ESPNow is successfully Init, we will register for Send CB to
-  // get the status of Trasnmitted packet
-  esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
-  esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
-
-  esp_now_register_send_cb(OnDataSent);
-  esp_now_register_recv_cb(OnDataRecv);
+  client.setServer(MQTT_HOST, MQTT_PORT);
+  client.setCallback(callback);
+  client.setKeepAlive(500);
 
   // Initialize RFID
   SPI.begin();
@@ -107,11 +129,19 @@ void setup() {
 
   Serial.println("ESP8226 now has started!!");
   setLCD("Device Ready!", 0, 0, true);
+
   delay(1000);
 }
 
 void loop() {
-  if(camDevice){
+  if (!client.connected()) {
+    setLCD("Connecting to", 0, 0, true);
+    setLCD(" MQTT Broker ", 0, 1, false);
+    reconnect();
+  }
+  client.loop();
+
+  if(deviceFlag){
     delay(350);
     setLCD(" Face at Camera ", 0, 0, true);
     setLCD(" and Scan RFID ", 1, 1, false);
@@ -124,7 +154,8 @@ void loop() {
       }
     }
     else{
-      SendNow(tag.c_str(), camDevice);
+      // SendNow(tag.c_str(), camDevice);
+      client.publish(pubtopic.c_str(), tag.c_str());
     }
 
     tag = "";

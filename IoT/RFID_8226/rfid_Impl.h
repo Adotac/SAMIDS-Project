@@ -5,7 +5,8 @@
 #include <MFRC522.h>
 
 #include <ESP8266WiFi.h>
-#include <espnow.h>
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
 
 #include <Arduino.h>
 #include <cstring>
@@ -33,7 +34,8 @@ typedef struct ESPRFID_MESSAGE {
 
 void printSeparationLine();
 
-void SendNow(const char* msg, bool df);
+void esprfidToJson(const esprfid_message& data, String& json);
+void espcamFromJson(const String& json, espcam_message& data);
 void printBroadcastAddress();
 
 #endif

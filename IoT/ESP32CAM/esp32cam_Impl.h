@@ -1,3 +1,6 @@
+#ifndef esp32cam_Impl_h
+#define esp32cam_Impl_h
+
 #include <ArduinoJson.h>
 #include "base64.hpp"
 // #include "base64.h"
@@ -5,22 +8,19 @@
 #include "defines.h" // ignored by git for privacy purposes
 #include "mac_addresses.h" 
 
-#include <WiFi.h>
-#include <esp_now.h>
-#include <HTTPClient.h>
 
 #include "esp_camera.h"
 #include "esp_timer.h"
-#include "esp_wifi.h"
 
 #include "Arduino.h"
+#include <WiFi.h>
+#include <HTTPClient.h>
+
 #include "soc/soc.h" // Disable brownout problems
 #include "soc/rtc_cntl_reg.h" // Disable brownout problems
 #include "driver/rtc_io.h"
 
 
-
-#ifndef esp32cam_Impl_h
 
 // OV2640 camera module pins (CAMERA_MODEL_AI_THINKER)
 #define PWDN_GPIO_NUM 32
@@ -59,20 +59,20 @@ typedef struct ESPCAM_MESSAGE {
   bool displayFlag;
 } espcam_message;
 
-
 typedef struct ESPRFID_MESSAGE {
   char message[MSG_SIZE];
   bool deviceFlag;
 } esprfid_message;
 
-void initCamera();
+bool initCamera();
 String JsonData(camera_fb_t *fb, bool flag, long id);
 const char* capturePhoto(camera_fb_t*& fb);
 uint8_t * captureBufferPhoto(camera_fb_t*& imagedata);
 void flash(int n);
 void printSeparationLine();
 
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t  sendStatus);
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len);
-void SendNow(espcam_message &myData, const char* msg, bool atf, bool df, bool device);
+void espcamToJson(const espcam_message& data, String& json);
+void espcamToJson(espcam_message& data, String& json, const char* msg, bool af, bool df, bool device);
+void esprfidFromJson(const String& json, esprfid_message& data);
+
 #endif

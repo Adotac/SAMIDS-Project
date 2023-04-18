@@ -21,6 +21,10 @@ async def root():
 async def root():
     return {"message": "Connected to server"}
 
+@app.get("/attendance")
+async def root():
+    return {"message": "Connected to server"}
+
 @app.get("/test")
 async def test():
     response = requests.get(url + "/api/Student", headers=headers, verify=False)

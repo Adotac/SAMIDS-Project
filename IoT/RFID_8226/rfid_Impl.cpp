@@ -5,17 +5,24 @@ void printSeparationLine()
   Serial.println("************************************************");
 }
 
-//-----------------------FOR ESP NOW FUNCTIONALITIES--------------------------------//
+void esprfidToJson(const esprfid_message& data, String& json) {
+  StaticJsonDocument<64> doc;
 
-// Send message via ESP-NOW
-void SendNow(const char* msg, bool df){
-  esprfid_message myData;
+  doc["message"] = data.message;
+  doc["deviceFlag"] = data.deviceFlag;
 
-  strcpy(myData.message, msg);
-  myData.deviceFlag = df;
+  serializeJson(doc, json);
+}
 
-printBroadcastAddress();
-  esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+void espcamFromJson(const String& json, espcam_message& data) {
+  StaticJsonDocument<128> doc;
+
+  deserializeJson(doc, json);
+
+  strlcpy(data.message, doc["message"] | "", sizeof(data.message));
+  data.attendanceFlag = doc["attendanceFlag"] | false;
+  data.displayFlag = doc["displayFlag"] | false;
+  data.deviceFlag = doc["deviceFlag"] | false;
 }
 
 void printBroadcastAddress() {

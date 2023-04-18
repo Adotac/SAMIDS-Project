@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "esp32cam_Impl.h"
 
-void initCamera()
+bool initCamera()
 {
   // Turn-off the 'brownout detector'
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
@@ -49,7 +49,9 @@ void initCamera()
   {
     Serial.printf("Camera init failed with error 0x%x", err);
     ESP.restart();
+    return false;
   }
+  return true;
 }
 
 const size_t CAPACITY = 2048;
@@ -152,17 +154,49 @@ void printSeparationLine()
   Serial.println("************************************************");
 }
 
-//-----------------------FOR ESP NOW FUNCTIONALITIES--------------------------------//
+void espcamToJson(const espcam_message& data, String& json) {
+  StaticJsonDocument<128> doc;
 
-// Send message via ESP-NOW
-void SendNow(espcam_message &myData, const char* msg, bool atf, bool df, bool device) {
-  strcpy(myData.message, msg);
-  myData.attendanceFlag = atf;
-  myData.displayFlag = df;
-  myData.deviceFlag = device;
+  doc["message"] = data.message;
+  doc["attendanceFlag"] = data.attendanceFlag;
+  doc["displayFlag"] = data.displayFlag;
+  doc["deviceFlag"] = data.deviceFlag;
 
-  esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-  delay(2000);
+  serializeJson(doc, json);
+
+  doc.clear();
 }
+
+void espcamToJson(espcam_message& data, String& jsonStr, const char* msg, bool af, bool df, bool device){
+  DynamicJsonDocument jsonBuffer(512);
+  JsonObject json = jsonBuffer.to<JsonObject>();
+
+  strlcpy(data.message, msg, sizeof(data.message));
+  data.attendanceFlag = af;
+  data.displayFlag = df;
+  data.deviceFlag = device;
+
+  json["message"] = data.message;
+  json["attendanceFlag"] = data.attendanceFlag;
+  json["displayFlag"] = data.displayFlag;
+  json["deviceFlag"] = data.deviceFlag;
+
+  serializeJson(json, jsonStr);
+
+  jsonBuffer.clear();
+}
+
+void esprfidFromJson(const String& json, esprfid_message& data) {
+  StaticJsonDocument<64> doc;
+
+  deserializeJson(doc, json);
+
+  strlcpy(data.message, doc["message"] | "", sizeof(data.message));
+  data.deviceFlag = doc["deviceFlag"] | false;
+
+  doc.clear();
+}
+
+
 
 
