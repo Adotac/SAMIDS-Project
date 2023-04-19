@@ -15,6 +15,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
+import '../../widgets/line_chart.dart';
 import '../../widgets/mobile_view.dart';
 import 'package:intl/intl.dart';
 
@@ -73,17 +74,58 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Expanded(
                             child: Column(
                               children: [
+                                Card(
+                                  child: Column(
+                                    children: [
+                                      StudentInfoCard(
+                                          user: _sdController.student,
+                                          isFaculty: true),
+                                      SizedBox(
+                                        height: 80,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          _buildLegendContainer(
+                                              Colors.red, 16, 'Absent'),
+                                          SizedBox(width: 8),
+                                          _buildLegendContainer(
+                                              Colors.yellow.shade700,
+                                              16,
+                                              'Cutting'),
+                                          SizedBox(width: 8),
+                                          _buildLegendContainer(
+                                              Colors.green, 16, 'On-Time'),
+                                          SizedBox(width: 8),
+                                          _buildLegendContainer(
+                                              Colors.orange, 16, 'Late'),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                          height: 240,
+                                          child: TestLineChart(
+                                              isShowingMainData: false)),
+                                    ],
+                                  ),
+                                ),
+
+                                // SizedBox(
+                                //     height: 250,
+                                //     child: TestLineChart(
+                                //         isShowingMainData: false)),
                                 // StudentInfoCard(
                                 //     user: _sdController.student,
                                 //     isFaculty: true),
-                                buildLineChart(context),
+                                // buildLineChart(context),
                               ],
                             ),
                           ),
@@ -94,7 +136,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                       )),
                   Expanded(
                       child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
                     child: _buildGridView(constraints),
                   )),
                 ],
@@ -106,22 +148,41 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  GridView _buildGridView(BoxConstraints constraints) {
-    return GridView.builder(
-      itemCount: _sdController.allAttendanceList.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        // crossAxisSpacing: 16.0,
-        // mainAxisSpacing: 16.0,
-        childAspectRatio: constraints.maxWidth /
-            2 / // divide by crossAxisCount
-            256, // height of the _overviewCard
+  Widget _buildLegendContainer(Color color, double width, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        children: [
+          Container(
+            width: width,
+            height: width,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          SizedBox(width: 8),
+          Text(text),
+        ],
       ),
-      itemBuilder: (BuildContext context, int index) {
-        return _overviewCard(index, context);
-      },
     );
   }
+  // GridView _buildGridView(BoxConstraints constraints) {
+  //   return GridView.builder(
+  //     itemCount: _sdController.allAttendanceList.length,
+  //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //       crossAxisCount: 2,
+  //       // crossAxisSpacing: 16.0,
+  //       // mainAxisSpacing: 16.0,
+  //       childAspectRatio: constraints.maxWidth /
+  //           2 / // divide by crossAxisCount
+  //           256, // height of the _overviewCard
+  //     ),
+  //     itemBuilder: (BuildContext context, int index) {
+  //       return _overviewCard(index, context);
+  //     },
+  //   );
+  // }
 
   Widget buildLineChart(BuildContext context) {
     return SizedBox(
@@ -181,7 +242,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             userName:
                 '${_sdController.student.firstName} ${_sdController.student.lastName}',
             body: _sdController.isCountCalculated
-                ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard(0)]
+                ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard()]
                 : [
                     Center(
                       child: CircularProgressIndicator(
@@ -231,6 +292,47 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
+  String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
+    final timeStart =
+        _sdController.formatTime(subjectSchedule?.timeStart ?? DateTime.now());
+    final timeEnd =
+        _sdController.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
+    return '$timeStart - $timeEnd';
+  }
+
+  DataRow classesSampleDataRow(context) {
+    return DataRow(
+      cells: <DataCell>[
+        DataCell(Text('10:30am - 11:30am ')),
+        DataCell(Expanded(
+          child: Text(
+            textAlign: TextAlign.start,
+            '10023 - Programming 1',
+            overflow: TextOverflow.ellipsis,
+          ),
+        )),
+        DataCell(Text(
+          'On Going',
+          style: TextStyle(color: Colors.green),
+        )),
+      ],
+    );
+  }
+
+  // Widget _dataTableClasses(context) {
+  //   return DataTable(
+  //     columns: [
+  //       customDataColumn(label: Text('Subject'), flex: 3),
+  //       customDataColumn(label: Text('Room'), flex: 1),
+  //       customDataColumn(label: Text('Time'), flex: 1),
+  //       customDataColumn(label: Text('Day'), flex: 1),
+  //     ],
+  //     rows: _sdController.studentClasses
+  //         .map((attendance) => _buildDataRowClasses(context, attendance))
+  //         .toList(),
+  //   );
+  // }
+
   DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
     return DataRow(
       cells: [
@@ -263,47 +365,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           ),
         ),
       ],
-    );
-  }
-
-  String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
-    final timeStart =
-        _sdController.formatTime(subjectSchedule?.timeStart ?? DateTime.now());
-    final timeEnd =
-        _sdController.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
-    return '$timeStart - $timeEnd';
-  }
-
-  DataRow classesSampleDataRow(context) {
-    return DataRow(
-      cells: <DataCell>[
-        DataCell(Text('10:30am - 11:30am ')),
-        DataCell(Expanded(
-          child: Text(
-            textAlign: TextAlign.start,
-            '10023 - Programming 1',
-            overflow: TextOverflow.ellipsis,
-          ),
-        )),
-        DataCell(Text(
-          'On Going',
-          style: TextStyle(color: Colors.green),
-        )),
-      ],
-    );
-  }
-
-  Widget _dataTableClasses(context) {
-    return DataTable(
-      columns: [
-        customDataColumn(label: Text('Subject'), flex: 3),
-        customDataColumn(label: Text('Room'), flex: 1),
-        customDataColumn(label: Text('Time'), flex: 1),
-        customDataColumn(label: Text('Day'), flex: 1),
-      ],
-      rows: _sdController.studentClasses
-          .map((attendance) => _buildDataRowClasses(context, attendance))
-          .toList(),
     );
   }
 
@@ -390,49 +451,132 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             ),
           ),
           SizedBox(height: 16),
-          Container(width: double.infinity, child: _dataTableClasses(context)),
+          SizedBox(width: double.infinity, child: _dataTableClasses(context)),
         ],
       ),
     ));
-  }
-
-  Widget _webRecentLogsCard(context) {
-    return Card(
-      child: CardSmall(
-        title: "Recent Activity",
-        isShadow: false,
-        child:
-            // SizedBox(width: 800, child: Text('No recent activity')),
-            _dataTableRecentLogs(context),
-      ),
-    );
   }
 
   String _formatCurrentDate() {
     return DateFormat('MMMM d, y').format(DateTime.now());
   }
 
-  Widget _mobileRecentLogsCard([flexValue = 1]) {
+  List<Map<String, dynamic>> sampleRecentLogsData = [
+    {
+      'subjectName': 'Data Structures',
+      'statusText': 'On Time',
+      'statusIcon': Icons.timer_outlined,
+      'statusColor': Colors.green,
+      'time': DateTime(2023, 4, 12, 9, 30),
+      'roomId': 'BCL1',
+    },
+    {
+      'subjectName': 'Algorithms',
+      'statusText': 'Late',
+      'statusIcon': Icons.access_time,
+      'statusColor': Colors.orange,
+      'time': DateTime(2023, 4, 12, 11, 15),
+      'roomId': 'BCL2',
+    },
+    {
+      'subjectName': 'Computer Networks',
+      'statusText': 'Absent',
+      'statusIcon': Icons.access_time,
+      'statusColor': Colors.red,
+      'time': DateTime(2023, 4, 11, 14, 0),
+      'roomId': 'BCL3',
+    },
+    {
+      'subjectName': 'Database Systems',
+      'statusText': 'On Time',
+      'statusIcon': Icons.timer_outlined,
+      'statusColor': Colors.green,
+      'time': DateTime(2023, 4, 11, 16, 30),
+      'roomId': 'BCL4',
+    },
+    {
+      'subjectName': 'Operating Systems',
+      'statusText': 'Late',
+      'statusIcon': Icons.access_time,
+      'statusColor': Colors.orange,
+      'time': DateTime(2023, 4, 10, 10, 45),
+      'roomId': 'BCL5',
+    },
+    {
+      'subjectName': 'Software Engineering',
+      'statusText': 'Cutting',
+      'statusIcon': Icons.access_time,
+      'statusColor': Colors.yellow.shade700,
+      'time': DateTime(2023, 4, 10, 13, 15),
+      'roomId': 'BCL6',
+    },
+    {
+      'subjectName': 'Artificial Intelligence',
+      'statusText': 'On Time',
+      'statusIcon': Icons.timer_outlined,
+      'statusColor': Colors.green,
+      'time': DateTime(2023, 4, 9, 9, 0),
+      'roomId': 'BCL7',
+    },
+    {
+      'subjectName': 'Machine Learning',
+      'statusText': 'Late',
+      'statusIcon': Icons.access_time,
+      'statusColor': Colors.orange,
+      'time': DateTime(2023, 4, 9, 15, 45),
+      'roomId': 'BCL8',
+    },
+  ];
+
+  // Widget _mobileRecentLogsCard() {
+  //   return MobileSmallCard(
+  //     isShadow: false,
+  //     sideTitle: _formatCurrentDate(),
+  //     title: "Recent Activity",
+  //     child: ListView.builder(
+  //       shrinkWrap: true,
+  //       itemCount: _sdController.attendance.length,
+  //       itemBuilder: (BuildContext context, int index) {
+  //         Attendance attendance = _sdController.attendance[index];
+  //         return CustomListTile(
+  //           title: attendance.subjectSchedule?.subject?.subjectName ??
+  //               'No subject name',
+  //           subtitle: _sdController.getStatusText(attendance.remarks.name),
+  //           leadingIcon: Icon(getStatusIcon(attendance.remarks),
+  //               color: Theme.of(context).scaffoldBackgroundColor),
+  //           leadingColors:
+  //               _sdController.getStatusColor(attendance.remarks, context),
+  //           trailingText: _sdController.formatTime(_getActualTime(attendance)),
+  //           subTrailingText:
+  //               attendance.subjectSchedule?.room.toString() ?? 'No subject id',
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
+  Widget _mobileRecentLogsCard() {
     return MobileSmallCard(
       isShadow: false,
       sideTitle: _formatCurrentDate(),
       title: "Recent Activity",
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: _sdController.attendance.length,
+        itemCount: sampleRecentLogsData.length,
         itemBuilder: (BuildContext context, int index) {
-          Attendance attendance = _sdController.attendance[index];
+          Map<String, dynamic> attendance = sampleRecentLogsData[index];
           return CustomListTile(
-            title: attendance.subjectSchedule?.subject?.subjectName ??
-                'No subject name',
-            subtitle: _sdController.getStatusText(attendance.remarks.name),
-            leadingIcon: Icon(getStatusIcon(attendance.remarks),
-                color: Theme.of(context).scaffoldBackgroundColor),
-            leadingColors:
-                _sdController.getStatusColor(attendance.remarks, context),
-            trailingText: _sdController.formatTime(_getActualTime(attendance)),
-            subTrailingText:
-                attendance.subjectSchedule?.room.toString() ?? 'No subject id',
+            title: attendance['subjectName'],
+            subtitle: Text(attendance['statusText'],
+                style:
+                    TextStyle(color: attendance['statusColor'], fontSize: 14)),
+            leadingIcon: Icon(
+              attendance['statusIcon'],
+              color: Theme.of(context).scaffoldBackgroundColor,
+            ),
+            leadingColors: attendance['statusColor'],
+            trailingText: _sdController.formatTime(attendance['time']),
+            subTrailingText: attendance['roomId'],
           );
         },
       ),
@@ -451,11 +595,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       case Remarks.onTime:
         return Icons.timer_outlined;
       case Remarks.late:
-        return Icons.schedule_outlined;
       case Remarks.cutting:
-        return Icons.cancel_outlined;
+
       case Remarks.absent:
-        return Icons.highlight_off_outlined;
+        return Icons.schedule_outlined;
     }
   }
 
@@ -475,118 +618,213 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     return attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject';
   }
 
-  Widget _overviewCard(index, BuildContext context) {
-    Attendance attendance = _sdController.allAttendanceList[index];
-    double totalLogs = _sdController.allAttendanceList.length.toDouble();
-    return StatefulBuilder(builder: (context, setState) {
-      return SizedBox(
-        child: Card(
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+  // Widget _overviewCard(index, BuildContext context) {
+  //   Attendance attendance = _sdController.allAttendanceList[index];
+  //   double totalLogs = _sdController.allAttendanceList.length.toDouble();
+  //   return StatefulBuilder(builder: (context, setState) {
+  //     return SizedBox(
+  //       child: Card(
+  //         child: Container(
+  //           padding: EdgeInsets.all(16.0),
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.start,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: _buildOverviewCard(attendance, context, totalLogs),
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   });
+  // }
+  List<Widget> _buildOverviewCard(
+      Map<String, dynamic> attendance, BuildContext context, double totalLogs) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            attendance['subjectName'],
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          Spacer(),
+          TextButton(
+            onPressed: () {
+              _showMyClassesDialog(context, attendance['subjectName']);
+            },
+            child: Text('Class List'),
+          ),
+          TextButton(
+            onPressed: () {
+              _showAttendanceDialog(context, attendance['subjectName']);
+            },
+            child: Text('Attendance List'),
+          ),
+        ],
+      ),
+      SizedBox(height: 8.0),
+      Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text('Code:'),
+                      Text('Time:'),
+                      Text('Dates:'),
+                    ],
+                  ),
+                  SizedBox(width: 8.0),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(attendance['room']),
+                      Text(
+                        DateFormat('hh:mm a').format(attendance['timeStart']) +
+                            ' - ' +
+                            DateFormat('hh:mm a').format(attendance['timeEnd']),
+                      ),
+                      Text(attendance['day']),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 12.0),
+              DataNumber(
+                number: totalLogs.toString(),
+                description: "Total logs",
+              ),
+            ],
+          ),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      getSubjectName(attendance),
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        _showMyClassesDialog(
-                            context,
-                            attendance.subjectSchedule?.subject?.subjectName ??
-                                'No Subject');
-                      },
-                      child: Text('Class List'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        _showAttendanceDialog(
-                            context,
-                            attendance.subjectSchedule?.subject?.subjectName ??
-                                'No Subject');
-                      },
-                      child: Text('Attendance List'),
-                    ),
+                    circularData(attendance['absentCount'], 'Absent',
+                        Colors.red, totalLogs),
+                    circularData(attendance['cuttingCount'], 'Cutting',
+                        Colors.yellow.shade700, totalLogs),
+                    circularData(attendance['onTimeCount'], 'On-Time',
+                        Colors.green, totalLogs),
+                    circularData(attendance['lateCount'], 'Late', Colors.orange,
+                        totalLogs),
                   ],
                 ),
-                SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text('Code:'),
-                                Text('Time:'),
-                                Text('Dates:'),
-                              ],
-                            ),
-                            SizedBox(width: 8.0),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(attendance.subjectSchedule?.room
-                                        .toString() ??
-                                    'No Room'), // Replace with actual class room code
-                                Text(
-                                  getTimeStartEnd(attendance.subjectSchedule),
-                                ),
-                                Text('${attendance.subjectSchedule?.day.name}'),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 6.0),
-                        DataNumber(
-                          number: totalLogs.toString(),
-                          description: "Total logs",
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Row(
-                            children: [
-                              circularData(_sdController.absentCount, 'Absent',
-                                  Colors.red),
-                              circularData(_sdController.cuttingCount,
-                                  'Cutting', Colors.yellow.shade700),
-                              circularData(_sdController.onTimeCount, 'On-Time',
-                                  Colors.green),
-                              circularData(_sdController.lateCount, 'Late',
-                                  Colors.orange),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(height: 16.0),
               ],
             ),
-          ),
-        ),
-      );
-    });
+          )
+        ],
+      ),
+      SizedBox(height: 16.0),
+    ];
   }
+
+  // List<Widget> _buildOverviewCard(Map<String, dynamic> attendance, BuildContext context, double totalLogs) {
+  //   return [
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.start,
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   getSubjectName(attendance),
+  //                   style:
+  //                       TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //                 ),
+  //                 Spacer(),
+  //                 TextButton(
+  //                   onPressed: () {
+  //                     _showMyClassesDialog(
+  //                         context,
+  //                         attendance.subjectSchedule?.subject?.subjectName ??
+  //                             'No Subject');
+  //                   },
+  //                   child: Text('Class List'),
+  //                 ),
+  //                 TextButton(
+  //                   onPressed: () {
+  //                     _showAttendanceDialog(
+  //                         context,
+  //                         attendance.subjectSchedule?.subject?.subjectName ??
+  //                             'No Subject');
+  //                   },
+  //                   child: Text('Attendance List'),
+  //                 ),
+  //               ],
+  //             ),
+  //             SizedBox(height: 8.0),
+  //             Row(
+  //               children: [
+  //                 Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Row(
+  //                       children: [
+  //                         Column(
+  //                           crossAxisAlignment: CrossAxisAlignment.start,
+  //                           mainAxisAlignment: MainAxisAlignment.start,
+  //                           children: [
+  //                             Text('Code:'),
+  //                             Text('Time:'),
+  //                             Text('Dates:'),
+  //                           ],
+  //                         ),
+  //                         SizedBox(width: 8.0),
+  //                         Column(
+  //                           crossAxisAlignment: CrossAxisAlignment.start,
+  //                           mainAxisAlignment: MainAxisAlignment.start,
+  //                           children: [
+  //                             Text(attendance.subjectSchedule?.room
+  //                                     .toString() ??
+  //                                 'No Room'), // Replace with actual class room code
+  //                             Text(
+  //                               getTimeStartEnd(attendance.subjectSchedule),
+  //                             ),
+  //                             Text('${attendance.subjectSchedule?.day.name}'),
+  //                           ],
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     SizedBox(height: 6.0),
+  //                     DataNumber(
+  //                       number: totalLogs.toString(),
+  //                       description: "Total logs",
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 Expanded(
+  //                   child: Row(
+  //                     crossAxisAlignment: CrossAxisAlignment.end,
+  //                     mainAxisAlignment: MainAxisAlignment.end,
+  //                     children: [
+  //                       Row(
+  //                         children: [
+  //                           circularData(_sdController.absentCount, 'Absent',
+  //                               Colors.red),
+  //                           circularData(_sdController.cuttingCount,
+  //                               'Cutting', Colors.yellow.shade700),
+  //                           circularData(_sdController.onTimeCount, 'On-Time',
+  //                               Colors.green),
+  //                           circularData(_sdController.lateCount, 'Late',
+  //                               Colors.orange),
+  //                         ],
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 )
+  //               ],
+  //             ),
+  //             SizedBox(height: 16.0),
+  //           ];
+  // }
 
   Future<void> showCancelClassDialog(BuildContext context) {
     return showDialog<void>(
@@ -629,18 +867,14 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         return MobileSmallCard(
           isShadow: true,
           sideTitle: "Total logs",
-          sideTitleTrailer: totalLogs.toString(),
+          sideTitleTrailer: "19",
           title: "Overview",
           child: Row(
             children: [
-              circularData(
-                  _sdController.absentCount, 'Absent', Colors.red, 32.0),
-              circularData(
-                  _sdController.cuttingCount, 'Cutting', Colors.yellow, 32.0),
-              circularData(
-                  _sdController.onTimeCount, 'On-Time', Colors.green, 32.0),
-              circularData(_sdController.lateCount, 'Late',
-                  Color.fromRGBO(255, 152, 0, 1), 32.0),
+              circularData(2, 'Absent', Colors.red, 19),
+              circularData(2, 'Cutting', Colors.yellow, 19),
+              circularData(12, 'On-Time', Colors.green, 19),
+              circularData(3, 'Late', Color.fromRGBO(255, 152, 0, 1), 19),
             ],
           ),
         );
@@ -648,69 +882,254 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  Widget circularData(value, description, color, [radius = 40.0]) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          CircularViewer(
-            value: value,
-            maxValue: _sdController.allAttendanceList.length.toDouble(),
-            radius: radius,
-            textStyle: TextStyle(fontSize: 20),
-            color: Color(0xffEEEEEE),
-            sliderColor: color,
-            unSelectedColor: Color.fromARGB(255, 255, 255, 255),
+  Widget circularData(value, description, color, [maxValue]) {
+    maxValue ??= _sdController.allAttendanceList.length.toDouble();
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double radius = 40.0;
+        if (MediaQuery.of(context).size.width <= 450) {
+          radius = 33.0;
+        }
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              CircularViewer(
+                value: value,
+                maxValue: maxValue,
+                radius: radius,
+                textStyle: TextStyle(fontSize: 20),
+                color: Color(0xffEEEEEE),
+                sliderColor: color,
+                unSelectedColor: Color.fromARGB(255, 255, 255, 255),
+              ),
+              SizedBox(
+                height: 4.0,
+              ),
+              Text(description),
+            ],
           ),
-          SizedBox(
-            height: 4.0,
-          ),
-          Text(description),
-        ],
-      ),
+        );
+      },
     );
   }
-}
 
-class Header extends StatelessWidget {
-  const Header({Key? key}) : super(key: key);
+  List<Map<String, dynamic>> sampleStudentClasses = [
+    {
+      'subject': 'Data Structures and Algorithms',
+      'room': 'BCL1',
+      'timeStart': DateTime(2023, 4, 1, 5, 30),
+      'timeEnd': DateTime(2023, 4, 1, 6, 30),
+      'day': 'Mon, Wed, Fri',
+    },
+    {
+      'subject': 'Operating Systems',
+      'room': 'BCL2',
+      'timeStart': DateTime(2023, 4, 1, 10, 0),
+      'timeEnd': DateTime(2023, 4, 1, 11, 30),
+      'day': 'Tue, Thu',
+    },
+    {
+      'subject': 'Design and Analysis of Algorithms',
+      'room': 'BCL3',
+      'timeStart': DateTime(2023, 4, 1, 2, 0),
+      'timeEnd': DateTime(2023, 4, 1, 3, 30),
+      'day': 'Mon, Wed, Fri',
+    },
+    {
+      'subject': 'Natural Language Processing',
+      'room': 'BCL4',
+      'timeStart': DateTime(2023, 4, 1, 13, 0),
+      'timeEnd': DateTime(2023, 4, 1, 14, 30),
+      'day': 'Tue, Thu',
+    },
+    {
+      'subject': 'Programming Languages',
+      'room': 'BCL5',
+      'timeStart': DateTime(2023, 4, 1, 16, 0),
+      'timeEnd': DateTime(2023, 4, 1, 17, 30),
+      'day': 'Mon, Wed, Fri',
+    },
+    // {
+    //   'subject': 'Calculus',
+    //   'room': 'BCL6',
+    //   'timeStart': DateTime(2023, 4, 1, 8, 0),
+    //   'timeEnd': DateTime(2023, 4, 1, 9, 30),
+    //   'day': 'Tue, Thu',
+    // },
+    {
+      'subject': 'Machine Learning',
+      'room': 'BCL7',
+      'timeStart': DateTime(2023, 4, 1, 14, 30),
+      'timeEnd': DateTime(2023, 4, 1, 16, 0),
+      'day': 'Mon, Wed, Fri',
+    },
+    // {
+    //   'subject': 'Apps Development 2',
+    //   'room': 'BCL8',
+    //   'timeStart': DateTime(2023, 4, 1, 9, 0),
+    //   'timeEnd': DateTime(2023, 4, 1, 10, 30),
+    //   'day': 'Tue, Thu',
+    // },
+    // {
+    //   'subject': 'Software Engineering 2',
+    //   'room': 'BCL9',
+    //   'timeStart': DateTime(2023, 4, 1, 11, 0),
+    //   'timeEnd': DateTime(2023, 4, 1, 12, 30),
+    //   'day': 'Mon, Wed, Fri',
+    // },
+  ];
 
-  @override
-  Widget build(BuildContext context) => Container(color: Colors.red);
-}
+  List<DataRow> _buildSampleDataRows(BuildContext context) {
+    return sampleStudentClasses.map((schedule) {
+      return DataRow(
+        cells: [
+          DataCell(
+            Text(
+              schedule['subject'],
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          DataCell(
+            Text(
+              schedule['room'],
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+          DataCell(
+            Text(
+              '${schedule['timeStart'].hour == 0 ? 12 : (schedule['timeStart'].hour < 13 ? schedule['timeStart'].hour : schedule['timeStart'].hour - 12).toString().padLeft(2, '0')}:${schedule['timeStart'].minute.toString().padLeft(2, '0')} ${schedule['timeStart'].hour < 12 ? 'AM' : 'PM'} - ${(schedule['timeEnd'].hour == 0 ? 12 : (schedule['timeEnd'].hour < 13 ? schedule['timeEnd'].hour : schedule['timeEnd'].hour - 12)).toString().padLeft(2, '0')}:${schedule['timeEnd'].minute.toString().padLeft(2, '0')} ${schedule['timeEnd'].hour < 12 ? 'AM' : 'PM'}',
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+          DataCell(
+            Text(
+              schedule['day'],
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      );
+    }).toList();
+  }
 
-class Navigation extends StatelessWidget {
-  const Navigation({Key? key}) : super(key: key);
+  Widget _dataTableClasses(context) {
+    return DataTable(
+      columns: [
+        customDataColumn(label: Text('Subject'), flex: 3),
+        customDataColumn(label: Text('Room'), flex: 1),
+        customDataColumn(label: Text('Time'), flex: 1),
+        customDataColumn(label: Text('Day'), flex: 1),
+      ],
+      rows: _buildSampleDataRows(context),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) => Container(color: Colors.purple);
-}
+  List<Map<String, dynamic>> sampleOverviewData = [
+    {
+      'subjectName': 'Data Structures and Algorithms',
+      'room': 'BCL1',
+      'timeStart': DateTime(2023, 4, 1, 5, 30),
+      'timeEnd': DateTime(2023, 4, 1, 6, 30),
+      'day': 'Mon, Wed, Fri',
+      'absentCount': 2,
+      'cuttingCount': 10,
+      'onTimeCount': 5,
+      'lateCount': 15,
+    },
+    {
+      'subjectName': 'Operating Systems',
+      'room': 'BCL2',
+      'timeStart': DateTime(2023, 4, 1, 10, 0),
+      'timeEnd': DateTime(2023, 4, 1, 11, 30),
+      'day': 'Tue, Thu',
+      'absentCount': 0,
+      'cuttingCount': 5,
+      'onTimeCount': 20,
+      'lateCount': 10,
+    },
+    {
+      'subjectName': 'Design and Analysis of Algorithms',
+      'room': 'BCL3',
+      'timeStart': DateTime(2023, 4, 1, 2, 0),
+      'timeEnd': DateTime(2023, 4, 1, 3, 30),
+      'day': 'Mon, Wed, Fri',
+      'absentCount': 7,
+      'cuttingCount': 5,
+      'onTimeCount': 5,
+      'lateCount': 10,
+    },
+    {
+      'subjectName': 'Natural Language Processing',
+      'room': 'BCL4',
+      'timeStart': DateTime(2023, 4, 1, 13, 0),
+      'timeEnd': DateTime(2023, 4, 1, 14, 30),
+      'day': 'Tue, Thu',
+      'absentCount': 2,
+      'cuttingCount': 15,
+      'onTimeCount': 10,
+      'lateCount': 10,
+    },
+    {
+      'subjectName': 'Programming Languages',
+      'room': 'BCL5',
+      'timeStart': DateTime(2023, 4, 1, 16, 0),
+      'timeEnd': DateTime(2023, 4, 1, 17, 30),
+      'day': 'Mon, Wed, Fri',
+      'absentCount': 3,
+      'cuttingCount': 5,
+      'onTimeCount': 10,
+      'lateCount': 15,
+    },
+    {
+      'subjectName': 'Machine Learning',
+      'room': 'BCL7',
+      'timeStart': DateTime(2023, 4, 1, 14, 30),
+      'timeEnd': DateTime(2023, 4, 1, 16, 0),
+      'day': 'Mon, Wed, Fri',
+      'absentCount': 0,
+      'cuttingCount': 10,
+      'onTimeCount': 15,
+      'lateCount': 10,
+    },
+  ];
 
-class Content extends StatelessWidget {
-  const Content({Key? key}) : super(key: key);
+  GridView _buildGridView(BoxConstraints constraints) {
+    return GridView.builder(
+      itemCount: sampleOverviewData.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: constraints.maxWidth / 2 / 256,
+      ),
+      itemBuilder: (BuildContext context, int index) {
+        return _overviewCard(index, context);
+      },
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) => Container(color: Colors.grey[300]);
-}
-
-class Sidebar extends StatelessWidget {
-  const Sidebar({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) =>
-      Container(color: Colors.grey[600], width: 184);
-}
-
-class Footer extends StatelessWidget {
-  const Footer({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => Container(color: Colors.deepPurple);
-}
-
-class Ad extends StatelessWidget {
-  const Ad({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => Container(color: Colors.deepOrange);
+  Widget _overviewCard(index, BuildContext context) {
+    Map<String, dynamic> attendance = sampleOverviewData[index];
+    double totalLogs = attendance['onTimeCount'] +
+        attendance['lateCount'] +
+        attendance['absentCount'] +
+        attendance['cuttingCount'];
+    return StatefulBuilder(builder: (context, setState) {
+      return SizedBox(
+        child: Card(
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [..._buildOverviewCard(attendance, context, totalLogs)],
+            ),
+          ),
+        ),
+      );
+    });
+  }
 }

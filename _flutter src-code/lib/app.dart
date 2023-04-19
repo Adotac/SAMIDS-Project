@@ -101,6 +101,7 @@ class MyApp extends StatelessWidget {
           // darkTheme: ThemeData.dark(),
           theme: ThemeData(
             scaffoldBackgroundColor: const Color(0xFFF2F2F2),
+
             primaryColor: const Color(0xFF0597F2),
             cardTheme: CardTheme(
               elevation: 0.2,

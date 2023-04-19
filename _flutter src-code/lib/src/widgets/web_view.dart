@@ -149,6 +149,8 @@ class _WebViewState extends State<WebView> {
                       width: 40,
                     ),
                     const SizedBox(width: 8),
+                    Text('BiSAMS'),
+                    const SizedBox(width: 158),
                     Text(widget.appBarTitle),
                   ],
                 ),

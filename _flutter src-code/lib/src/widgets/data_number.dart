@@ -20,7 +20,7 @@ class DataNumber extends StatelessWidget {
           Text(
             number,
             style: const TextStyle(
-              fontSize: 25,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
           ),

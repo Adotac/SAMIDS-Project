@@ -37,7 +37,7 @@ class _MobileViewState extends State<MobileView> {
 
     // Set the unselected item color based on the current theme's brightness
     Color unselectedItemColor =
-        brightness == Brightness.dark ? Colors.white : Colors.black;
+        brightness == Brightness.dark ? Colors.white : Colors.grey;
 
     Color selectedItemColor = Theme.of(context).primaryColor;
 

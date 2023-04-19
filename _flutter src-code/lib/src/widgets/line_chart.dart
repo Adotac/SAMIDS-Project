@@ -1,8 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class _LineChart extends StatelessWidget {
-  const _LineChart({required this.isShowingMainData});
+class TestLineChart extends StatelessWidget {
+  const TestLineChart({super.key, required this.isShowingMainData});
 
   final bool isShowingMainData;
 
@@ -93,25 +93,24 @@ class _LineChart extends StatelessWidget {
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
-      fontWeight: FontWeight.bold,
       fontSize: 14,
     );
     String text;
     switch (value.toInt()) {
       case 1:
-        text = '1m';
+        text = '0';
         break;
       case 2:
-        text = '2m';
+        text = '10';
         break;
       case 3:
-        text = '3m';
+        text = '20';
         break;
       case 4:
-        text = '5m';
+        text = '30';
         break;
       case 5:
-        text = '6m';
+        text = '40';
         break;
       default:
         return Container();
@@ -124,7 +123,7 @@ class _LineChart extends StatelessWidget {
         getTitlesWidget: leftTitleWidgets,
         showTitles: true,
         interval: 1,
-        reservedSize: 40,
+        reservedSize: 35,
       );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
@@ -135,13 +134,13 @@ class _LineChart extends StatelessWidget {
     Widget text;
     switch (value.toInt()) {
       case 2:
-        text = const Text('SEPT', style: style);
+        text = const Text('', style: style);
         break;
       case 7:
-        text = const Text('OCT', style: style);
+        text = const Text('', style: style);
         break;
       case 12:
-        text = const Text('DEC', style: style);
+        text = const Text('', style: style);
         break;
       default:
         text = const Text('');
@@ -194,13 +193,13 @@ class _LineChart extends StatelessWidget {
 
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
         isCurved: true,
-        color: Colors.pink,
+        color: Colors.green,
         barWidth: 8,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
         belowBarData: BarAreaData(
           show: false,
-          color: Colors.pink.withOpacity(0),
+          color: Colors.green.withOpacity(0),
         ),
         spots: const [
           FlSpot(1, 1),
@@ -231,7 +230,7 @@ class _LineChart extends StatelessWidget {
   LineChartBarData get lineChartBarData2_1 => LineChartBarData(
         isCurved: true,
         curveSmoothness: 0,
-        color: Colors.green.withOpacity(0.5),
+        color: Colors.red.withOpacity(0.5),
         barWidth: 4,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
@@ -240,7 +239,7 @@ class _LineChart extends StatelessWidget {
           FlSpot(1, 1),
           FlSpot(3, 4),
           FlSpot(5, 1.8),
-          FlSpot(7, 5),
+          FlSpot(7, 3),
           FlSpot(10, 2),
           FlSpot(12, 2.2),
           FlSpot(13, 1.8),
@@ -249,13 +248,13 @@ class _LineChart extends StatelessWidget {
 
   LineChartBarData get lineChartBarData2_2 => LineChartBarData(
         isCurved: true,
-        color: Colors.pink.withOpacity(0.5),
+        color: Colors.green.withOpacity(0.5),
         barWidth: 4,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
         belowBarData: BarAreaData(
           show: true,
-          color: Colors.pink.withOpacity(0.2),
+          color: Colors.green.withOpacity(0.2),
         ),
         spots: const [
           FlSpot(1, 1),
@@ -270,17 +269,17 @@ class _LineChart extends StatelessWidget {
   LineChartBarData get lineChartBarData2_3 => LineChartBarData(
         isCurved: true,
         curveSmoothness: 0,
-        color: Colors.cyan.withOpacity(0.5),
+        color: Colors.orange.withOpacity(0.5),
         barWidth: 2,
         isStrokeCapRound: true,
-        dotData: FlDotData(show: true),
+        dotData: FlDotData(show: false),
         belowBarData: BarAreaData(show: false),
         spots: const [
           FlSpot(1, 3.8),
           FlSpot(3, 1.9),
-          FlSpot(6, 5),
-          FlSpot(10, 3.3),
-          FlSpot(13, 4.5),
+          FlSpot(6, 2),
+          FlSpot(10, 4.3),
+          FlSpot(13, 2.5),
         ],
       );
 }
@@ -329,7 +328,7 @@ class LineChartSample1State extends State<LineChartSample1> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16, left: 6),
-                  child: _LineChart(isShowingMainData: isShowingMainData),
+                  child: TestLineChart(isShowingMainData: isShowingMainData),
                 ),
               ),
               const SizedBox(
