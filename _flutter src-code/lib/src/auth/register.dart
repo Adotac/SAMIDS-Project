@@ -10,6 +10,8 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   late final TextEditingController _userIdController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -34,12 +36,34 @@ class _RegisterPageState extends State<RegisterPage> {
     super.initState();
   }
 
+  Widget _textFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    FormFieldValidator<String>? validator,
+  }) {
+    return SizedBox(
+      width: 400,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: label,
+          hintText: hint,
+        ),
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        validator: validator,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Center(
-        child: registerFormWeb(context),
-      ),
+    return Center(
+      child: registerForm(context),
     );
   }
 
@@ -47,11 +71,11 @@ class _RegisterPageState extends State<RegisterPage> {
       TextEditingController controller, String labelText, String hintText,
       {bool obscureText = false}) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           labelText: labelText,
           hintText: hintText,
         ),
@@ -61,20 +85,24 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _dropDownSecurityQuestion(
-      String? currentValue, ValueChanged<String?> onChanged) {
+      String? currentValue, ValueChanged<String?>? onChanged) {
     return DropdownButtonFormField<String>(
       value: currentValue,
-      items: securityQuestions.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
       onChanged: onChanged,
+      items: securityQuestions.map<DropdownMenuItem<String>>(
+        (String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        },
+      ).toList(),
       decoration: const InputDecoration(
-        labelText: 'Security Question',
         border: OutlineInputBorder(),
+        labelText: 'Security Question',
       ),
+
+      isExpanded: true, // This will help with fitting long text values
     );
   }
 
@@ -82,20 +110,23 @@ class _RegisterPageState extends State<RegisterPage> {
     return Container(
       padding: const EdgeInsets.all(10),
       height: 72,
-      width: double.infinity,
+      width: 420,
       child: TextButton(
         style: TextButton.styleFrom(
           backgroundColor: Theme.of(context).primaryColor,
           foregroundColor: Colors.white,
         ),
-        onPressed: () {
-          // Add validation and submission logic here
-          // Then navigate back to the login page
-          Navigator.pop(context);
-        },
-        child: const Text("Submit"),
+        onPressed: _onSubmit,
+        child: const Text('Submit'),
       ),
     );
+  }
+
+  void _onSubmit() {
+    if (_formKey.currentState!.validate()) {
+      // Handle form submission logic here, e.g., sending data to the server
+      print('Form submitted');
+    }
   }
 
   Widget _backButton(BuildContext context) {
@@ -104,65 +135,168 @@ class _RegisterPageState extends State<RegisterPage> {
         onPressed: () => {widget.controller.setShowRegister(false)});
   }
 
-  Widget registerFormWeb(BuildContext context) {
+  Widget registerForm(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 550,
-            child: Card(
-              elevation: 0,
-              color: Colors.transparent,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Register",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _inputField(
-                        _userIdController, 'User ID', 'Enter your user ID'),
-                    _inputField(_emailController, 'Email', 'Enter your email'),
-                    _inputField(
-                        _passwordController, 'Password', 'Enter your password',
-                        obscureText: true),
-                    _inputField(_confirmPasswordController, 'Confirm Password',
-                        'Confirm your password',
-                        obscureText: true),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: _dropDownSecurityQuestion(_securityQuestion1,
-                          (String? newValue) {
-                        setState(() {
-                          _securityQuestion1 = newValue;
-                        });
-                      }),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: _dropDownSecurityQuestion(_securityQuestion2,
-                          (String? newValue) {
-                        setState(() {
-                          _securityQuestion2 = newValue;
-                        });
-                      }),
-                    ),
-                    _submitButton(context),
-                    _backButton(context),
-                  ],
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              constraints: const BoxConstraints(minWidth: 550),
+              child: Card(
+                elevation: 0,
+                color: Colors.transparent,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: newMethod(context),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
+  }
+
+  Column newMethod(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          "Register",
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: _textFormField(
+            controller: _userIdController,
+            label: 'User ID',
+            hint: 'Enter your user ID',
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a user ID';
+              } else if (int.tryParse(value) == null) {
+                return 'User ID must be an integer';
+              }
+              return null;
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: _textFormField(
+            controller: _emailController,
+            label: 'Email',
+            hint: 'Enter your email',
+            keyboardType: TextInputType.emailAddress,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an email';
+              } else if (!isValidEmail(value)) {
+                return 'Please enter a valid email';
+              }
+              return null;
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: _textFormField(
+            controller: _passwordController,
+            label: 'Password',
+            hint: 'Enter your password',
+            obscureText: true,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a password';
+              }
+              return null;
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: _textFormField(
+            controller: _confirmPasswordController,
+            label: 'Confirm Password',
+            hint: 'Confirm your password',
+            obscureText: true,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please confirm your password';
+              } else if (value != _passwordController.text) {
+                return 'Passwords do not match';
+              }
+              return null;
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Container(
+            width: 400, // Adjust this value according to your layout
+            child: _dropDownSecurityQuestion(_securityQuestion1,
+                (String? newValue) {
+              setState(() {
+                _securityQuestion1 = newValue;
+              });
+            }),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: _textFormField(
+            controller: TextEditingController(),
+            label: 'Answer 1',
+            hint: 'Enter your answer to the first security question',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an answer';
+              }
+              return null;
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Container(
+            width: 400, // Adjust this value according to your layout
+            child: _dropDownSecurityQuestion(_securityQuestion2,
+                (String? newValue) {
+              setState(() {
+                _securityQuestion2 = newValue;
+              });
+            }),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: _textFormField(
+            controller: TextEditingController(),
+            label: 'Answer 2',
+            hint: 'Enter your answer to the second security question',
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an answer';
+              }
+              return null;
+            },
+          ),
+        ),
+        _submitButton(context),
+        _backButton(context),
+      ],
+    );
+  }
+
+  bool isValidEmail(String email) {
+    RegExp regExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return regExp.hasMatch(email);
   }
 }

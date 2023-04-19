@@ -58,11 +58,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       builder: (context, isMobile) {
-        if (isMobile) {
-          return _buildMobileView(context);
-        } else {
-          return _buildWebView(context);
-        }
+        return AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              if (isMobile) {
+                return _buildMobileView(context);
+              } else {
+                return _buildWebView(context);
+              }
+            });
       },
     );
   }
@@ -196,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: loginForumFieldMobile(context),
           ),
         ),
@@ -205,47 +209,56 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildWebView(BuildContext context) {
-    return AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Stack(
-            children: [
-              backgroundImage,
-              Scaffold(
-                backgroundColor: Colors.transparent,
-                appBar: AppBar(
-                  automaticallyImplyLeading: false,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  title: const Text(
-                    'BiSAM',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black),
+    return Stack(
+      children: [
+        backgroundImage,
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 18.0, left: 18.0),
+                  child: Image.asset(
+                    'assets/images/BiSAM.png',
+                    height: 60,
+                    width: 60,
                   ),
                 ),
-                body: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _controller.showRegister
-                          ? RegisterPage(controller: _controller)
-                          : SizedBox(
-                              width: 450,
-                              height: 600,
-                              child: SingleChildScrollView(
-                                child: loginForumWeb(context),
-                              ),
-                            ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.3,
+                const SizedBox(width: 8),
+                const Text(
+                  'BiSAM - Biometric Smart Attendance Management',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+          body: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _controller.showRegister
+                    ? RegisterPage(controller: _controller)
+                    : SizedBox(
+                        width: 450,
+                        height: 600,
+                        child: SingleChildScrollView(
+                          child: loginForumWeb(context),
+                        ),
                       ),
-                    ],
-                  ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.3,
                 ),
-              ),
-            ],
-          );
-        });
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Column loginForumWeb(context) {
@@ -423,95 +436,89 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget loginForumFieldMobile(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            "Login",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            constraints: const BoxConstraints(
-              maxWidth: 370,
-            ),
+    return _controller.showRegister
+        ? RegisterPage(controller: _controller)
+        : Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    hintText: 'Enter your username',
-                    border: OutlineInputBorder(),
+                const Text(
+                  "Login",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    border: OutlineInputBorder(),
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 370,
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 50,
-                  width: double.infinity,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white),
-                    onPressed: () async {
-                      await _onLogin(context);
-                    },
-                    child: const Text("Continue"),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextButton(
-                  onPressed: () => _showResetPasswordDialog(context),
-                  child: const Text("Forget password?"),
-                ),
-                const SizedBox(
-                  height: 3,
-                ),
-                TextButton(
-                  onPressed: () => {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            RegisterPage(controller: _controller),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Username',
+                          hintText: 'Enter your username',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                    )
-                  },
-                  child: const Text("Don't have an account? Register"),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Colors.white),
+                          onPressed: () async {
+                            await _onLogin(context);
+                          },
+                          child: const Text("Continue"),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextButton(
+                        onPressed: () => _showResetPasswordDialog(context),
+                        child: const Text("Forget password?"),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      TextButton(
+                        onPressed: () => {_controller.setShowRegister(true)},
+                        child: const Text("Don't have an account? Register"),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 50,
                 ),
               ],
             ),
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-        ],
-      ),
-    );
+          );
   }
 }
