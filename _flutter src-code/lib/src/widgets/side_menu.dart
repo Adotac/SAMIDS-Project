@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/data_controller.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
@@ -11,7 +12,6 @@ import '../screen/student/attendance.dart';
 import '../screen/student/dashboard.dart';
 
 class SideMenu extends StatefulWidget {
-  final DataController studentDashboardController = DataController.instance;
   final AuthController authController = AuthController.instance;
   SideMenu({
     Key? key,
@@ -26,7 +26,6 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   int get _selectedIndex => widget.selectedWidgetMarker;
-  DataController get _sdController => widget.studentDashboardController;
 
   AuthController get _authController => widget.authController;
   set _selectedIndex(int index) {
@@ -102,10 +101,17 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Logout',
             index: 3,
             onTap: () {
-              _authController.logout();
-              _sdController.dispose();
-              GetIt.instance.unregister<DataController>();
+              int userType = _authController.loggedInUser!.type.index;
+              switch (userType) {
+                case 0:
+                  StudentController.instance.dispose();
+                  break;
+                case 1:
+                  FacultyController.instance.dispose();
+                  break;
+              }
 
+              _authController.logout();
               Navigator.of(context).pushNamedAndRemoveUntil(
                   LoginScreen.routeName, (Route<dynamic> route) => false);
             },

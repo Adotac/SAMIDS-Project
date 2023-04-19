@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 
 import 'package:samids_web_app/src/widgets/circular_viewer.dart';
@@ -8,7 +9,6 @@ import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:flutter_layout_grid/flutter_layout_grid.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
-import '../../controllers/data_controller.dart';
 import '../../model/attendance_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -23,8 +23,8 @@ import '../../widgets/web_view.dart';
 
 // ignore: must_be_immutable
 class FacultyDashboard extends StatefulWidget {
-  static const routeName = '/student-dashboard';
-  final DataController dataController;
+  static const routeName = '/faculty-dashboard';
+  final FacultyController dataController;
 
   const FacultyDashboard({super.key, required this.dataController});
 
@@ -33,12 +33,11 @@ class FacultyDashboard extends StatefulWidget {
 }
 
 class _FacultyDashboardState extends State<FacultyDashboard> {
-  DataController get _sdController => widget.dataController;
+  FacultyController get _sdController => widget.dataController;
 
   // add on init
   @override
   void initState() {
-    _sdController.getAttendanceToday();
     _sdController.getAttendanceAll();
     _sdController.getStudentClasses();
 
@@ -86,7 +85,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                                   child: Column(
                                     children: [
                                       StudentInfoCard(
-                                          user: _sdController.student,
+                                          firstName:
+                                              _sdController.faculty.firstName,
+                                          lastName:
+                                              _sdController.faculty.lastName,
                                           isFaculty: true),
                                       SizedBox(
                                         height: 80,
@@ -240,7 +242,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             currentIndex: 0,
             appBarTitle: 'Dashboard',
             userName:
-                '${_sdController.student.firstName} ${_sdController.student.lastName}',
+                '${_sdController.faculty.firstName} ${_sdController.faculty.lastName}',
             body: _sdController.isCountCalculated
                 ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard()]
                 : [

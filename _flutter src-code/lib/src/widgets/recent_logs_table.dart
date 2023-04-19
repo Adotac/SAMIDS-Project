@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../controllers/data_controller.dart';
+import '../controllers/student_controller.dart';
 import '../model/attendance_model.dart'; // Import your controller
 
 class ActivityLogsTable extends StatelessWidget {
-  final DataController _sdController;
+  final StudentController _sdController;
 
-  const ActivityLogsTable({super.key, required DataController sdController})
+  const ActivityLogsTable({super.key, required StudentController sdController})
       : _sdController = sdController;
   DateTime _getActualTime(Attendance attendance) =>
       attendance.actualTimeOut != null

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:samids_web_app/src/model/enum_values.dart';
+import 'package:samids_web_app/src/model/faculty_model.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
 
 class User {
@@ -15,6 +16,7 @@ class User {
   Types type;
   String schoolYear;
   bool deleted;
+  Faculty? faculty;
 
   User({
     required this.userId,
@@ -27,11 +29,14 @@ class User {
     required this.type,
     required this.schoolYear,
     required this.deleted,
+    required this.faculty,
   });
 
   static User fromJson(Map<String, dynamic> json) {
     return User(
       userId: json['userId'],
+      faculty:
+          json['faculty'] != null ? Faculty.fromJson(json['faculty']) : null,
       student:
           json['student'] != null ? Student.fromJson(json['student']) : null,
       firstName: json['firstName'],
@@ -62,8 +67,6 @@ class User {
 
   get studentNo => student!.studentNo;
 }
-
-
 
 enum Types { student, faculty }
 

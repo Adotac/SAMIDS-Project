@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:samids_web_app/src/controllers/data_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
@@ -13,8 +13,9 @@ import '../widgets/web_view.dart';
 
 class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
-  final DataController sdController;
-  final DataController studentDashboardController = DataController.instance;
+  final StudentController sdController;
+  final StudentController studentDashboardController =
+      StudentController.instance;
   final AuthController authController = AuthController.instance;
 
   final SettingsController settingsController;
@@ -29,13 +30,14 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  DataController get _sdController => widget.studentDashboardController;
+  StudentController get _sdController => widget.studentDashboardController;
 
   AuthController get _authController => widget.authController;
   SettingsController get settingsController => widget.settingsController;
   Widget _buildUserInformation(BuildContext context) {
     return StudentInfoCard(
-      user: widget.sdController.student,
+      firstName: _sdController.student.firstName,
+      lastName: _sdController.student.lastName,
     );
   }
 
@@ -90,7 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onTap: () {
                 _authController.logout();
                 _sdController.dispose();
-                GetIt.instance.unregister<DataController>();
+                GetIt.instance.unregister<StudentController>();
 
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     LoginScreen.routeName, (Route<dynamic> route) => false);

@@ -5,16 +5,23 @@ import 'package:samids_web_app/src/widgets/line_chart.dart';
 
 import '../controllers/auth.controller.dart';
 
+// ignore: must_be_immutable
 class StudentInfoCard extends StatelessWidget {
   final currentUser = AuthController.instance;
-  final Student user;
+  final String firstName;
+  final String lastName;
   bool isFaculty;
 
-  StudentInfoCard({Key? key, required this.user, this.isFaculty = false})
+  StudentInfoCard(
+      {Key? key,
+      this.isFaculty = false,
+      required this.firstName,
+      required this.lastName})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var user;
     return Container(
       constraints: const BoxConstraints(minWidth: double.infinity),
       child: Padding(
@@ -35,7 +42,7 @@ class StudentInfoCard extends StatelessWidget {
                 children: [
                   RichText(
                     text: TextSpan(
-                      text: '${user.firstName} ${user.lastName} ',
+                      text: '$firstName $lastName ',
                       style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w600,

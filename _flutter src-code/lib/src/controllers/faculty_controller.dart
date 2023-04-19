@@ -1,25 +1,23 @@
+//faculty
+//75779
+
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
-import 'package:samids_web_app/src/model/faculty_model.dart';
-import 'package:samids_web_app/src/model/student_model.dart';
+
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
-import 'package:samids_web_app/src/model/subject_model.dart';
-import 'package:samids_web_app/src/model/user_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
-
+import '../model/faculty_model.dart';
 import '../services/student.services.dart';
 
 class FacultyController with ChangeNotifier {
-  final Student student;
+  final Faculty faculty;
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
@@ -34,9 +32,12 @@ class FacultyController with ChangeNotifier {
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
 
-  FacultyController({required this.student});
+  FacultyController({required this.faculty});
 
-  static void initialize() {}
+  static void initialize(Faculty faculty) {
+    GetIt.instance.registerSingleton<FacultyController>(
+        FacultyController(faculty: faculty));
+  }
 
   static FacultyController get I => GetIt.instance<FacultyController>();
   static FacultyController get instance => GetIt.instance<FacultyController>();
@@ -76,25 +77,11 @@ class FacultyController with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getAttendanceToday() async {
-    try {
-      if (isAttendanceTodayCollected) return;
-      CRUDReturn response = await AttendanceService.getAll(
-          studentNo: student.studentNo, date: DateTime(2023));
-      if (response.success) {
-        handEventJsonAttendance(response);
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceNow $e $stacktrace');
-    }
-  }
-
   Future<void> getStudentClasses() async {
     try {
       if (isStudentClassesCollected) return;
       CRUDReturn response =
-          await StudentService.getStudentClasses(student.studentNo);
+          await StudentService.getStudentClasses(faculty.facultyNo);
       if (response.success) {
         handleEventJsonStudentClasses(response);
       }
@@ -105,20 +92,24 @@ class FacultyController with ChangeNotifier {
   }
 
   void handleEventJsonStudentClasses(CRUDReturn result) {
-    if (studentClasses.isNotEmpty) studentClasses.clear();
-    for (Map<String, dynamic> map in result.data) {
-      studentClasses.add(SubjectSchedule.fromJson(map));
-    }
+    try {
+      if (studentClasses.isNotEmpty) studentClasses.clear();
+      for (Map<String, dynamic> map in result.data) {
+        studentClasses.add(SubjectSchedule.fromJson(map));
+      }
 
-    isStudentClassesCollected = true;
-    notifyListeners();
+      isStudentClassesCollected = true;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonStudentClasses $e $stacktrace');
+    }
   }
 
   Future<void> getAttendanceAll() async {
     try {
       if (isAllAttendanceCollected) return;
       CRUDReturn response = await AttendanceService.getAll(
-        studentNo: student.studentNo,
+        studentNo: faculty.facultyNo,
       );
 
       if (response.success) {

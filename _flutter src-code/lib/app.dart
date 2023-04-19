@@ -6,7 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
-import 'package:samids_web_app/src/controllers/data_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 
@@ -199,29 +199,35 @@ class MyApp extends StatelessWidget {
 
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
+
           onGenerateRoute: (RouteSettings settings) {
+            print(settings.name);
             switch (settings.name) {
               case FacultyDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => FacultyDashboard(
-                          dataController: DataController.instance,
+                          dataController: FacultyController.instance,
                         ));
               case FacultyAttendance.routeName:
                 return MaterialPageRoute(
                   builder: (_) => FacultyAttendance(
-                    dataController: DataController.instance,
+                    dataController: StudentController.instance,
                   ),
                 );
-
+              case StudentDashboard.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => StudentDashboard(
+                          sdController: StudentController.instance,
+                        ));
               case StudentAttendance.routeName:
                 return MaterialPageRoute(
                     builder: (_) => StudentAttendance(
-                          sdController: DataController.instance,
+                          sdController: StudentController.instance,
                         ));
               case SettingsPage.routeName:
                 return MaterialPageRoute(
                     builder: (_) => SettingsPage(
-                          sdController: DataController.instance,
+                          sdController: StudentController.instance,
                           settingsController:
                               settingsController, // Add this line
                         ));
@@ -230,7 +236,7 @@ class MyApp extends StatelessWidget {
               case StudentClasses.routeName:
                 return MaterialPageRoute(
                     builder: (_) => StudentClasses(
-                          sdController: DataController.instance,
+                          sdController: StudentController.instance,
                         ));
               default:
                 return MaterialPageRoute(builder: (_) => const PageNotFound());

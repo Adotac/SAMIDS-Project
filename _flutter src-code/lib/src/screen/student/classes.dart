@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../controllers/data_controller.dart';
+import '../../controllers/student_controller.dart';
 import '../../model/Subject_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/classes_tile_list.dart';
 import '../../widgets/mobile_view.dart';
 
 class StudentClasses extends StatefulWidget {
-  final DataController sdController;
+  final StudentController sdController;
   static const routeName = '/student-classes';
   StudentClasses({Key? key, required this.sdController}) : super(key: key);
 
@@ -16,7 +16,7 @@ class StudentClasses extends StatefulWidget {
 }
 
 class _StudentClassesState extends State<StudentClasses> {
-  DataController get _sdController => widget.sdController;
+  StudentController get _sdController => widget.sdController;
 
   @override
   void initState() {

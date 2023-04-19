@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../controllers/data_controller.dart';
+import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/card_small.dart';
@@ -12,7 +12,7 @@ import '../../widgets/web_view.dart';
 
 class FacultyAttendance extends StatefulWidget {
   static const routeName = '/faculty-attendance';
-  final DataController dataController;
+  final StudentController dataController;
 
   const FacultyAttendance({super.key, required this.dataController});
 
@@ -23,7 +23,7 @@ class FacultyAttendance extends StatefulWidget {
 class _FacultyAttendanceState extends State<FacultyAttendance> {
   final _textEditingController = TextEditingController();
 
-  DataController get _dataController => widget.dataController;
+  StudentController get _dataController => widget.dataController;
 
   @override
   void initState() {

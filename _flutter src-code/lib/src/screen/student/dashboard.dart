@@ -10,7 +10,7 @@ import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
-import '../../controllers/data_controller.dart';
+import '../../controllers/student_controller.dart';
 
 import '../../model/attendance_model.dart';
 import '../../widgets/app_bar.dart';
@@ -27,7 +27,7 @@ import '../../widgets/web_view.dart';
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
   static const routeName = '/student-dashboard';
-  final DataController sdController;
+  final StudentController sdController;
   const StudentDashboard({super.key, required this.sdController});
 
   @override
@@ -35,7 +35,7 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
-  DataController get _sdController => widget.sdController;
+  StudentController get _sdController => widget.sdController;
   // add on init
   @override
   void initState() {
@@ -95,7 +95,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                     Flexible(
                                         flex: 1,
                                         child: StudentInfoCard(
-                                            user: _sdController.student)),
+                                          firstName:
+                                              _sdController.student.firstName,
+                                          lastName:
+                                              _sdController.student.lastName,
+                                        )),
                                     Flexible(
                                       flex: 1,
                                       child: _overviewCard(5),
