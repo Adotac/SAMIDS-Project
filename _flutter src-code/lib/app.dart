@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/constant/constant_values.dart';
+import 'package:samids_web_app/src/controllers/admin_controller.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 
@@ -203,6 +205,11 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: (RouteSettings settings) {
             print(settings.name);
             switch (settings.name) {
+              case AdminDashboard.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => AdminDashboard(
+                          adminController: null,
+                        ));
               case FacultyDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => FacultyDashboard(

@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
+import 'package:flutter/widgets.dart';
 
 import '../auth/login.dart';
 import '../controllers/auth.controller.dart';
