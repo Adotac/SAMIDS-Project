@@ -208,7 +208,7 @@ class MyApp extends StatelessWidget {
               case AdminDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => AdminDashboard(
-                          adminController: null,
+                          adminController: AdminController.instance,
                         ));
               case FacultyDashboard.routeName:
                 return MaterialPageRoute(

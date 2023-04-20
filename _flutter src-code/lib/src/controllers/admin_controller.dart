@@ -34,7 +34,9 @@ class AdminController with ChangeNotifier {
 
   AdminController();
 
-  static void initialize(Faculty faculty) {}
+  static void initialize() {
+    GetIt.instance.registerSingleton<AdminController>(AdminController());
+  }
 
   static AdminController get I => GetIt.instance<AdminController>();
   static AdminController get instance => GetIt.instance<AdminController>();

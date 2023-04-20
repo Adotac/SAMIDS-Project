@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/auth/controller.dart';
 import 'package:samids_web_app/src/auth/register.dart';
+import 'package:samids_web_app/src/controllers/admin_controller.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
@@ -369,6 +370,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _setIsloading(true);
       if (_usernameController.text == '0000' &&
           _passwordController.text == 'admin') {
+        AdminController.initialize();
         WidgetsBinding.instance!.addPostFrameCallback((_) {
           Navigator.pushNamed(context, AdminDashboard.routeName);
         });
