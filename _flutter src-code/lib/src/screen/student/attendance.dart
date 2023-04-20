@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +15,7 @@ import '../../widgets/side_menu.dart';
 import '../../widgets/web_view.dart';
 
 class StudentAttendance extends StatefulWidget {
-  final StudentDashboardController sdController;
+  final StudentController sdController;
 
   const StudentAttendance({
     Key? key,
@@ -30,8 +30,7 @@ class StudentAttendance extends StatefulWidget {
 class _StudentAttendanceState extends State<StudentAttendance>
     with SingleTickerProviderStateMixin {
   final _textEditingController = TextEditingController();
-  late AnimationController _animationController;
-  StudentDashboardController get _sdController => widget.sdController;
+  StudentController get _sdController => widget.sdController;
 
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
@@ -40,16 +39,10 @@ class _StudentAttendanceState extends State<StudentAttendance>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _animationController.forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
   }
 
@@ -129,13 +122,13 @@ class _StudentAttendanceState extends State<StudentAttendance>
           ),
         ],
         rows: _sdController.allAttendanceList
-            .map((attendance) => _buildDataRowRecentLogs(context, attendance))
+            .map((attendance) => _buildAttendanceRow(context, attendance))
             .toList(),
       ),
     );
   }
 
-  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
+  DataRow _buildAttendanceRow(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
         DataCell(

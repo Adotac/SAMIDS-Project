@@ -26,6 +26,8 @@ class Attendance {
     required this.remarks,
   });
 
+  get subject => null;
+
   static Attendance fromJson(Map<String, dynamic> json) {
     return Attendance(
       attendanceId: json['attendanceId'],

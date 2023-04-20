@@ -10,7 +10,8 @@ import 'package:samids_web_app/src/widgets/custom_list_tile.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
-import '../../controllers/student_dashboard.controller.dart';
+import '../../controllers/student_controller.dart';
+
 import '../../model/attendance_model.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/card_small.dart';
@@ -26,7 +27,7 @@ import '../../widgets/web_view.dart';
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
   static const routeName = '/student-dashboard';
-  final StudentDashboardController sdController;
+  final StudentController sdController;
   const StudentDashboard({super.key, required this.sdController});
 
   @override
@@ -34,7 +35,7 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
-  StudentDashboardController get _sdController => widget.sdController;
+  StudentController get _sdController => widget.sdController;
   // add on init
   @override
   void initState() {
@@ -94,7 +95,11 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                     Flexible(
                                         flex: 1,
                                         child: StudentInfoCard(
-                                            student: _sdController.student)),
+                                          firstName:
+                                              _sdController.student.firstName,
+                                          lastName:
+                                              _sdController.student.lastName,
+                                        )),
                                     Flexible(
                                       flex: 1,
                                       child: _overviewCard(5),
@@ -164,6 +169,39 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
+  Widget _myClassesCard(context) {
+    return Card(
+      child: CardSmall(
+        flexValue: 1,
+        title: "My Classes",
+        isShadow: false,
+        child: _dataTableClasses(context),
+      ),
+    );
+  }
+
+  Widget _dataTableClasses(context) {
+    return DataTable(
+      columns: [
+        DataColumn(
+          label: Expanded(child: Text('Subject')),
+        ),
+        DataColumn(
+          label: Text('Room'),
+        ),
+        DataColumn(
+          label: Text('Time'),
+        ),
+        DataColumn(
+          label: Text('Day'),
+        ),
+      ],
+      rows: _sdController.studentClasses
+          .map((attendance) => _buildDataRowClasses(context, attendance))
+          .toList(),
+    );
+  }
+
   DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
     return DataRow(
       cells: [
@@ -224,28 +262,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-  Widget _dataTableClasses(context) {
-    return DataTable(
-      columns: [
-        DataColumn(
-          label: Expanded(child: Text('Subject')),
-        ),
-        DataColumn(
-          label: Text('Room'),
-        ),
-        DataColumn(
-          label: Text('Time'),
-        ),
-        DataColumn(
-          label: Text('Day'),
-        ),
-      ],
-      rows: _sdController.studentClasses
-          .map((attendance) => _buildDataRowClasses(context, attendance))
-          .toList(),
-    );
-  }
-
   Widget _dataTableRecentLogs(context) {
     return DataTable(
       columns: [
@@ -296,17 +312,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
           _sdController.getStatusText(attendance.remarks.name),
         ),
       ],
-    );
-  }
-
-  Widget _myClassesCard(context) {
-    return Card(
-      child: CardSmall(
-        flexValue: 1,
-        title: "My Classes",
-        isShadow: false,
-        child: _dataTableClasses(context),
-      ),
     );
   }
 
@@ -389,9 +394,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     title: "Overview",
                   ),
                   DataNumber(
-                      number: totalLogs.toString(),
-                      description: "Total logs",
-                      flex: leadingFlex),
+                    number: totalLogs.toString(),
+                    description: "Total logs",
+                  ),
                 ],
               ),
               Spacer(),
@@ -407,7 +412,84 @@ class _StudentDashboardState extends State<StudentDashboard> {
       ),
     );
   }
+// Widget _webView() {
+//     return WebView(
+//       appBarTitle: "Dashboard",
+//       selectedWidgetMarker: 0,
+//       body: AnimatedBuilder(
+//         animation: _sdController,
+//         builder: (context, child) {
+//           return !_sdController.isAllAttendanceCollected
+//               ? Center(
+//                   child: CircularProgressIndicator(
+//                     strokeWidth: 4,
+//                     valueColor: AlwaysStoppedAnimation<Color>(
+//                       Theme.of(context).primaryColor, // Customize the color
+//                     ),
+//                   ),
+//                 )
+//               : Container(
+//                   alignment: Alignment.topCenter,
+//                   child: Row(
+//                     children: [
+//                       Expanded(
+//                         child: SingleChildScrollView(
+//                           child: Padding(
+//                             padding: const EdgeInsets.only(
+//                                 left: 8.0, right: 8.0, bottom: 8.0),
+//                             child: Column(
+//                               children: [
+//                                 // StudentInfoCard(student: _sdController.student),
 
+//                                 Row(
+//                                   children: [
+//                                     Flexible(
+//                                         flex: 1,
+//                                         child: StudentInfoCard(
+//                                             user: _sdController.student)),
+//                                     Flexible(
+//                                       flex: 1,
+//                                       child: _overviewCard(5),
+//                                     ),
+//                                   ],
+//                                 ),
+//                                 SizedBox(height: 8),
+//                                 Padding(
+//                                   padding: const EdgeInsets.symmetric(
+//                                       horizontal: 8.0),
+//                                   child: Row(
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.start,
+//                                     mainAxisAlignment:
+//                                         MainAxisAlignment.spaceBetween,
+//                                     children: [
+//                                       Expanded(
+//                                         child: _webRecentLogsCard(
+//                                           context,
+//                                         ),
+//                                       ),
+//                                       Expanded(
+//                                         child: _myClassesCard(
+//                                           context,
+//                                         ),
+//                                       ),
+//                                       // _myClassesCard(context)
+//                                     ],
+//                                   ),
+//                                 ),
+//                                 SizedBox(height: 8),
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 );
+//         },
+//       ),
+//     );
+//   }
   Widget _mobileOverviewCard(leadingFlex, [flexValue = 1]) {
     return AnimatedBuilder(
       animation: _sdController,

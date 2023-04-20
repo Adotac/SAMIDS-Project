@@ -23,7 +23,9 @@ class Faculty {
       firstName: json['firstName'],
       subjects: json['subjects'] != null
           ? List<Subject>.from(
-              json['subjects'].map((x) => Subject.fromJson(x)),
+              json['subjects']
+                  .map((x) => x != null ? Subject.fromJson(x) : null)
+                  .where((x) => x != null),
             )
           : null,
     );

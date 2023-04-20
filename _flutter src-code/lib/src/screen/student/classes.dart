@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../controllers/student_dashboard.controller.dart';
+import '../../controllers/student_controller.dart';
 import '../../model/Subject_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/classes_tile_list.dart';
 import '../../widgets/mobile_view.dart';
 
 class StudentClasses extends StatefulWidget {
-  final StudentDashboardController sdController;
+  final StudentController sdController;
   static const routeName = '/student-classes';
   StudentClasses({Key? key, required this.sdController}) : super(key: key);
 
@@ -16,7 +16,7 @@ class StudentClasses extends StatefulWidget {
 }
 
 class _StudentClassesState extends State<StudentClasses> {
-  StudentDashboardController get _sdController => widget.sdController;
+  StudentController get _sdController => widget.sdController;
 
   @override
   void initState() {
@@ -50,8 +50,8 @@ class _StudentClassesState extends State<StudentClasses> {
               ),
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
+                children: const [
+                  Padding(
                     padding:
                         EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
                     child: Text(
@@ -61,8 +61,8 @@ class _StudentClassesState extends State<StudentClasses> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 16.0, horizontal: 16),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
                     child: Text(
                       'Total Units: 18',
                       style:

@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:samids_web_app/src/auth/controller.dart';
+import 'package:samids_web_app/src/auth/register.dart';
+import 'package:samids_web_app/src/controllers/admin_controller.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
-import 'package:samids_web_app/src/services/DTO/login_user.dart';
 
+import '../model/faculty_model.dart';
 import '../model/student_model.dart';
+import '../screen/admin/dashboard.dart';
 import '../widgets/responsive_builder.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,16 +24,19 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthViewController _controller = AuthViewController();
   late final TextEditingController _usernameController;
   late final TextEditingController _passwordController;
+  bool _isloading = false;
 
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '2004';
+    _usernameController.text = '0000';
+//35526 admin
 
     _passwordController = TextEditingController();
-    _passwordController.text = 'test123';
+    _passwordController.text = 'admin';
     super.initState();
   }
 
@@ -50,11 +60,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       builder: (context, isMobile) {
-        if (isMobile) {
-          return _buildMobileView(context);
-        } else {
-          return _buildWebView(context);
-        }
+        return AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              if (isMobile) {
+                return _buildMobileView(context);
+              } else {
+                return _buildWebView(context);
+              }
+            });
       },
     );
   }
@@ -134,7 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 );
               } else {
-                // show invalid email error
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
@@ -169,30 +182,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return regExp.hasMatch(email);
   }
 
-  // Widget _buildMobileView(BuildContext context) {
-  //   return Stack(
-  //     children: [
-  //       Container(
-  //           color: Colors.white), // Add this line to set a white background
-  //       backgroundImageMobile,
-  //       Scaffold(
-  //         backgroundColor: Colors.transparent,
-  //         appBar: AppBar(
-  //           automaticallyImplyLeading: false,
-  //           backgroundColor: Colors.transparent,
-  //           elevation: 0,
-  //           title: const Text(
-  //             'SAMSS',
-  //             style:
-  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-  //           ),
-  //         ),
-  //         body: loginForumFieldMobile(context),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget _buildMobileView(BuildContext context) {
     return Stack(
       children: [
@@ -213,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: loginForumFieldMobile(context),
           ),
         ),
@@ -231,23 +220,38 @@ class _LoginScreenState extends State<LoginScreen> {
             automaticallyImplyLeading: false,
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: const Text(
-              'BiSAM',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+            title: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 18.0, left: 18.0),
+                  child: Image.asset(
+                    'assets/images/BiSAM.png',
+                    height: 60,
+                    width: 60,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'BiSAM - Biometric Smart Attendance Management',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ],
             ),
           ),
           body: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 450,
-                  height: 600,
-                  child: SingleChildScrollView(
-                    child: loginForumWeb(context),
-                  ),
-                ),
+                _controller.showRegister
+                    ? RegisterPage(controller: _controller)
+                    : SizedBox(
+                        width: 450,
+                        height: 600,
+                        child: SingleChildScrollView(
+                          child: loginForumWeb(context),
+                        ),
+                      ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.3,
                 ),
@@ -258,43 +262,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ],
     );
   }
-
-  // Widget _buildWebView(BuildContext context) {
-  //   return Stack(
-  //     children: [
-  //       backgroundImage,
-  //       Scaffold(
-  //         backgroundColor: Colors.transparent,
-  //         appBar: AppBar(
-  //           automaticallyImplyLeading: false,
-  //           backgroundColor: Colors.transparent,
-  //           elevation: 0,
-  //           // remove the back button
-  //           title: const Text(
-  //             'SAMS',
-  //             style:
-  //                 TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-  //           ),
-  //         ),
-  //         body: Center(
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               SizedBox(
-  //                 width: 450,
-  //                 height: 600,
-  //                 child: loginForumWeb(context),
-  //               ),
-  //               SizedBox(
-  //                 width: MediaQuery.of(context).size.width * 0.3,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   Column loginForumWeb(context) {
     return Column(
@@ -322,21 +289,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 10,
                   ),
                   Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _usernameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Username',
                           hintText: 'Username'),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     child: TextField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Password',
                           hintText: 'Enter your secure password'),
@@ -356,7 +323,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         await _onLogin(context);
                       },
-                      child: const Text("Continue"),
+                      child: _isloading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text("Continue"),
                     ),
                   ),
                   const SizedBox(
@@ -365,7 +340,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () => _showResetPasswordDialog(context),
                     child: const Text("Forget password?"),
-                  )
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  TextButton(
+                    onPressed: () => {_controller.setShowRegister(true)},
+                    child: const Text("Don't have an account? Register"),
+                  ),
                 ],
               ),
             ),
@@ -375,124 +357,195 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  _setIsloading(bool value) {
+    setState(() {
+      _isloading = value;
+    });
+  }
+
   Future<void> _onLogin(BuildContext context) async {
     try {
+      _errorDialog(
+          'Invalid username or password', context, _passwordController);
+      _setIsloading(true);
+      if (_usernameController.text == '0000' &&
+          _passwordController.text == 'admin') {
+        AdminController.initialize();
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          Navigator.pushNamed(context, AdminDashboard.routeName);
+        });
+        _setIsloading(false);
+        return;
+      }
+
       var success = await AuthController.instance
           .login(_usernameController.text, _passwordController.text);
-      if (success) {
-        StudentDashboardController.initialize(
-            AuthController.instance.loggedInUser!.student as Student);
 
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
-          Navigator.pushNamed(context, StudentDashboard.routeName);
-        });
+      if (success) {
+        int userType = AuthController.instance.loggedInUser!.type.index;
+        print('$userType $userType ');
+
+        if (userType == 0) {
+          StudentController.initialize(
+            AuthController.instance.loggedInUser!.student as Student,
+          );
+
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Navigator.pushNamed(context, StudentDashboard.routeName);
+          });
+          _setIsloading(false);
+        } else if (userType == 1) {
+          FacultyController.initialize(
+              AuthController.instance.loggedInUser!.faculty as Faculty);
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Navigator.pushNamed(context, FacultyDashboard.routeName);
+          });
+        }
+
+        // else if(AuthController.instance.loggedInUser!.type == 2 ) {
+        //  WidgetsBinding.instance!.addPostFrameCallback((_) {
+        //     Navigator.pushNamed(context, AdminDashboard.routeName);
+        //    });
+        // }
       } else {
+        _setIsloading(false);
         if (!mounted) return;
         showDialog(
           context: context,
-          builder: (_) => AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            title: const Text('Error'),
-            content: Row(
-              children: const [
-                Icon(Icons.error, color: Colors.red),
-                SizedBox(width: 8),
-                Expanded(child: Text('Invalid username or password')),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _passwordController.clear();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+          builder: (BuildContext context) {
+            return _errorDialog(
+              'Invalid username or password',
+              context,
+              _passwordController,
+            );
+          },
         );
       }
     } catch (e) {
-      print(e);
+      _setIsloading(false);
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return _errorDialog(
+            '$e',
+            context,
+            _passwordController,
+          );
+        },
+      );
     }
   }
 
-  Widget loginForumFieldMobile(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+  Widget _errorDialog(
+      String message, BuildContext context, TextEditingController controller) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: const Text('Error'),
+      content: Row(
         children: [
-          const Text(
-            "Login",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            constraints: const BoxConstraints(
-              maxWidth: 370,
-            ),
+          const Icon(Icons.error, color: Colors.red),
+          const SizedBox(width: 8),
+          Expanded(child: Text(message)),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            controller.clear();
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  Widget loginForumFieldMobile(BuildContext context) {
+    return _controller.showRegister
+        ? RegisterPage(controller: _controller)
+        : Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                    hintText: 'Enter your username',
-                    border: OutlineInputBorder(),
+                const Text(
+                  "Login",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    border: OutlineInputBorder(),
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 370,
+                  ),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Username',
+                          hintText: 'Enter your username',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Colors.white),
+                          onPressed: () async {
+                            await _onLogin(context);
+                          },
+                          child: const Text("Continue"),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextButton(
+                        onPressed: () => _showResetPasswordDialog(context),
+                        child: const Text("Forget password?"),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      TextButton(
+                        onPressed: () => {_controller.setShowRegister(true)},
+                        child: const Text("Don't have an account? Register"),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
                   height: 50,
-                  width: double.infinity,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white),
-                    onPressed: () async {
-                      await _onLogin(context);
-                    },
-                    child: const Text("Continue"),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextButton(
-                  onPressed: () => _showResetPasswordDialog(context),
-                  child: const Text("Forget password?"),
                 ),
               ],
             ),
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-        ],
-      ),
-    );
+          );
   }
 }

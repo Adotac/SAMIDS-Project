@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
-import 'package:samids_web_app/src/controllers/student_dashboard.controller.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/faculty/attendance.dart';
+import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
 
 import '../screen/student/attendance.dart';
 import '../screen/student/dashboard.dart';
 
 class SideMenu extends StatefulWidget {
-  final StudentDashboardController studentDashboardController =
-      StudentDashboardController.instance;
   final AuthController authController = AuthController.instance;
   SideMenu({
     Key? key,
@@ -25,8 +26,6 @@ class SideMenu extends StatefulWidget {
 
 class _SideMenuState extends State<SideMenu> {
   int get _selectedIndex => widget.selectedWidgetMarker;
-  StudentDashboardController get _sdController =>
-      widget.studentDashboardController;
 
   AuthController get _authController => widget.authController;
   set _selectedIndex(int index) {
@@ -63,7 +62,7 @@ class _SideMenuState extends State<SideMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: 18.0, bottom: 18),
+      margin: const EdgeInsets.only(left: 18.0, bottom: 18),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -77,7 +76,17 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Dashboard',
             index: 0,
             onTap: () {
-              Navigator.popAndPushNamed(context, StudentDashboard.routeName);
+              int userType = _authController.loggedInUser!.type.index;
+              switch (userType) {
+                case 0:
+                  Navigator.popAndPushNamed(
+                      context, StudentDashboard.routeName);
+                  break;
+                case 1:
+                  Navigator.popAndPushNamed(
+                      context, FacultyDashboard.routeName);
+                  break;
+              }
             },
           ),
           _buildListTile(
@@ -85,7 +94,17 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Attendance',
             index: 1,
             onTap: () {
-              Navigator.popAndPushNamed(context, StudentAttendance.routeName);
+              int userType = _authController.loggedInUser!.type.index;
+              switch (userType) {
+                case 0:
+                  Navigator.popAndPushNamed(
+                      context, StudentAttendance.routeName);
+                  break;
+                case 1:
+                  Navigator.popAndPushNamed(
+                      context, FacultyAttendance.routeName);
+                  break;
+              }
             },
           ),
           _buildListTile(
@@ -96,21 +115,30 @@ class _SideMenuState extends State<SideMenu> {
               Navigator.popAndPushNamed(context, SettingsPage.routeName);
             },
           ),
-          Spacer(),
+          const Spacer(),
           _buildListTile(
             icon: Icons.logout_outlined,
             title: 'Logout',
             index: 3,
             onTap: () {
-              _authController.logout();
-              _sdController.dispose();
-              GetIt.instance.unregister<StudentDashboardController>();
+              int userType = _authController.loggedInUser!.type.index;
+              switch (userType) {
+                case 0:
+                  StudentController.instance.dispose();
+                  GetIt.instance.unregister<StudentController>();
+                  break;
+                case 1:
+                  FacultyController.instance.dispose();
+                  GetIt.instance.unregister<FacultyController>();
+                  break;
+              }
 
+              _authController.logout();
               Navigator.of(context).pushNamedAndRemoveUntil(
                   LoginScreen.routeName, (Route<dynamic> route) => false);
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

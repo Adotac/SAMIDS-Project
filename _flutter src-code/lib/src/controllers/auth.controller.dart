@@ -32,34 +32,42 @@ class AuthController with ChangeNotifier {
 
       if (result.success) {
         isLoggedIn = true;
-        if (kDebugMode)
+        if (kDebugMode) {
           _logger.i(' AuthController logins ${result.data['user']}');
+        }
         loggedInUser = User.fromJson(result.data['user']);
         notifyListeners();
         return true;
       } else {
-        print('Login failed');
-        return false;
+        throw result.data;
       }
     } catch (e, stacktrace) {
       if (kDebugMode) _logger.i(' AuthController logins $e $stacktrace');
-      return false;
+      rethrow;
     }
   }
 
-  Future<bool> register(UserRegisterDto credentials) async {
+  Future<bool> register(
+      int userId, String email, String password, int type) async {
     try {
+      Map<String, dynamic> credentials = {
+        'idNo': userId,
+        'email': email,
+        'password': password,
+        'type': type
+      };
+      print(credentials);
       CRUDReturn result = await AuthService.register(credentials);
+
       if (result.success) {
-        isLoggedIn = true;
-        loggedInUser = User.fromJson(jsonDecode(result.data));
         notifyListeners();
         return true;
       } else {
-        return false;
+        throw result.data;
       }
     } catch (e) {
-      return false;
+      print('Error registering user: $e');
+      rethrow;
     }
   }
 
