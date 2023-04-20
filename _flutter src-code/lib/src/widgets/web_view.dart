@@ -6,6 +6,8 @@ import 'package:samids_web_app/src/widgets/notification_tile_list.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 import 'package:intl/intl.dart';
 
+enum FilterOptions { subjectId, date, time }
+
 class WebView extends StatefulWidget {
   final String appBarTitle;
   final Widget body;
@@ -64,12 +66,6 @@ class _WebViewState extends State<WebView> {
       case 'Attendance':
         return [
           _searchBar(context),
-          IconButton(
-            icon: Icon(Icons.filter_list),
-            onPressed: () {
-              // Implement your filter selection logic here
-            },
-          ),
         ];
       case 'Settings':
         return [];
@@ -119,8 +115,47 @@ class _WebViewState extends State<WebView> {
         },
         // controller: _textEditingController,
         decoration: InputDecoration(
-          suffixIcon:
+          suffixIcon: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PopupMenuButton<FilterOptions>(
+                icon: const Icon(Icons.filter_list),
+                onSelected: (FilterOptions filterOption) {
+                  // Implement your filter selection logic here
+                  switch (filterOption) {
+                    case FilterOptions.subjectId:
+                      // Filter by subject id
+                      break;
+                    case FilterOptions.date:
+                      // Filter by date
+                      break;
+                    case FilterOptions.time:
+                      // Filter by time
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) {
+                  return [
+                    PopupMenuItem<FilterOptions>(
+                      value: FilterOptions.subjectId,
+                      child: Text('Filter by Subject ID'),
+                    ),
+                    PopupMenuItem<FilterOptions>(
+                      value: FilterOptions.date,
+                      child: Text('Filter by Date'),
+                    ),
+                    PopupMenuItem<FilterOptions>(
+                      value: FilterOptions.time,
+                      child: Text('Filter by Time'),
+                    ),
+                  ];
+                },
+              ),
               Icon(Icons.search_outlined, color: Theme.of(context).hintColor),
+              const SizedBox(width: 12)
+            ],
+          ),
           border: InputBorder.none,
           hintText: 'Search',
           hintStyle: TextStyle(color: currentTheme.hintColor),
@@ -157,12 +192,6 @@ class _WebViewState extends State<WebView> {
               ),
               if (widget.appBarActionWidget != null) ...[
                 _searchBar(context),
-                IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  onPressed: () {
-                    // Implement your filter selection logic here
-                  },
-                ),
               ],
             ],
           ),

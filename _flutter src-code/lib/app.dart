@@ -211,7 +211,7 @@ class MyApp extends StatelessWidget {
               case FacultyAttendance.routeName:
                 return MaterialPageRoute(
                   builder: (_) => FacultyAttendance(
-                    dataController: StudentController.instance,
+                    dataController: FacultyController.instance,
                   ),
                 );
               case StudentDashboard.routeName:
@@ -227,7 +227,6 @@ class MyApp extends StatelessWidget {
               case SettingsPage.routeName:
                 return MaterialPageRoute(
                     builder: (_) => SettingsPage(
-                          sdController: StudentController.instance,
                           settingsController:
                               settingsController, // Add this line
                         ));

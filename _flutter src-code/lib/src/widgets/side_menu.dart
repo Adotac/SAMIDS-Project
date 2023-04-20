@@ -76,7 +76,17 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Dashboard',
             index: 0,
             onTap: () {
-              Navigator.popAndPushNamed(context, FacultyDashboard.routeName);
+              int userType = _authController.loggedInUser!.type.index;
+              switch (userType) {
+                case 0:
+                  Navigator.popAndPushNamed(
+                      context, StudentDashboard.routeName);
+                  break;
+                case 1:
+                  Navigator.popAndPushNamed(
+                      context, FacultyDashboard.routeName);
+                  break;
+              }
             },
           ),
           _buildListTile(
@@ -84,7 +94,17 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Attendance',
             index: 1,
             onTap: () {
-              Navigator.popAndPushNamed(context, FacultyAttendance.routeName);
+              int userType = _authController.loggedInUser!.type.index;
+              switch (userType) {
+                case 0:
+                  Navigator.popAndPushNamed(
+                      context, StudentAttendance.routeName);
+                  break;
+                case 1:
+                  Navigator.popAndPushNamed(
+                      context, FacultyAttendance.routeName);
+                  break;
+              }
             },
           ),
           _buildListTile(
@@ -105,9 +125,11 @@ class _SideMenuState extends State<SideMenu> {
               switch (userType) {
                 case 0:
                   StudentController.instance.dispose();
+                  GetIt.instance.unregister<StudentController>();
                   break;
                 case 1:
                   FacultyController.instance.dispose();
+                  GetIt.instance.unregister<FacultyController>();
                   break;
               }
 

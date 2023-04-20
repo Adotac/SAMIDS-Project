@@ -14,6 +14,7 @@ import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/faculty_model.dart';
+import '../services/faculty.services.dart';
 import '../services/student.services.dart';
 
 class FacultyController with ChangeNotifier {
@@ -77,19 +78,19 @@ class FacultyController with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getStudentClasses() async {
-    try {
-      if (isStudentClassesCollected) return;
-      CRUDReturn response =
-          await StudentService.getStudentClasses(faculty.facultyNo);
-      if (response.success) {
-        handleEventJsonStudentClasses(response);
-      }
-      notifyListeners();
-    } catch (e, stacktrace) {
-      print('StudentDashboardController getStudentClasses $e $stacktrace');
-    }
-  }
+  // Future<void> getStudentClasses() async {
+  //   try {
+  //     if (isStudentClassesCollected) return;
+  //     CRUDReturn response =
+  //         await StudentService.getStudentClasses(faculty.facultyNo);
+  //     if (response.success) {
+  //       handleEventJsonStudentClasses(response);
+  //     }
+  //     notifyListeners();
+  //   } catch (e, stacktrace) {
+  //     print('StudentDashboardController getStudentClasses $e $stacktrace');
+  //   }
+  // }
 
   void handleEventJsonStudentClasses(CRUDReturn result) {
     try {
@@ -102,6 +103,21 @@ class FacultyController with ChangeNotifier {
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonStudentClasses $e $stacktrace');
+    }
+  }
+
+  //create function to query to FacultyService getFacultyClasses
+  Future<void> getFacultyClasses() async {
+    try {
+      if (isStudentClassesCollected) return;
+      CRUDReturn response =
+          await FacultyService.getFacultyClasses(faculty.facultyNo);
+      if (response.success) {
+        handleEventJsonStudentClasses(response);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('StudentDashboardController getStudentClasses $e $stacktrace');
     }
   }
 

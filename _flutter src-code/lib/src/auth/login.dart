@@ -30,11 +30,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '46382';
+    _usernameController.text = '71692';
 //35526 admin
 
     _passwordController = TextEditingController();
-    _passwordController.text = 'test123';
+    _passwordController.text = '71692';
     super.initState();
   }
 
@@ -363,6 +363,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _onLogin(BuildContext context) async {
     try {
+      _errorDialog(
+          'Invalid username or password', context, _passwordController);
       _setIsloading(true);
 
       var success = await AuthController.instance
@@ -395,19 +397,35 @@ class _LoginScreenState extends State<LoginScreen> {
         //    });
         // }
       } else {
-        //
         _setIsloading(false);
         if (!mounted) return;
-
-        _errorDialog(
-            'Invalid username or password', context, _passwordController);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return _errorDialog(
+              'Invalid username or password',
+              context,
+              _passwordController,
+            );
+          },
+        );
       }
     } catch (e) {
       print(e);
-
-      if (!mounted) return;
-      _errorDialog('$e', context, _passwordController);
+      print('adsfasdfadsf');
       _setIsloading(false);
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return _errorDialog(
+            '$e',
+            context,
+            _passwordController,
+          );
+        },
+      );
     }
   }
 

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 import 'package:samids_web_app/src/services/DTO/add_faculty.dart';
 import 'package:samids_web_app/src/services/DTO/add_facultySubject.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
@@ -7,11 +9,28 @@ import 'package:samids_web_app/src/services/http.services.dart';
 
 class FacultyService {
   static const String _baseUrl = "https://localhost:7170/api";
-  
+  static final Logger _logger = Logger();
+
   static Future<CRUDReturn> getFaculties() async {
     final response = await HttpService.get('$_baseUrl/Faculty');
     final jsonResponse = json.decode(response.body);
     return CRUDReturn.fromJson(jsonResponse);
+  }
+
+  static Future<CRUDReturn> getFacultyClasses(int id) async {
+    try {
+      final response =
+          await HttpService.get('$_baseUrl/Faculty/Classes/?facultyNo=$id');
+      if (kDebugMode) {
+        _logger
+            .i('getFacultiesClasses ${response.statusCode} ${response.body}');
+      }
+      final jsonResponse = json.decode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' getFacultiesClasses $e $stacktrace');
+      rethrow;
+    }
   }
 
   static Future<CRUDReturn> getFacultyById(int id) async {

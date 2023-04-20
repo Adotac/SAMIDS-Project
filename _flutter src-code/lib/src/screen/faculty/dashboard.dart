@@ -39,7 +39,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   @override
   void initState() {
     _sdController.getAttendanceAll();
-    _sdController.getStudentClasses();
+    _sdController.getFacultyClasses();
 
     super.initState();
   }
@@ -75,8 +75,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: Column(
@@ -436,25 +436,29 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     return Card(
         child: Container(
       width: MediaQuery.of(context).size.width * 0.4,
+      height: 445,
       padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Subject Schedule',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            '1st Semester - 2023',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Subject Schedule',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-          ),
-          SizedBox(height: 16),
-          SizedBox(width: double.infinity, child: _dataTableClasses(context)),
-        ],
+            SizedBox(height: 8),
+            Text(
+              '1st Semester - 2023',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 16),
+            SizedBox(width: double.infinity, child: _dataTableClasses(context)),
+          ],
+        ),
       ),
     ));
   }
@@ -664,7 +668,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           ),
         ],
       ),
-      SizedBox(height: 8.0),
+      SizedBox(height: 18.0),
       Row(
         children: [
           Column(
@@ -697,7 +701,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   ),
                 ],
               ),
-              SizedBox(height: 12.0),
+              SizedBox(height: 18.0),
               DataNumber(
                 number: totalLogs.toString(),
                 description: "Total logs",
@@ -1027,7 +1031,9 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         customDataColumn(label: Text('Time'), flex: 1),
         customDataColumn(label: Text('Day'), flex: 1),
       ],
-      rows: _buildSampleDataRows(context),
+      rows: _sdController.studentClasses
+          .map((attendance) => _buildDataRowClasses(context, attendance))
+          .toList(),
     );
   }
 
@@ -1123,7 +1129,11 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       return SizedBox(
         child: Card(
           child: Container(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(
+              top: 16.0,
+              left: 16.0,
+              right: 16.0,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,

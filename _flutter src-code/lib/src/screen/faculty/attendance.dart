@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 
@@ -12,7 +13,7 @@ import '../../widgets/web_view.dart';
 
 class FacultyAttendance extends StatefulWidget {
   static const routeName = '/faculty-attendance';
-  final StudentController dataController;
+  final FacultyController dataController;
 
   const FacultyAttendance({super.key, required this.dataController});
 
@@ -23,7 +24,7 @@ class FacultyAttendance extends StatefulWidget {
 class _FacultyAttendanceState extends State<FacultyAttendance> {
   final _textEditingController = TextEditingController();
 
-  StudentController get _dataController => widget.dataController;
+  FacultyController get _dataController => widget.dataController;
 
   @override
   void initState() {

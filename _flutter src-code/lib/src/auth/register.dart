@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/auth/controller.dart';
 
+import '../controllers/auth.controller.dart';
+
 class RegisterPage extends StatefulWidget {
   final AuthViewController controller;
-  const RegisterPage({Key? key, required this.controller}) : super(key: key);
+  final AuthController authController = AuthController.instance;
+
+  List<String> userTypes = ["Student", "Faculty"];
+  Map<String, int> userTypeValues = {"Student": 0, "Faculty": 1};
+
+  RegisterPage({Key? key, required this.controller}) : super(key: key);
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -11,6 +18,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  AuthController get _authController => widget.authController;
+  List<String> get _userTypes => widget.userTypes;
+  Map<String, int> get _userTypeValues => widget.userTypeValues;
 
   late final TextEditingController _userIdController;
   late final TextEditingController _emailController;
@@ -18,6 +28,27 @@ class _RegisterPageState extends State<RegisterPage> {
   late final TextEditingController _confirmPasswordController;
   String? _securityQuestion1;
   String? _securityQuestion2;
+  int _userType = 0; // 0 for Student (default), 1 for Faculty
+
+  Widget _userTypeDropDown(int currentValue, ValueChanged<int?>? onChanged) {
+    return DropdownButtonFormField<int>(
+      value: currentValue,
+      onChanged: onChanged,
+      items: _userTypes.map<DropdownMenuItem<int>>(
+        (String value) {
+          return DropdownMenuItem<int>(
+            value: _userTypeValues[value],
+            child: Text(value),
+          );
+        },
+      ).toList(),
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'User Type',
+      ),
+      isExpanded: true,
+    );
+  }
 
   List<String> securityQuestions = [
     "What is your mother's maiden name?",
@@ -122,11 +153,78 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
     if (_formKey.currentState!.validate()) {
-      // Handle form submission logic here, e.g., sending data to the server
-      print('Form submitted');
+      try {
+        bool success = await _authController.register(
+          int.parse(_userIdController.text),
+          _emailController.text,
+          _passwordController.text,
+          _userType,
+        );
+
+        if (success && mounted) {
+          widget.controller.setShowRegister(false);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return _successDialog("Registration successful", context);
+            },
+          );
+        }
+      } catch (e) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return _errorDialog(e.toString(), context);
+          },
+        );
+      }
     }
+  }
+
+  Widget _successDialog(String message, BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: const Text('Success'),
+      content: Row(
+        children: [
+          const Icon(Icons.check_circle_outline, color: Colors.green),
+          const SizedBox(width: 8),
+          Expanded(child: Text(message)),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  Widget _errorDialog(String message, BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      title: const Text('Error'),
+      content: Row(
+        children: [
+          const Icon(Icons.error, color: Colors.red),
+          const SizedBox(width: 8),
+          Expanded(child: Text(message)),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
   }
 
   Widget _backButton(BuildContext context) {
@@ -287,6 +385,17 @@ class _RegisterPageState extends State<RegisterPage> {
               }
               return null;
             },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Container(
+            width: 400,
+            child: _userTypeDropDown(_userType, (int? newValue) {
+              setState(() {
+                _userType = newValue!;
+              });
+            }),
           ),
         ),
         _submitButton(context),

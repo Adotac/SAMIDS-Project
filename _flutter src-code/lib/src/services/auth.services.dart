@@ -28,11 +28,20 @@ class AuthService {
     }
   }
 
-  static Future<CRUDReturn> register(UserRegisterDto credentials) async {
-    final response = await HttpService.post('$_baseUrl/register',
-        body: credentials.toJson());
-    final jsonResponse = jsonDecode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
+  static Future<CRUDReturn> register(credentials) async {
+    try {
+      print('register');
+      final response = await HttpService.post('$_baseUrl/register',
+          body: credentials, headers: {"Content-Type": "application/json"});
+      final jsonResponse = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('AuthService register ${response.statusCode} ${response.body}');
+      }
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('AuthService register $e $stacktrace');
+      return CRUDReturn(success: false, data: e);
+    }
   }
 
   static Future<CRUDReturn> changePassword(

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
@@ -6,6 +8,7 @@ import 'package:samids_web_app/src/widgets/student_info_card.dart';
 
 import '../auth/login.dart';
 import '../controllers/auth.controller.dart';
+import '../controllers/faculty_controller.dart';
 import '../model/student_model.dart';
 import '../settings/settings_controller.dart';
 import '../widgets/mobile_view.dart';
@@ -13,15 +16,12 @@ import '../widgets/web_view.dart';
 
 class SettingsPage extends StatefulWidget {
   static const routeName = '/settings';
-  final StudentController sdController;
-  final StudentController studentDashboardController =
-      StudentController.instance;
+
   final AuthController authController = AuthController.instance;
 
   final SettingsController settingsController;
   SettingsPage({
     Key? key,
-    required this.sdController,
     required this.settingsController,
   }) : super(key: key);
 
@@ -30,11 +30,37 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  StudentController get _sdController => widget.studentDashboardController;
+  late final _sdController;
+  @override
+  void initState() {
+    int userType = _authController.loggedInUser!.type.index;
+    switch (userType) {
+      case 0:
+        _sdController = StudentController.instance;
+        break;
+      case 1:
+        _sdController = FacultyController.instance;
+        break;
+    }
+    super.initState();
+  }
 
   AuthController get _authController => widget.authController;
   SettingsController get settingsController => widget.settingsController;
   Widget _buildUserInformation(BuildContext context) {
+    int userType = _authController.loggedInUser!.type.index;
+    switch (userType) {
+      case 0:
+        return StudentInfoCard(
+          firstName: _sdController.student.firstName,
+          lastName: _sdController.student.lastName,
+        );
+      case 1:
+        return StudentInfoCard(
+          firstName: _sdController.faculty.firstName,
+          lastName: _sdController.faculty.lastName,
+        );
+    }
     return StudentInfoCard(
       firstName: _sdController.student.firstName,
       lastName: _sdController.student.lastName,
@@ -90,9 +116,19 @@ class _SettingsPageState extends State<SettingsPage> {
               title:
                   Text('Logout', style: Theme.of(context).textTheme.subtitle1),
               onTap: () {
+                int userType = _authController.loggedInUser!.type.index;
+                switch (userType) {
+                  case 0:
+                    StudentController.instance.dispose();
+                    GetIt.instance.unregister<StudentController>();
+                    break;
+                  case 1:
+                    FacultyController.instance.dispose();
+                    GetIt.instance.unregister<FacultyController>();
+                    break;
+                }
+
                 _authController.logout();
-                _sdController.dispose();
-                GetIt.instance.unregister<StudentController>();
 
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     LoginScreen.routeName, (Route<dynamic> route) => false);
