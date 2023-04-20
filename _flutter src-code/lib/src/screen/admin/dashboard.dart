@@ -63,6 +63,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Row(
         children: [
           Expanded(
+            // child: _buildUpload(),
             child: _buildConfig(context),
           ),
           const VerticalDivider(width: 32.0),
@@ -78,30 +79,74 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  _buildUpload() {
-    return Text("data");
+  Widget _buildUpload() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Upload CSV',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Student'),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Subject'),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Teacher'),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Teacher Subject'),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Text('Student Subject'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16.0),
+        Expanded(
+          child: Card(
+            child: ListView.builder(
+              itemCount: 5,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text('Selected File $index'),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildConfig(context) {
-    return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Config",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16.0),
-            _termInfo(),
-            const SizedBox(height: 16.0),
-            _timeOffset(),
-            const SizedBox(height: 16.0),
-            _dataTableClasses(context)
-          ],
+    return //add scroll view here
+        Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Config",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-      ),
+        const SizedBox(height: 16.0),
+        _termInfo(),
+        const SizedBox(height: 16.0),
+        _timeOffset(),
+        const SizedBox(height: 16.0),
+        _dataTableClasses(context)
+      ],
     );
   }
 
