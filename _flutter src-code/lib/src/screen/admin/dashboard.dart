@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../controllers/admin_controller.dart';
+import '../../widgets/Csv-upload/students.dart';
 import '../../widgets/web_view.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -14,7 +19,7 @@ class AdminDashboard extends StatefulWidget {
 
 class _AdminDashboardState extends State<AdminDashboard> {
   AdminController get adminController => widget.adminController;
-
+  List<String> selectedFiles = [];
   @override
   void initState() {
     super.initState();
@@ -83,7 +88,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Upload CSV',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -91,42 +96,76 @@ class _AdminDashboardState extends State<AdminDashboard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Student'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Subject'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Teacher'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Teacher Subject'),
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('Student Subject'),
-            ),
+            _buildTextButton('Student', () => _uploadCSV(0)),
+            _buildTextButton('Subject', () => _uploadCSV(1)),
+            _buildTextButton('Teacher', () => _uploadCSV(2)),
+            _buildTextButton('Teacher Subject', () => _uploadCSV(3)),
+            _buildTextButton('Student Subject', () => _uploadCSV(4)),
           ],
         ),
         const SizedBox(height: 16.0),
         Expanded(
           child: Card(
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text('Selected File $index'),
-                );
-              },
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: DataTable(
+                  columns: [
+                    DataColumn(label: Text('File Name')),
+                    DataColumn(label: Text('Status')),
+                  ],
+                  rows: selectedFiles
+                      .map(
+                        (fileName) => DataRow(cells: [
+                          DataCell(Text(fileName)),
+                          DataCell(Text('Uploading...')),
+                        ]),
+                      )
+                      .toList(),
+                ),
+              ),
             ),
           ),
         ),
       ],
+    );
+  }
+
+  void _uploadCSV(int table) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (result != null) {
+      String fileName = result.files.single.name;
+      selectedFiles.add(fileName);
+      setState(() {});
+
+      Uint8List fileBytes = result.files.single.bytes!;
+      await CSVFileUpload.uploadCsv(fileBytes, table);
+    } else {
+      print('No file selected.');
+    }
+  }
+
+  Widget _buildTextButton(String buttonName, VoidCallback onPressed) {
+    return TextButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(
+          Theme.of(context).primaryColor ?? Colors.blue,
+        ),
+        foregroundColor: MaterialStateProperty.all<Color>(
+          Theme.of(context).colorScheme.onPrimary,
+        ),
+      ),
+      child: Text(buttonName),
     );
   }
 
