@@ -152,7 +152,59 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ),
         const SizedBox(height: 16.0),
         _downloadForm(),
+        const SizedBox(height: 18.0),
+        const Text(
+          'Reset Password',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16.0),
+        _resetPasswordForm(),
       ],
+    );
+  }
+
+  Widget _resetPasswordForm() {
+    final TextEditingController usernameController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
+    return Expanded(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16.0),
+              const Text(
+                "Reset faculty/student password",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: passwordController,
+                decoration: const InputDecoration(
+                  labelText: 'New Password',
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 24.0),
+              TextButton(
+                onPressed: () {
+                  // Implement your reset password logic here
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
