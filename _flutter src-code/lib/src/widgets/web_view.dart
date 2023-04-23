@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:samids_web_app/src/screen/settings.dart';
+import 'package:intl/intl.dart';
 import 'package:samids_web_app/src/widgets/notification_tile_list.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
-import 'package:intl/intl.dart';
 
 enum FilterOptions { subjectId, date, time }
 
