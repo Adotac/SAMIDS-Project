@@ -233,8 +233,10 @@ class _MobileViewState extends State<MobileView> {
             )
           : null,
       body: (!widget.showAppBar || widget.appBarOnly)
-          ? Column(
-              children: [...widget.body],
+          ? SingleChildScrollView(
+              child: Column(
+                children: [...widget.body],
+              ),
             )
           : CustomScrollView(
               slivers: [

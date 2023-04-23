@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../controllers/admin_controller.dart';
 import '../../widgets/Csv-upload/students.dart';
+import '../../widgets/mobile_view.dart';
 import '../../widgets/web_view.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -60,7 +61,27 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return AnimatedBuilder(
       animation: adminController,
       builder: (context, child) {
-        return const SizedBox();
+        return MobileView(
+            appBarTitle: "Admin Dashboard",
+            appBarOnly: true,
+            currentIndex: 0,
+            body: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _mBuildConfig(context),
+                    // _mBuildConfig(context),
+                    // _mBuildConfig(context),
+                    // _mBuildConfig(context),
+                    // _mBuildConfig(context),
+                    const Divider(),
+                    _mBuildUpload(),
+                    const Divider(),
+                    _mBuildDownloadCSV(),
+                  ],
+                ),
+              ),
+            ]);
       },
     );
   }
@@ -82,6 +103,77 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Expanded(
             child: _buildDownloadCSV(),
           )
+        ],
+      ),
+    );
+  }
+
+  Widget _mBuildUpload() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Upload CSV',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16.0),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTextButton('Student', () => _uploadCSV(0)),
+                  const SizedBox(width: 8.0),
+                  _buildTextButton('Subject', () => _uploadCSV(1)),
+                  const SizedBox(width: 8.0),
+                  _buildTextButton('Teacher', () => _uploadCSV(2)),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTextButton('Teacher Subject', () => _uploadCSV(3)),
+                  const SizedBox(width: 8.0),
+                  _buildTextButton('Student Subject', () => _uploadCSV(4)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * .95,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('File Name')),
+                    DataColumn(label: Text('Table Selected')),
+                    DataColumn(label: Text('Status')),
+                  ],
+                  rows: List.generate(
+                    selectedFiles.length,
+                    (index) => DataRow(
+                      cells: [
+                        DataCell(Text(selectedFiles[index])),
+                        DataCell(SingleChildScrollView(
+                            child: Text(selectedFileTable[index]))),
+                        const DataCell(Text('Uploading...')),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -163,6 +255,30 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  Widget _mBuildDownloadCSV() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Download Attendance CSV',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16.0),
+          _mDownloadForm(),
+          const SizedBox(height: 18.0),
+          const Text(
+            'Reset Password',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16.0),
+          _mResetPasswordForm(),
+        ],
+      ),
+    );
+  }
+
   Widget _resetPasswordForm() {
     final TextEditingController usernameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
@@ -170,11 +286,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Expanded(
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16.0),
               const Text(
                 "Reset faculty/student password",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -203,6 +318,137 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mResetPasswordForm() {
+    final TextEditingController usernameController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Reset faculty/student password",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username',
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: passwordController,
+              decoration: const InputDecoration(
+                labelText: 'New Password',
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 24.0),
+            TextButton(
+              onPressed: () {
+                // Implement your reset password logic here
+              },
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Card _mDownloadForm() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Select Year - Term",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            _buildDropdownField(
+              label: "Current Year - Current Term",
+              items: ["2022-2023 2nd Semester"],
+              defaultValue: "2022-2023 2nd Semester",
+            ),
+            const Divider(),
+            const SizedBox(
+              height: 18,
+            ),
+            const Text(
+              "From Faculty",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: _buildDropdownField(
+                    label: "Select Faculty",
+                    items: ["All", "Faculty A", "Faculty B"],
+                    defaultValue: "All",
+                  ),
+                ),
+                Expanded(
+                  child: _buildDropdownField(
+                    label: "Select Subject",
+                    items: ["All", "Subject A", "Subject B"],
+                    defaultValue: "All",
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 12.0),
+              child: TextButton(
+                onPressed: () {},
+                child: const Text('Download'),
+              ),
+            ),
+            const SizedBox(
+              height: 18,
+            ),
+            const Divider(),
+            const Text(
+              "From Attendance",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDropdownField(
+                    label: "Select Student",
+                    items: ["All", "Student A", "Student B"],
+                    defaultValue: "All",
+                  ),
+                ),
+                Expanded(
+                  child: _buildDropdownField(
+                    label: "Select Subject",
+                    items: ["All", "Subject A", "Subject B"],
+                    defaultValue: "All",
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 12.0),
+              child: TextButton(
+                onPressed: () {},
+                child: const Text('Download'),
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -435,6 +681,137 @@ class _AdminDashboardState extends State<AdminDashboard> {
         const SizedBox(height: 12.0),
         Expanded(child: _dataTableClasses(context))
       ],
+    );
+  }
+
+  Widget _mBuildConfig(context) {
+    return //add scroll view here
+        Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Configurations",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8.0),
+          _mTermInfo(),
+          const SizedBox(height: 8.0),
+          _mTimeOffset(),
+          const SizedBox(height: 8.0),
+          // Expanded(child: _dataTableClasses(context))
+        ],
+      ),
+    );
+  }
+
+  Widget _mTermInfo() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Text(
+                  'Term Information',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text('Set Term'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: _titleText("2023-2024")),
+                    const Text('Current Year'),
+                  ],
+                ),
+                const SizedBox(width: 14.0),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: _titleText("2nd Semester")),
+                    const Text('Current Term'),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Card _mTimeOffset() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Text(
+                  'Time Offset',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text('Set offset'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: _titleText("25 mins")),
+                    const Text('Minutes Late'),
+                  ],
+                ),
+                const SizedBox(width: 18.0),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: _titleText("30 mins")),
+                    const Text('Minutes Absent'),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
