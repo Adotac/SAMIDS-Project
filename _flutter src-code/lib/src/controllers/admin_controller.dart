@@ -13,7 +13,9 @@ import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
+import '../model/config_model.dart';
 import '../model/faculty_model.dart';
+import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
 
@@ -22,15 +24,16 @@ class AdminController with ChangeNotifier {
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
 
-  double onTimeCount = 0;
-  double lateCount = 0;
-  double absentCount = 0;
-  double cuttingCount = 0;
-
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
+
+  String currentYear = '';
+  String currentTerm = '';
+
+  String lateMinutes = '';
+  String absentMinutes = '';
 
   AdminController();
 
@@ -46,14 +49,40 @@ class AdminController with ChangeNotifier {
     isAttendanceTodayCollected = false;
     isAllAttendanceCollected = false;
 
-    onTimeCount = 0;
-    lateCount = 0;
-    absentCount = 0;
-    cuttingCount = 0;
-
     attendance.clear();
     allAttendanceList.clear();
     studentClasses.clear();
+  }
+
+  Config? config;
+
+  void handleEventJsonConfig(CRUDReturn result) {
+    if (result.data.isNotEmpty) {
+      config = Config.fromJson(result.data[0]);
+    }
+    notifyListeners();
+  }
+
+  Future<void> getConfig() async {
+    try {
+      CRUDReturn response = await ConfigService.getConfig();
+      if (response.success) {
+        handleEventJsonConfig(response);
+      }
+    } catch (e, stacktrace) {
+      print('ConfigController getConfig $e $stacktrace');
+    }
+  }
+
+  Future<void> updateConfig(Config newConfig) async {
+    try {
+      CRUDReturn response = await ConfigService.updateConfig(newConfig);
+      if (response.success) {
+        handleEventJsonConfig(response);
+      }
+    } catch (e, stacktrace) {
+      print('ConfigController updateConfig $e $stacktrace');
+    }
   }
 
   handEventJsonAttendance(CRUDReturn result) {
@@ -192,21 +221,5 @@ class AdminController with ChangeNotifier {
       text,
       style: TextStyle(color: color),
     );
-  }
-
-  void getRemarksCount() {
-    try {
-      if (isCountCalculated) return;
-      for (Attendance attendance in allAttendanceList) {
-        if (attendance.remarks == Remarks.late) lateCount += 1;
-        if (attendance.remarks == Remarks.onTime) onTimeCount += 1;
-        if (attendance.remarks == Remarks.absent) absentCount += 1;
-        if (attendance.remarks == Remarks.cutting) cuttingCount += 1;
-        isCountCalculated = true;
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      print('getRemarksCount $e $stacktrace');
-    }
   }
 }

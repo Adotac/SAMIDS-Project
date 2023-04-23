@@ -37,6 +37,7 @@ class StudentController with ChangeNotifier {
 
   static StudentController get I => GetIt.instance<StudentController>();
   static StudentController get instance => GetIt.instance<StudentController>();
+
   logout() {
     isStudentClassesCollected = false;
     isCountCalculated = false;

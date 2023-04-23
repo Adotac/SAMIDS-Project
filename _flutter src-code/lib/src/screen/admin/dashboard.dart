@@ -26,6 +26,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   void initState() {
+    adminController.getConfig();
     super.initState();
   }
 
@@ -70,10 +71,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 child: Column(
                   children: [
                     _mBuildConfig(context),
-                    // _mBuildConfig(context),
-                    // _mBuildConfig(context),
-                    // _mBuildConfig(context),
-                    // _mBuildConfig(context),
                     const Divider(),
                     _mBuildUpload(),
                     const Divider(),
@@ -666,22 +663,27 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _buildConfig(context) {
     return //add scroll view here
-        Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Configurations",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 14.0),
-        _termInfo(),
-        const SizedBox(height: 14.0),
-        _timeOffset(),
-        const SizedBox(height: 12.0),
-        Expanded(child: _dataTableClasses(context))
-      ],
-    );
+        adminController.config == null
+            ? const SizedBox(
+                height: 500,
+                child: CircularProgressIndicator(),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Configurations",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 14.0),
+                  _termInfo(),
+                  const SizedBox(height: 14.0),
+                  _timeOffset(),
+                  const SizedBox(height: 12.0),
+                  Expanded(child: _dataTableClasses(context))
+                ],
+              );
   }
 
   Widget _mBuildConfig(context) {
@@ -847,7 +849,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("2023-2024")),
+                        child: _titleText(
+                            adminController.config?.currentYear ?? "")),
                     const Text('Current Year'),
                   ],
                 ),
@@ -857,7 +860,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("2nd Semester")),
+                        child: _titleText(
+                            adminController.config?.currentTerm ?? "")),
                     const Text('Current Term'),
                   ],
                 ),

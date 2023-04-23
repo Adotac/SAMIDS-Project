@@ -13,19 +13,19 @@ class Config {
 
   static Config fromJson(Map<String, dynamic> json) {
     return Config(
-      currentTerm: json['CurrentTerm'],
-      currentYear: json['CurrentYear'],
-      lateMinutes: json['LateMinutes'],
-      absentMinutes: json['AbsentMinutes'],
+      currentTerm: json['currentTerm'],
+      currentYear: json['currentYear'],
+      lateMinutes: json['lateMinutes'],
+      absentMinutes: json['absentMinutes'],
     );
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['CurrentTerm'] = currentTerm;
-    data['CurrentYear'] = currentYear;
-    data['LateMinutes'] = lateMinutes;
-    data['AbsentMinutes'] = absentMinutes;
+    data['currentTerm'] = currentTerm;
+    data['currentYear'] = currentYear;
+    data['lateMinutes'] = lateMinutes;
+    data['absentMinutes'] = absentMinutes;
     return data;
   }
 }
