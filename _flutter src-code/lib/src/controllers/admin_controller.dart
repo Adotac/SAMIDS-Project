@@ -54,13 +54,23 @@ class AdminController with ChangeNotifier {
     studentClasses.clear();
   }
 
-  Config? config;
+  Config config = Config(
+      currentTerm: "1st Semester",
+      currentYear: "2023-2024",
+      lateMinutes: 20,
+      absentMinutes: 30);
 
   void handleEventJsonConfig(CRUDReturn result) {
-    if (result.data.isNotEmpty) {
-      config = Config.fromJson(result.data[0]);
+    try {
+      print(result);
+      print(result.data);
+      if (result.data.isNotEmpty) {
+        config = Config.fromJson(result.data);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonConfig $e $stacktrace');
     }
-    notifyListeners();
   }
 
   Future<void> getConfig() async {

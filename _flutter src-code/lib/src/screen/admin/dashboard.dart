@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/model/config_model.dart';
 
 import '../../controllers/admin_controller.dart';
 import '../../widgets/Csv-upload/students.dart';
@@ -744,7 +745,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("2023-2024")),
+                        child: _titleText(adminController.config.currentYear)),
                     const Text('Current Year'),
                   ],
                 ),
@@ -754,7 +755,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("2nd Semester")),
+                        child: _titleText(adminController.config.currentYear)),
                     const Text('Current Term'),
                   ],
                 ),
@@ -800,7 +801,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("25 mins")),
+                        child: _titleText(
+                            '${adminController.config.lateMinutes} mins')),
                     const Text('Minutes Late'),
                   ],
                 ),
@@ -810,7 +812,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("30 mins")),
+                        child: _titleText(
+                            '${adminController.config.absentMinutes} mins')),
                     const Text('Minutes Absent'),
                   ],
                 ),
@@ -824,8 +827,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _showSetTermDialog(BuildContext context) async {
     final _formKey = GlobalKey<FormState>();
-    String? currentTerm;
-    String? currentYear;
+    String currentTerm = adminController.config.currentTerm;
+    String currentYear = adminController.config.currentYear;
 
     return showDialog<void>(
       context: context,
@@ -839,6 +842,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               child: ListBody(
                 children: <Widget>[
                   TextFormField(
+                    initialValue: adminController.config.currentYear,
                     decoration: const InputDecoration(
                         labelText: 'Current Year',
                         hintText: '(e.g. 2023-2024)'),
@@ -850,10 +854,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     },
                     onChanged: (value) {
                       currentYear = value;
+                      adminController.config.currentYear = currentYear;
                     },
                   ),
                   const SizedBox(height: 12.0),
                   TextFormField(
+                    initialValue: adminController.config.currentTerm,
                     decoration: const InputDecoration(
                         labelText: 'Current Term',
                         hintText: '(e.g. 1st Semester)'),
@@ -866,6 +872,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     },
                     onChanged: (value) {
                       currentTerm = value;
+                      adminController.config!.currentTerm = currentTerm;
                     },
                   ),
                 ],
@@ -884,6 +891,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   // Save the changes to the AdminController Config
+                  print('adminController.config');
+                  print(adminController.config.toJson());
+                  adminController.updateConfig(adminController.config);
                   Navigator.of(context).pop();
                 }
               },
@@ -896,8 +906,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _showSetOfftimeDialog(BuildContext context) async {
     final _formKey = GlobalKey<FormState>();
-    String? lateMinutes;
-    String? absentMinutes;
+    int lateMinutes = adminController.config.lateMinutes;
+    int absentMinutes = adminController.config.absentMinutes;
 
     return showDialog<void>(
       context: context,
@@ -911,31 +921,35 @@ class _AdminDashboardState extends State<AdminDashboard> {
               child: ListBody(
                 children: <Widget>[
                   TextFormField(
+                    initialValue: adminController.config.lateMinutes.toString(),
                     decoration: const InputDecoration(
-                        labelText: 'Late Minutes', hintText: '(e.g. 25 mins)'),
+                        labelText: 'Late Minutes', hintText: '(e.g. 25)'),
                     validator: (value) {
-                      if (!RegExp(r'^\d+ mins$').hasMatch(value!)) {
+                      if (!RegExp(r'^\d+').hasMatch(value!)) {
                         return 'Invalid minutes format';
                       }
                       return null;
                     },
                     onChanged: (value) {
-                      lateMinutes = value;
+                      lateMinutes = int.parse(value);
+                      adminController.config!.lateMinutes = lateMinutes;
                     },
                   ),
                   const SizedBox(height: 12.0),
                   TextFormField(
+                    initialValue:
+                        adminController.config.absentMinutes.toString(),
                     decoration: const InputDecoration(
-                        labelText: 'Absent Minutes',
-                        hintText: '(e.g. 60 mins)'),
+                        labelText: 'Absent Minutes', hintText: '(e.g. 60)'),
                     validator: (value) {
-                      if (!RegExp(r'^\d+ mins$').hasMatch(value!)) {
+                      if (!RegExp(r'^\d+').hasMatch(value!)) {
                         return 'Invalid minutes format';
                       }
                       return null;
                     },
                     onChanged: (value) {
-                      absentMinutes = value;
+                      absentMinutes = int.parse(value);
+                      adminController.config!.absentMinutes = absentMinutes;
                     },
                   ),
                 ],
@@ -955,6 +969,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 if (_formKey.currentState!.validate()) {
 // Save the changes to the AdminController Config
 // You should update the AdminController Config with the new lateMinutes and absentMinutes values
+                  adminController.updateConfig(adminController.config);
                   Navigator.of(context).pop();
                 }
               },
@@ -999,8 +1014,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(
-                            adminController.config?.currentYear ?? "")),
+                        child: _titleText(adminController.config.currentYear)),
                     const Text('Current Year'),
                   ],
                 ),
@@ -1010,8 +1024,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(
-                            adminController.config?.currentTerm ?? "")),
+                        child: _titleText(adminController.config.currentTerm)),
                     const Text('Current Term'),
                   ],
                 ),
@@ -1057,7 +1070,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("25 mins")),
+                        child: _titleText(
+                            '${adminController.config.lateMinutes} mins')),
                     const Text('Minutes Late'),
                   ],
                 ),
@@ -1067,7 +1081,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("30 mins")),
+                        child: _titleText(
+                            '${adminController.config.absentMinutes} mins')),
                     const Text('Minutes Absent'),
                   ],
                 ),

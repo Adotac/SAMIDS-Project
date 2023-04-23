@@ -10,11 +10,15 @@ import 'package:http/http.dart' as http;
 
 class ConfigService {
   static const String _baseUrl = "https://localhost:7170/api";
+  static final Logger _logger = Logger();
 
   static Future<CRUDReturn> getConfig() async {
     try {
       final response = await HttpService.get('$_baseUrl/Config');
-
+      if (kDebugMode) {
+        _logger
+            .i('getFacultiesClasses ${response.statusCode} ${response.body}');
+      }
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           final jsonResponse = jsonDecode(response.body);
@@ -39,11 +43,15 @@ class ConfigService {
 
   static Future<CRUDReturn> updateConfig(Config config) async {
     try {
-      final response = await HttpService.put(
+      final response = await HttpService.post(
         '$_baseUrl/Config',
-        body: jsonEncode(config.toJson()),
+        body: config.toJson(),
+        headers: {"Content-Type": "application/json"},
       );
 
+      if (kDebugMode) {
+        _logger.i('ConfigService ${response.statusCode} ${response.body}');
+      }
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           final jsonResponse = jsonDecode(response.body);
