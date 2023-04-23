@@ -663,27 +663,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _buildConfig(context) {
     return //add scroll view here
-        adminController.config == null
-            ? const SizedBox(
-                height: 500,
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Configurations",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 14.0),
-                  _termInfo(),
-                  const SizedBox(height: 14.0),
-                  _timeOffset(),
-                  const SizedBox(height: 12.0),
-                  Expanded(child: _dataTableClasses(context))
-                ],
-              );
+        // adminController.config == null
+        //     ? const SizedBox(
+        //         height: 500,
+        //         child: CircularProgressIndicator(),
+        //       )
+        //     :
+        Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Configurations",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 14.0),
+        _termInfo(),
+        const SizedBox(height: 14.0),
+        _timeOffset(),
+        const SizedBox(height: 12.0),
+        Expanded(child: _dataTableClasses(context))
+      ],
+    );
   }
 
   Widget _mBuildConfig(context) {
@@ -727,7 +728,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showSetTermDialog(context);
+                  },
                   child: const Text('Set Term'),
                 ),
               ],
@@ -781,7 +784,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showSetOfftimeDialog(context);
+                  },
                   child: const Text('Set offset'),
                 ),
               ],
@@ -817,6 +822,149 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  Future<void> _showSetTermDialog(BuildContext context) async {
+    final _formKey = GlobalKey<FormState>();
+    String? currentTerm;
+    String? currentYear;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Set Term and Year'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: ListBody(
+                children: <Widget>[
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Current Year',
+                        hintText: '(e.g. 2023-2024)'),
+                    validator: (value) {
+                      if (!RegExp(r'^\d{4}-\d{4}$').hasMatch(value!)) {
+                        return 'Invalid year format';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      currentYear = value;
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Current Term',
+                        hintText: '(e.g. 1st Semester)'),
+                    validator: (value) {
+                      if (!RegExp(r'^(1st|2nd|3rd) Semester|Tri Semester$')
+                          .hasMatch(value!)) {
+                        return 'Invalid term format';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      currentTerm = value;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Submit'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  // Save the changes to the AdminController Config
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSetOfftimeDialog(BuildContext context) async {
+    final _formKey = GlobalKey<FormState>();
+    String? lateMinutes;
+    String? absentMinutes;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Set Late and Absent Minutes'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: ListBody(
+                children: <Widget>[
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Late Minutes', hintText: '(e.g. 25 mins)'),
+                    validator: (value) {
+                      if (!RegExp(r'^\d+ mins$').hasMatch(value!)) {
+                        return 'Invalid minutes format';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      lateMinutes = value;
+                    },
+                  ),
+                  const SizedBox(height: 12.0),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Absent Minutes',
+                        hintText: '(e.g. 60 mins)'),
+                    validator: (value) {
+                      if (!RegExp(r'^\d+ mins$').hasMatch(value!)) {
+                        return 'Invalid minutes format';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      absentMinutes = value;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Submit'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+// Save the changes to the AdminController Config
+// You should update the AdminController Config with the new lateMinutes and absentMinutes values
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Card _termInfo() {
     return Card(
       shape: RoundedRectangleBorder(
@@ -835,7 +983,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showSetTermDialog(context);
+                  },
                   child: const Text('Set Term'),
                 ),
               ],
@@ -891,7 +1041,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 const Spacer(),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showSetOfftimeDialog(context);
+                  },
                   child: const Text('Set offset'),
                 ),
               ],
