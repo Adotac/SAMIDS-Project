@@ -189,8 +189,9 @@ class _WebViewState extends State<WebView> {
                 ),
               ),
               if (widget.appBarActionWidget != null) ...[
-                _searchBar(context),
+                widget.appBarActionWidget!
               ],
+              // if (widget.appBarActionWidget == null) _searchBar(context),
             ],
           ),
         ),

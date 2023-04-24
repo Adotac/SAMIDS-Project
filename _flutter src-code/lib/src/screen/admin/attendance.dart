@@ -9,6 +9,7 @@ import '../../controllers/admin_controller.dart';
 import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
+import '../../widgets/attendance_data_source.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/web_view.dart';
 
@@ -52,7 +53,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
 
   Widget _webView(BuildContext context) {
     return WebView(
-      appBarTitle: "Attendance",
+      appBarTitle: "Admin Attendance",
       appBarActionWidget: _searchBar(context),
       selectedWidgetMarker: 1,
       body: AnimatedBuilder(
@@ -64,104 +65,104 @@ class _AdminAttendanceState extends State<AdminAttendance> {
   }
 
   Widget _webAttendanceBody(BuildContext context) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Card(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: _dataTableAttendance(context),
-        ),
-      ),
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      scrollDirection: Axis.vertical,
+      child: _dataTableAttendance(context),
     );
   }
 
   Widget _dataTableAttendance(context) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.all(16.0),
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: DataTable(
-        columns: [
-          _dataColumn("Student ID"),
-          _dataColumn("Name"),
-          _dataColumn("Reference ID"),
-          _dataColumn("Room"),
-          _dataColumn("Subject"),
-          _dataColumn("Date"),
-          _dataColumn("Time In"),
-          _dataColumn("Time Out"),
-          _dataColumn("Remarks"),
-        ],
-        rows: _dataController.allAttendanceList
-            .map((attendance) => _buildAttendanceRow(context, attendance))
-            .toList(),
-      ),
-    );
-  }
-
-  DataCell dataCell(String data) {
-    return DataCell(
-      Text(
-        data,
-      ),
-    );
-  }
-
-  DataRow _buildAttendanceRow(BuildContext context, Attendance attendance) {
-    return DataRow(
-      cells: [
-        dataCell(attendance.student?.studentID.toString() ?? 'No student ID'),
-        dataCell(
-            '${attendance.student?.firstName} ${attendance.student?.lastName}'),
-        dataCell(attendance.attendanceId.toString()),
-        dataCell(attendance.subjectSchedule?.room ?? 'No Room'),
-        dataCell(attendance.subjectSchedule?.subject?.subjectName ??
-            'No subject name'),
-        dataCell(attendance.subjectSchedule?.day.name ?? 'No Day'),
-        dataCell(attendance.actualTimeIn != null
-            ? _dataController.formatTime(attendance.actualTimeIn!)
-            : 'No Time In'),
-        dataCell(attendance.actualTimeOut != null
-            ? _dataController.formatTime(attendance.actualTimeOut!)
-            : 'No Time Out'),
-        DataCell(
-          _dataController.getStatusText(attendance.remarks.name),
-        ),
+    return PaginatedDataTable(
+      columns: [
+        _dataColumn("Student ID"),
+        _dataColumn("Name"),
+        _dataColumn("Reference ID"),
+        _dataColumn("Room"),
+        _dataColumn("Subject"),
+        _dataColumn("Date"),
+        _dataColumn("Day"),
+        _dataColumn("Time In"),
+        _dataColumn("Time Out"),
+        _dataColumn("Remarks"),
       ],
+      showFirstLastButtons: true,
+      rowsPerPage: 20,
+      onPageChanged: (int value) {
+        print('Page changed to $value');
+      },
+      source: _createAttendanceDataSource(),
+    );
+  }
+
+  // AttendanceDataSource _createAttendanceDataSource() {
+  //   return AttendanceDataSource(
+  //     _dataController.allAttendanceList,
+  //     _dataController,
+  //   );
+  // }
+
+  AttendanceDataSource _createAttendanceDataSource() {
+    return AttendanceDataSource(
+      _dataController.filteredAttendanceList,
+      _dataController,
     );
   }
 
   DataColumn _dataColumn(String title) {
+    bool isSortedColumn = _dataController.sortColumn == title;
+
     return DataColumn(
-      label: SizedBox(
-        width: 100, // Set a fixed width as per your requirement
-        child: Flexible(
-          child: Text(
-            title,
-            style: TextStyle(fontStyle: FontStyle.italic),
-            overflow: TextOverflow.ellipsis,
+      label: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          width: 100,
+          // constraints: BoxConstraints(maxWidth: 100),
+          child: InkWell(
+            onTap: () {
+              _dataController.sortAttendance(title);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    overflow: TextOverflow.ellipsis,
+                    title,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                if (isSortedColumn)
+                  Icon(
+                    _dataController.sortAscending
+                        ? Icons.arrow_drop_up_rounded
+                        : Icons.arrow_drop_down_rounded,
+                    color: Theme.of(context).primaryColor,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
+      numeric: false,
     );
   }
 
-  Container _searchBar(context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      height: 42,
+  Widget _searchBar(context) {
+    return SizedBox(
+      // padding: const EdgeInsets.symmetric(horizontal: 12),
+      // height: 42,
       width: MediaQuery.of(context).size.width * .30,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Colors.grey, width: 1)),
+      // decoration: BoxDecoration(
+      //     color: Colors.white,
+      //     shape: BoxShape.rectangle,
+      //     borderRadius: BorderRadius.circular(5),
+      //     border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
         autofocus: true,
-        onSubmitted: (_textEditingController) {
-          if (kDebugMode) {
-            print(_textEditingController.toString());
-          }
+        onSubmitted: (query) {
+          // Call filterAttendance with the search query entered by the user
+          _dataController.filterAttendance(query);
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

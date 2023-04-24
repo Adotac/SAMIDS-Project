@@ -7,6 +7,7 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
 
@@ -23,12 +24,15 @@ class AdminController with ChangeNotifier {
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
+  List<Attendance> filteredAttendanceList = [];
 
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
+  bool sortAscending = true;
 
+  String sortColumn = "";
   String currentYear = '';
   String currentTerm = '';
 
@@ -36,13 +40,39 @@ class AdminController with ChangeNotifier {
   String absentMinutes = '';
 
   AdminController();
+  final Logger _logger = Logger();
 
+  static AdminController get I => GetIt.instance<AdminController>();
+  static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
   }
 
-  static AdminController get I => GetIt.instance<AdminController>();
-  static AdminController get instance => GetIt.instance<AdminController>();
+  void filterAttendance(String query) {
+    if (query.isEmpty) {
+      filteredAttendanceList = allAttendanceList;
+    } else {
+      filteredAttendanceList = allAttendanceList.where((attendance) {
+        final studentNo = attendance.student?.studentNo.toString() ?? '';
+        final firstName = attendance.student?.firstName.toLowerCase() ?? '';
+        final lastName = attendance.student?.lastName.toLowerCase() ?? '';
+        final subjectName =
+            attendance.subjectSchedule?.subject?.subjectName.toLowerCase() ??
+                '';
+
+        final room = attendance.subjectSchedule?.room.toLowerCase() ?? '';
+        final remarks = attendance.remarks.name.toLowerCase();
+        return firstName.contains(query.toLowerCase()) ||
+            studentNo.toString() == query ||
+            lastName.contains(query.toLowerCase()) ||
+            subjectName.contains(query.toLowerCase()) ||
+            room.contains(query.toLowerCase()) ||
+            remarks.contains(query.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
+  }
+
   logout() {
     isStudentClassesCollected = false;
     isCountCalculated = false;
@@ -84,6 +114,74 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  void sortAttendance(String column) {
+    sortAscending = sortColumn == column ? !sortAscending : true;
+    sortColumn = column;
+
+    int order = sortAscending ? 1 : -1;
+
+    switch (column) {
+      case "Student ID":
+        filteredAttendanceList.sort((a, b) =>
+            order *
+            (a.student?.studentNo.compareTo(b.student?.studentNo ?? 0) ?? 0));
+        break;
+      case "Name":
+        filteredAttendanceList.sort((a, b) {
+          int compare =
+              a.student?.lastName.compareTo(b.student?.lastName ?? '') ?? 0;
+          if (compare == 0) {
+            compare =
+                a.student?.firstName.compareTo(b.student?.firstName ?? '') ?? 0;
+          }
+          return order * compare;
+        });
+        break;
+      case "Reference ID":
+        filteredAttendanceList
+            .sort((a, b) => order * a.attendanceId.compareTo(b.attendanceId));
+        break;
+      case "Room":
+        filteredAttendanceList.sort((a, b) =>
+            order *
+            (a.subjectSchedule?.room.compareTo(b.subjectSchedule?.room ?? '') ??
+                0));
+        break;
+      case "Subject":
+        filteredAttendanceList.sort((a, b) =>
+            order *
+            (a.subjectSchedule?.subject?.subjectName
+                    .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
+                0));
+        break;
+      case "Day":
+        filteredAttendanceList.sort((a, b) =>
+            order *
+            (a.subjectSchedule?.day.index as num)
+                .compareTo(b.subjectSchedule?.day.index as num));
+        break;
+      case "Date":
+        filteredAttendanceList.sort((a, b) =>
+            order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));
+        break;
+      case "Time In":
+        filteredAttendanceList.sort((a, b) =>
+            order *
+            (a.actualTimeIn?.hour.compareTo(b.actualTimeIn?.hour ?? 0) ?? 0));
+        break;
+      case "Time Out":
+        filteredAttendanceList.sort((a, b) =>
+            order *
+            (a.actualTimeOut?.hour.compareTo(b.actualTimeOut?.hour ?? 0) ?? 0));
+        break;
+      case "Remarks":
+        filteredAttendanceList
+            .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
+        break;
+    }
+    notifyListeners();
+  }
+
   Future<void> updateConfig(Config newConfig) async {
     try {
       CRUDReturn response = await ConfigService.updateConfig(newConfig);
@@ -111,23 +209,24 @@ class AdminController with ChangeNotifier {
     for (Map<String, dynamic> map in result.data) {
       allAttendanceList.add(Attendance.fromJson(map));
     }
-
+    filteredAttendanceList = allAttendanceList;
     notifyListeners();
   }
 
-  // Future<void> getStudentClasses() async {
-  //   try {
-  //     if (isStudentClassesCollected) return;
-  //     CRUDReturn response =
-  //         await StudentService.getStudentClasses(faculty.facultyNo);
-  //     if (response.success) {
-  //       handleEventJsonStudentClasses(response);
-  //     }
-  //     notifyListeners();
-  //   } catch (e, stacktrace) {
-  //     print('StudentDashboardController getStudentClasses $e $stacktrace');
-  //   }
-  // }
+  Future<void> getAttendanceAll() async {
+    try {
+      if (isAllAttendanceCollected) return;
+      CRUDReturn response = await AttendanceService.getAll();
+
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        isAllAttendanceCollected = true;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      _logger.i('StudentDashboardController getAttendanceAll $e $stacktrace');
+    }
+  }
 
   void handleEventJsonStudentClasses(CRUDReturn result) {
     try {
@@ -135,46 +234,12 @@ class AdminController with ChangeNotifier {
       for (Map<String, dynamic> map in result.data) {
         studentClasses.add(SubjectSchedule.fromJson(map));
       }
-
       isStudentClassesCollected = true;
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonStudentClasses $e $stacktrace');
     }
   }
-
-  //create function to query to FacultyService getFacultyClasses
-  // Future<void> getFacultyClasses() async {
-  //   try {
-  //     if (isStudentClassesCollected) return;
-  //     CRUDReturn response =
-  //         await FacultyService.getFacultyClasses();
-  //     if (response.success) {
-  //       handleEventJsonStudentClasses(response);
-  //     }
-  //     notifyListeners();
-  //   } catch (e, stacktrace) {
-  //     print('StudentDashboardController getStudentClasses $e $stacktrace');
-  //   }
-  // }
-
-  // Future<void> getAttendanceAll() async {
-  //   try {
-  //     if (isAllAttendanceCollected) return;
-  //     CRUDReturn response = await AttendanceService.getAll(
-  //       studentNo: faculty.facultyNo,
-  //     );
-
-  //     if (response.success) {
-  //       await handEventJsonAttendanceAll(response);
-  //       getRemarksCount();
-  //       isAllAttendanceCollected = true;
-  //       notifyListeners();
-  //     }
-  //   } catch (e, stacktrace) {
-  //     print('StudentDashboardController getAttendanceAll $e $stacktrace');
-  //   }
-  // }
 
   String formatTime(DateTime dateTime) {
     final formattedTime = DateFormat('hh:mm a').format(dateTime);

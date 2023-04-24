@@ -28,6 +28,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     adminController.getConfig();
+    adminController.getAttendanceAll();
     super.initState();
   }
 
