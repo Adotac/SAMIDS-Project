@@ -5,26 +5,27 @@ import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../controllers/admin_controller.dart';
 import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/web_view.dart';
 
-class Admin extends StatefulWidget {
-  static const routeName = '/faculty-attendance';
-  final FacultyController dataController;
+class AdminAttendance extends StatefulWidget {
+  static const routeName = '/admin-attendance';
+  final AdminController adminController;
 
-  const Admin({super.key, required this.dataController});
+  const AdminAttendance({super.key, required this.adminController});
 
   @override
-  State<Admin> createState() => _AdminState();
+  State<AdminAttendance> createState() => _AdminAttendanceState();
 }
 
-class _AdminState extends State<Admin> {
+class _AdminAttendanceState extends State<AdminAttendance> {
   final _textEditingController = TextEditingController();
 
-  FacultyController get _dataController => widget.dataController;
+  AdminController get _dataController => widget.adminController;
 
   @override
   void initState() {

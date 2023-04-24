@@ -1,9 +1,13 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/controllers/admin_controller.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/admin/attendance.dart';
+import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
@@ -21,6 +25,7 @@ class SideMenu extends StatefulWidget {
   }) : super(key: key);
   int selectedWidgetMarker;
   @override
+  // ignore: library_private_types_in_public_api
   _SideMenuState createState() => _SideMenuState();
 }
 
@@ -76,7 +81,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Dashboard',
             index: 0,
             onTap: () {
-              int userType = _authController.loggedInUser!.type.index;
+              int userType = _authController.loggedInUser?.type.index ?? -1;
               switch (userType) {
                 case 0:
                   Navigator.popAndPushNamed(
@@ -86,6 +91,11 @@ class _SideMenuState extends State<SideMenu> {
                   Navigator.popAndPushNamed(
                       context, FacultyDashboard.routeName);
                   break;
+                default:
+                  Navigator.popAndPushNamed(
+                    context,
+                    AdminDashboard.routeName,
+                  );
               }
             },
           ),
@@ -94,7 +104,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Attendance',
             index: 1,
             onTap: () {
-              int userType = _authController.loggedInUser!.type.index;
+              int userType = _authController.loggedInUser?.type.index ?? -1;
               switch (userType) {
                 case 0:
                   Navigator.popAndPushNamed(
@@ -104,16 +114,25 @@ class _SideMenuState extends State<SideMenu> {
                   Navigator.popAndPushNamed(
                       context, FacultyAttendance.routeName);
                   break;
+
+                default:
+                  Navigator.popAndPushNamed(
+                    context,
+                    AdminAttendance.routeName,
+                  );
               }
             },
           ),
-          _buildListTile(
-            icon: Icons.settings_outlined,
-            title: 'Settings',
-            index: 2,
-            onTap: () {
-              Navigator.popAndPushNamed(context, SettingsPage.routeName);
-            },
+          Visibility(
+            visible: _authController.loggedInUser != null,
+            child: _buildListTile(
+              icon: Icons.settings_outlined,
+              title: 'Settings',
+              index: 2,
+              onTap: () {
+                Navigator.popAndPushNamed(context, SettingsPage.routeName);
+              },
+            ),
           ),
           const Spacer(),
           _buildListTile(
@@ -121,7 +140,7 @@ class _SideMenuState extends State<SideMenu> {
             title: 'Logout',
             index: 3,
             onTap: () {
-              int userType = _authController.loggedInUser!.type.index;
+              int userType = _authController.loggedInUser?.type.index ?? -1;
               switch (userType) {
                 case 0:
                   StudentController.instance.dispose();
@@ -131,6 +150,9 @@ class _SideMenuState extends State<SideMenu> {
                   FacultyController.instance.dispose();
                   GetIt.instance.unregister<FacultyController>();
                   break;
+                default:
+                  AdminController.instance.dispose();
+                  GetIt.instance.unregister<AdminController>();
               }
 
               _authController.logout();

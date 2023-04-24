@@ -932,7 +932,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     },
                     onChanged: (value) {
                       lateMinutes = int.parse(value);
-                      adminController.config!.lateMinutes = lateMinutes;
+                      adminController.config.lateMinutes = lateMinutes;
                     },
                   ),
                   const SizedBox(height: 12.0),

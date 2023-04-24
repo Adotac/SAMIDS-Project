@@ -8,6 +8,7 @@ import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/controllers/admin_controller.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
+import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
@@ -210,6 +211,12 @@ class MyApp extends StatelessWidget {
                     builder: (_) => AdminDashboard(
                           adminController: AdminController.instance,
                         ));
+              case AdminAttendance.routeName:
+                return MaterialPageRoute(
+                  builder: (_) => AdminAttendance(
+                    adminController: AdminController.instance,
+                  ),
+                );
               case FacultyDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => FacultyDashboard(
