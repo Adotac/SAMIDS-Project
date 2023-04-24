@@ -5,7 +5,7 @@
 #include <MFRC522.h>
 
 #include <ESP8266WiFi.h>
-#include <PubSubClient.h>
+#include <PicoMQTT.h>
 #include <ArduinoJson.h>
 
 #include <Arduino.h>
@@ -28,14 +28,16 @@ typedef struct ESPCAM_MESSAGE {
 } espcam_message;
 
 typedef struct ESPRFID_MESSAGE {
-  char message[32];
+  char message[MSG_SIZE];
   bool deviceFlag;
 } esprfid_message;
 
 void printSeparationLine();
 
-void esprfidToJson(const esprfid_message& data, String& json);
-void espcamFromJson(const String& json, espcam_message& data);
+JsonVariant esprfidToJson(esprfid_message& data, const char* msg, bool device);
+void espcamFromJson(const char* json, espcam_message& data);
 void printBroadcastAddress();
+
+void publishMessage(PicoMQTT::Client& mqttClient, String topic, const JsonVariant& jsonVariant);
 
 #endif

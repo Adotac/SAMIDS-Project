@@ -4,6 +4,7 @@
 /__pycache__
 /demo/__pycache__
 /dataset
+/models
 
 /demo/custom/images/*
 !demo/custom/images/person/

@@ -1,5 +1,9 @@
 #include "rfid_Impl.h"
 
+#if __has_include("config.h")
+#include "config.h"
+#endif
+
 // MAC Address of responder - edit as required
 uint8_t broadcastAddress[MACSIZE] = {MAC_ESP32CAM};
 
@@ -9,9 +13,9 @@ constexpr uint8_t SS_PIN = D4;     // Configurable, see typical pin layout above
 String deviceNumber = String("101");
 String deviceId = String(deviceNumber + "_RFID");
 
-String pubtopic = String("mqtt/RFID/attendance/" + deviceNumber); // publish to be read by deviceCAM
+String pubtopic = String("mqtt/attendance/" + deviceNumber); // publish to be read by deviceCAM
 String subtopic = String("mqtt/API/response/" + deviceId); // from the API
-String camtopic = String("mqtt/DEVICE/" + deviceNumber);
+String camtopic = String("mqtt/DEVICE/" + deviceNumber + "_CAM");
 
 // Create instances
 MFRC522 rfid(SS_PIN, RST_PIN);
@@ -21,10 +25,16 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 2000;  // send readings timer
 
 bool deviceFlag = false;
+bool retrySend = false;
+
+esprfid_message myData;
 String tag = "";
 
-WiFiClient espClient;
-PubSubClient client(espClient);
+PicoMQTT::Client client(
+    MQTT_HOST,    // broker address (or IP)
+    MQTT_PORT,                   // broker port (defaults to 1883)
+    deviceId.c_str()           // Client ID
+);
 
 void setup_wifi() {
 
@@ -50,65 +60,6 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-
-  String jsonPayload;
-  for (int i = 0; i < length; i++) {
-    jsonPayload += (char)payload[i];
-  }
-  Serial.print(jsonPayload);
-  Serial.print("] ");
-
-  Serial.println();
-
-  espcam_message receivedData;
-  espcamFromJson(jsonPayload, receivedData);
-
-  deviceFlag = receivedData.deviceFlag;
-
-  if(receivedData.attendanceFlag){
-    //display shet
-    setLCD("Attendance", 0, 0, true);
-    setLCD("Recorded", 0, 1, false);
-  }
-
-  // // Switch on the LED if an 1 was received as first character
-  // if ((char)payload[0] == '1') {
-  //   digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-  //   // but actually the LED is on; this is because
-  //   // it is active low on the ESP-01)
-  // } else {
-  //   digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-  // }
-
-}
-
-void reconnect() {
-  // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    // Create a random client ID
-    // Attempt to connect
-    if (client.connect(deviceId.c_str())) {
-      Serial.println("connected");
-      // Once connected, publish an announcement...
-      client.publish("mqtt/IDLE/connect", deviceNumber.c_str());
-      // ... and resubscribe
-      client.subscribe(camtopic.c_str());
-      client.subscribe(subtopic.c_str());
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
-      delay(5000);
-    }
-  }
-}
-
 void setup() {
   Serial.begin(115200);
 
@@ -119,9 +70,54 @@ void setup() {
 
   setup_wifi(); 
   while (!Serial && millis() < 5000);
-  client.setServer(MQTT_HOST, MQTT_PORT);
-  client.setCallback(callback);
-  client.setKeepAlive(500);
+
+   // Subscribe to a topic and attach a callback
+  client.subscribe(camtopic, [](const char * topic, const char * payload) {
+    // payload might be binary, but PicoMQTT guarantees that it's zero-terminated
+    Serial.printf("Received message in topic '%s': %s\n", topic, payload);
+    espcam_message camData;
+
+    espcamFromJson(payload, camData);
+
+    deviceFlag = camData.deviceFlag;
+
+    if(camData.displayFlag){
+      if(strlen(camData.message) < (MSG_SIZE/2)){
+        String iString(camData.message);
+        setLCD(iString.substring(0, MSG_SIZE/2).c_str(), 0, 0, true);
+        setLCD(iString.substring(MSG_SIZE/2).c_str(), 0, 1, false);
+      }
+      else{
+        setLCD(camData.message, 0, 0, true);
+      }
+    }
+    delay(5000);
+
+  });
+
+  client.subscribe(subtopic, [](const char * topic, const char * payload) {
+    // payload might be binary, but PicoMQTT guarantees that it's zero-terminated
+    Serial.printf("Received message in topic '%s': %s\n", topic, payload);
+    espcam_message camData;
+
+    espcamFromJson(payload, camData);
+
+    deviceFlag = camData.deviceFlag;
+
+    if(camData.attendanceFlag){
+      Serial.println("Attendance Verified!");
+      setLCD("Attendance", 0, 0, true);
+      setLCD("Verified!", 0, 1, false);
+
+    }
+    else{
+      Serial.println("Attendance Failed!");
+      setLCD("Attendance", 0, 0, true);
+      setLCD("Failed!", 0, 1, false);
+    }
+
+    delay(5000);
+  });
 
   // Initialize RFID
   SPI.begin();
@@ -129,16 +125,17 @@ void setup() {
 
   Serial.println("ESP8226 now has started!!");
   setLCD("Device Ready!", 0, 0, true);
+  delay(4000);
 
-  delay(1000);
+  setLCD("Connecting to", 0, 0, true);
+  setLCD(" MQTT Broker ", 0, 1, false);
+  client.begin();
+
+  delay(2000);
 }
 
 void loop() {
-  if (!client.connected()) {
-    setLCD("Connecting to", 0, 0, true);
-    setLCD(" MQTT Broker ", 0, 1, false);
-    reconnect();
-  }
+
   client.loop();
 
   if(deviceFlag){
@@ -154,14 +151,13 @@ void loop() {
       }
     }
     else{
-      // SendNow(tag.c_str(), camDevice);
-      client.publish(pubtopic.c_str(), tag.c_str());
+      publishMessage(client, pubtopic, esprfidToJson(myData, tag.c_str(), deviceFlag));
     }
 
-    tag = "";
+    tag.clear();
     rfid.PICC_HaltA();
     rfid.PCD_StopCrypto1();
-
+  
   }
   else{
     setLCD("Synchronizing...", 0, 0, true);

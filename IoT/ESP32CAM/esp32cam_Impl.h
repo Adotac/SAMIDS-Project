@@ -15,12 +15,11 @@
 #include "Arduino.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <PicoMQTT.h>
 
 #include "soc/soc.h" // Disable brownout problems
 #include "soc/rtc_cntl_reg.h" // Disable brownout problems
 #include "driver/rtc_io.h"
-
-
 
 // OV2640 camera module pins (CAMERA_MODEL_AI_THINKER)
 #define PWDN_GPIO_NUM 32
@@ -52,6 +51,10 @@
 
 extern uint8_t broadcastAddress[MACSIZE];
 
+extern const String deviceId;
+extern const String subtopic; // publish to be read by deviceCAM
+extern const String camtopic; // publish to send device state
+
 typedef struct ESPCAM_MESSAGE {
   char message[MSG_SIZE];
   bool attendanceFlag;
@@ -68,11 +71,15 @@ bool initCamera();
 String JsonData(camera_fb_t *fb, bool flag, long id);
 const char* capturePhoto(camera_fb_t*& fb);
 uint8_t * captureBufferPhoto(camera_fb_t*& imagedata);
-void flash(int n);
+void flash(bool on);
 void printSeparationLine();
+bool isAllNumbers(const char* arr, int arrLength);
 
 void espcamToJson(const espcam_message& data, String& json);
-void espcamToJson(espcam_message& data, String& json, const char* msg, bool af, bool df, bool device);
+JsonVariant espcamToJson(espcam_message& data, const char* msg, bool af, bool df, bool device);
 void esprfidFromJson(const String& json, esprfid_message& data);
+
+void publishMessage(PicoMQTT::Client& mqttClient, String topic, const JsonVariant& jsonMessage);
+
 
 #endif
