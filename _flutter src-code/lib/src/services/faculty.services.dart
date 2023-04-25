@@ -12,9 +12,17 @@ class FacultyService {
   static final Logger _logger = Logger();
 
   static Future<CRUDReturn> getFaculties() async {
-    final response = await HttpService.get('$_baseUrl/Faculty');
-    final jsonResponse = json.decode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
+    try {
+      final response = await HttpService.get('$_baseUrl/Faculty');
+      final jsonResponse = json.decode(response.body);
+      if (kDebugMode) {
+        _logger.i('getFaculties ${response.statusCode} ${response.body}');
+      }
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' getFaculties $e $stacktrace');
+      rethrow;
+    }
   }
 
   static Future<CRUDReturn> getFacultyClasses(int id) async {

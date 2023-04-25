@@ -11,6 +11,7 @@ import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/attendance_data_source.dart';
 import '../../widgets/card_small.dart';
+import '../../widgets/mobile_view.dart';
 import '../../widgets/web_view.dart';
 
 class AdminAttendance extends StatefulWidget {
@@ -43,11 +44,29 @@ class _AdminAttendanceState extends State<AdminAttendance> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 768) {
-          return SizedBox();
-          // _mobileView(context);
+          return _mobileView(context);
         }
         return _webView(context);
       },
+    );
+  }
+
+  Widget _mobileView(BuildContext context) {
+    return MobileView(
+      appBarOnly: true,
+      appBarTitle: "Admin Attendance",
+      currentIndex: 1, // Set the appropriate index for the current screen
+      body: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _searchBar(context),
+        ),
+        SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          scrollDirection: Axis.vertical,
+          child: _dataTableAttendance(context),
+        ),
+      ],
     );
   }
 
@@ -113,34 +132,30 @@ class _AdminAttendanceState extends State<AdminAttendance> {
     bool isSortedColumn = _dataController.sortColumn == title;
 
     return DataColumn(
-      label: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Container(
-          width: 100,
-          // constraints: BoxConstraints(maxWidth: 100),
-          child: InkWell(
-            onTap: () {
-              _dataController.sortAttendance(title);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    overflow: TextOverflow.ellipsis,
-                    title,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+      label: SizedBox(
+        width: 100,
+        child: InkWell(
+          onTap: () {
+            _dataController.sortAttendance(title);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  overflow: TextOverflow.ellipsis,
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                if (isSortedColumn)
-                  Icon(
-                    _dataController.sortAscending
-                        ? Icons.arrow_drop_up_rounded
-                        : Icons.arrow_drop_down_rounded,
-                    color: Theme.of(context).primaryColor,
-                  ),
-              ],
-            ),
+              ),
+              if (isSortedColumn)
+                Icon(
+                  _dataController.sortAscending
+                      ? Icons.arrow_drop_up_rounded
+                      : Icons.arrow_drop_down_rounded,
+                  color: Theme.of(context).primaryColor,
+                ),
+            ],
           ),
         ),
       ),

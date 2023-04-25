@@ -10,6 +10,7 @@ import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
+import 'package:samids_web_app/src/screen/admin/manage_users.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 
@@ -206,6 +207,11 @@ class MyApp extends StatelessWidget {
           onGenerateRoute: (RouteSettings settings) {
             print(settings.name);
             switch (settings.name) {
+              case AdminMngUsers.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => AdminMngUsers(
+                          adminController: AdminController.instance,
+                        ));
               case AdminDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => AdminDashboard(

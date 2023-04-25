@@ -16,10 +16,15 @@ class StudentService {
   static const String _baseUrl = "https://localhost:7170/api";
 
   static Future<CRUDReturn> getStudents() async {
-    final response = await HttpService.get(
-      '$_baseUrl/Student',
-    );
-    return CRUDReturn.fromJson(jsonDecode(response.body));
+    try {
+      final response = await HttpService.get(
+        '$_baseUrl/Student',
+      );
+      return CRUDReturn.fromJson(jsonDecode(response.body));
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' getStudents $e $stacktrace');
+      rethrow;
+    }
   }
 
   static Future<CRUDReturn> getStudentById(int id) async {

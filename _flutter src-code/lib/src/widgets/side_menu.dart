@@ -8,6 +8,7 @@ import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
+import 'package:samids_web_app/src/screen/admin/manage_users.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
@@ -122,6 +123,17 @@ class _SideMenuState extends State<SideMenu> {
                   );
               }
             },
+          ),
+          Visibility(
+            visible: _authController.loggedInUser == null,
+            child: _buildListTile(
+              icon: Icons.group_outlined,
+              title: 'Users',
+              index: 2,
+              onTap: () {
+                Navigator.popAndPushNamed(context, AdminMngUsers.routeName);
+              },
+            ),
           ),
           Visibility(
             visible: _authController.loggedInUser != null,

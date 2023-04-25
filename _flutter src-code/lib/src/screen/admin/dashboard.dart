@@ -28,7 +28,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     adminController.getConfig();
+    adminController.getStudents();
     adminController.getAttendanceAll();
+    adminController.getFaculties();
     super.initState();
   }
 
@@ -70,6 +72,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             currentIndex: 0,
             body: [
               SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Column(
                   children: [
                     _mBuildConfig(context),
@@ -664,52 +667,56 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildConfig(context) {
-    return //add scroll view here
-        // adminController.config == null
-        //     ? const SizedBox(
-        //         height: 500,
-        //         child: CircularProgressIndicator(),
-        //       )
-        //     :
-        Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Configurations",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 14.0),
-        _termInfo(),
-        const SizedBox(height: 14.0),
-        _timeOffset(),
-        const SizedBox(height: 12.0),
-        Expanded(child: _dataTableClasses(context))
-      ],
-    );
+    return adminController.config == null
+        ? const SizedBox(
+            height: 500,
+            child: CircularProgressIndicator(),
+          )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Configurations",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 14.0),
+              _termInfo(),
+              const SizedBox(height: 14.0),
+              _timeOffset(),
+              const SizedBox(height: 12.0),
+              Expanded(child: _dataTableClasses(context))
+            ],
+          );
   }
 
   Widget _mBuildConfig(context) {
     return //add scroll view here
-        Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Configurations",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8.0),
-          _mTermInfo(),
-          const SizedBox(height: 8.0),
-          _mTimeOffset(),
-          const SizedBox(height: 8.0),
-          // Expanded(child: _dataTableClasses(context))
-        ],
-      ),
-    );
+        adminController.config == null
+            ? const SizedBox(
+                height: 500,
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                margin: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Configurations",
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8.0),
+                    _mTermInfo(),
+                    const SizedBox(height: 8.0),
+                    _mTimeOffset(),
+                    const SizedBox(height: 8.0),
+                    // Expanded(child: _dataTableClasses(context))
+                  ],
+                ),
+              );
   }
 
   Widget _mTermInfo() {
@@ -746,7 +753,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(adminController.config.currentYear)),
+                        child: _titleText(adminController.config!.currentYear)),
                     const Text('Current Year'),
                   ],
                 ),
@@ -756,7 +763,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(adminController.config.currentYear)),
+                        child: _titleText(adminController.config!.currentYear)),
                     const Text('Current Term'),
                   ],
                 ),
@@ -803,7 +810,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: _titleText(
-                            '${adminController.config.lateMinutes} mins')),
+                            '${adminController.config!.lateMinutes} mins')),
                     const Text('Minutes Late'),
                   ],
                 ),
@@ -814,7 +821,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: _titleText(
-                            '${adminController.config.absentMinutes} mins')),
+                            '${adminController.config!.absentMinutes} mins')),
                     const Text('Minutes Absent'),
                   ],
                 ),
@@ -828,8 +835,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _showSetTermDialog(BuildContext context) async {
     final _formKey = GlobalKey<FormState>();
-    String currentTerm = adminController.config.currentTerm;
-    String currentYear = adminController.config.currentYear;
+    String currentTerm = adminController.config!.currentTerm;
+    String currentYear = adminController.config!.currentYear;
 
     return showDialog<void>(
       context: context,
@@ -843,7 +850,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               child: ListBody(
                 children: <Widget>[
                   TextFormField(
-                    initialValue: adminController.config.currentYear,
+                    initialValue: adminController.config!.currentYear,
                     decoration: const InputDecoration(
                         labelText: 'Current Year',
                         hintText: '(e.g. 2023-2024)'),
@@ -855,12 +862,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     },
                     onChanged: (value) {
                       currentYear = value;
-                      adminController.config.currentYear = currentYear;
+                      adminController.config!.currentYear = currentYear;
                     },
                   ),
                   const SizedBox(height: 12.0),
                   TextFormField(
-                    initialValue: adminController.config.currentTerm,
+                    initialValue: adminController.config!.currentTerm,
                     decoration: const InputDecoration(
                         labelText: 'Current Term',
                         hintText: '(e.g. 1st Semester)'),
@@ -893,8 +900,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 if (_formKey.currentState!.validate()) {
                   // Save the changes to the AdminController Config
                   print('adminController.config');
-                  print(adminController.config.toJson());
-                  adminController.updateConfig(adminController.config);
+                  print(adminController.config!.toJson());
+                  adminController.updateConfig(adminController.config!);
                   Navigator.of(context).pop();
                 }
               },
@@ -907,8 +914,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _showSetOfftimeDialog(BuildContext context) async {
     final _formKey = GlobalKey<FormState>();
-    int lateMinutes = adminController.config.lateMinutes;
-    int absentMinutes = adminController.config.absentMinutes;
+    int lateMinutes = adminController.config!.lateMinutes;
+    int absentMinutes = adminController.config!.absentMinutes;
 
     return showDialog<void>(
       context: context,
@@ -922,7 +929,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
               child: ListBody(
                 children: <Widget>[
                   TextFormField(
-                    initialValue: adminController.config.lateMinutes.toString(),
+                    initialValue:
+                        adminController.config!.lateMinutes.toString(),
                     decoration: const InputDecoration(
                         labelText: 'Late Minutes', hintText: '(e.g. 25)'),
                     validator: (value) {
@@ -933,13 +941,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     },
                     onChanged: (value) {
                       lateMinutes = int.parse(value);
-                      adminController.config.lateMinutes = lateMinutes;
+                      adminController.config!.lateMinutes = lateMinutes;
                     },
                   ),
                   const SizedBox(height: 12.0),
                   TextFormField(
                     initialValue:
-                        adminController.config.absentMinutes.toString(),
+                        adminController.config!.absentMinutes.toString(),
                     decoration: const InputDecoration(
                         labelText: 'Absent Minutes', hintText: '(e.g. 60)'),
                     validator: (value) {
@@ -970,7 +978,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 if (_formKey.currentState!.validate()) {
 // Save the changes to the AdminController Config
 // You should update the AdminController Config with the new lateMinutes and absentMinutes values
-                  adminController.updateConfig(adminController.config);
+                  adminController.updateConfig(adminController.config!);
                   Navigator.of(context).pop();
                 }
               },
@@ -1015,7 +1023,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(adminController.config.currentYear)),
+                        child: _titleText(adminController.config!.currentYear)),
                     const Text('Current Year'),
                   ],
                 ),
@@ -1025,7 +1033,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(adminController.config.currentTerm)),
+                        child: _titleText(adminController.config!.currentTerm)),
                     const Text('Current Term'),
                   ],
                 ),
@@ -1072,7 +1080,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: _titleText(
-                            '${adminController.config.lateMinutes} mins')),
+                            '${adminController.config!.lateMinutes} mins')),
                     const Text('Minutes Late'),
                   ],
                 ),
@@ -1083,7 +1091,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: _titleText(
-                            '${adminController.config.absentMinutes} mins')),
+                            '${adminController.config!.absentMinutes} mins')),
                     const Text('Minutes Absent'),
                   ],
                 ),

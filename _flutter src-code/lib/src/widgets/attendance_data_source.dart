@@ -52,9 +52,11 @@ class AttendanceDataSource extends DataTableSource {
     return DataCell(
       SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Text(
-          overflow: TextOverflow.ellipsis,
-          data,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 120),
+          child: Text(
+            data,
+          ),
         ),
       ),
     );

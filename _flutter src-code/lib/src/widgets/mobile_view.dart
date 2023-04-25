@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 
+import '../controllers/auth.controller.dart';
+import '../screen/admin/attendance.dart';
+import '../screen/admin/dashboard.dart';
+import '../screen/faculty/attendance.dart';
+import '../screen/faculty/dashboard.dart';
 import '../screen/settings.dart';
 import '../screen/student/attendance.dart';
 import '../screen/student/classes.dart';
@@ -25,12 +30,13 @@ class MobileView extends StatefulWidget {
     this.showAppBar = true,
     this.appBarOnly = false,
   }) : super(key: key);
-
+  final AuthController authController = AuthController.instance;
   @override
   State<MobileView> createState() => _MobileViewState();
 }
 
 class _MobileViewState extends State<MobileView> {
+  AuthController get _authController => widget.authController;
   Widget _buildBottomNavigationBar(context, int currentIndex) {
     // Get the current theme's brightness
     Brightness brightness = Theme.of(context).brightness;
@@ -88,10 +94,38 @@ class _MobileViewState extends State<MobileView> {
       onTap: (int index) {
         switch (index) {
           case 0:
-            Navigator.of(context).popAndPushNamed(StudentDashboard.routeName);
+            int userType = _authController.loggedInUser?.type.index ?? -1;
+            switch (userType) {
+              case 0:
+                Navigator.popAndPushNamed(context, StudentDashboard.routeName);
+                break;
+              case 1:
+                Navigator.popAndPushNamed(context, FacultyDashboard.routeName);
+                break;
+              default:
+                Navigator.popAndPushNamed(
+                  context,
+                  AdminDashboard.routeName,
+                );
+            }
+
             break;
           case 1:
-            Navigator.of(context).popAndPushNamed(StudentAttendance.routeName);
+            int userType = _authController.loggedInUser?.type.index ?? -1;
+            switch (userType) {
+              case 0:
+                Navigator.popAndPushNamed(context, StudentAttendance.routeName);
+                break;
+              case 1:
+                Navigator.popAndPushNamed(context, FacultyAttendance.routeName);
+                break;
+
+              default:
+                Navigator.popAndPushNamed(
+                  context,
+                  AdminAttendance.routeName,
+                );
+            }
             break;
           case 2:
             Navigator.of(context).popAndPushNamed(StudentClasses.routeName);

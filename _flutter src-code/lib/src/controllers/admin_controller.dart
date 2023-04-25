@@ -16,6 +16,7 @@ import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/config_model.dart';
 import '../model/faculty_model.dart';
+import '../model/student_model.dart';
 import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
@@ -25,21 +26,26 @@ class AdminController with ChangeNotifier {
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
   List<Attendance> filteredAttendanceList = [];
+  List<Student> students = [];
+
+  List<Faculty> filteredFaculties = [];
 
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
   bool sortAscending = true;
+  bool sortAscendingStudent = true;
 
   String sortColumn = "";
   String currentYear = '';
   String currentTerm = '';
-
+  String sortColumnStudent = "";
   String lateMinutes = '';
   String absentMinutes = '';
 
-  AdminController();
+  String sortColumnFaculties = '';
+  bool sortAscendingFaculties = true;
   final Logger _logger = Logger();
 
   static AdminController get I => GetIt.instance<AdminController>();
@@ -84,16 +90,10 @@ class AdminController with ChangeNotifier {
     studentClasses.clear();
   }
 
-  Config config = Config(
-      currentTerm: "1st Semester",
-      currentYear: "2023-2024",
-      lateMinutes: 20,
-      absentMinutes: 30);
+  Config? config;
 
   void handleEventJsonConfig(CRUDReturn result) {
     try {
-      print(result);
-      print(result.data);
       if (result.data.isNotEmpty) {
         config = Config.fromJson(result.data);
       }
@@ -111,6 +111,30 @@ class AdminController with ChangeNotifier {
       }
     } catch (e, stacktrace) {
       print('ConfigController getConfig $e $stacktrace');
+    }
+  }
+
+  void _handleEventJsonStudent(CRUDReturn result) {
+    try {
+      if (result.data.isNotEmpty) {
+        students = List<Student>.from(
+          result.data.map((studentJson) => Student.fromJson(studentJson)),
+        );
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonStudent $e $stacktrace');
+    }
+  }
+
+  Future<void> getStudents() async {
+    try {
+      CRUDReturn response = await StudentService.getStudents();
+      if (response.success) {
+        _handleEventJsonStudent(response);
+      }
+    } catch (e, stacktrace) {
+      print('StudentController getStudents $e $stacktrace');
     }
   }
 
@@ -180,6 +204,29 @@ class AdminController with ChangeNotifier {
         break;
     }
     notifyListeners();
+  }
+
+  String _searchQueryStudent = '';
+
+  void searchStudents(String query) {
+    _searchQueryStudent = query;
+    notifyListeners();
+  }
+
+  List<Student> get filteredStudents {
+    if (_searchQueryStudent.isEmpty) {
+      return students;
+    } else {
+      return students
+          .where((student) =>
+              student.lastName
+                  .toLowerCase()
+                  .contains(_searchQueryStudent.toLowerCase()) ||
+              student.firstName
+                  .toLowerCase()
+                  .contains(_searchQueryStudent.toLowerCase()))
+          .toList();
+    }
   }
 
   Future<void> updateConfig(Config newConfig) async {
@@ -296,5 +343,105 @@ class AdminController with ChangeNotifier {
       text,
       style: TextStyle(color: color),
     );
+  }
+
+  void sortStudents(String column) {
+    if (sortColumnStudent == column) {
+      sortAscendingStudent = !sortAscendingStudent;
+    } else {
+      sortColumnStudent = column;
+      sortAscendingStudent = true;
+    }
+
+    students.sort((a, b) {
+      int compare;
+      switch (column) {
+        case 'Student No':
+          compare = a.studentNo.compareTo(b.studentNo);
+          break;
+        case 'RFID':
+          compare = a.rfid.compareTo(b.rfid);
+          break;
+        case 'Last Name':
+          compare = a.lastName.compareTo(b.lastName);
+          break;
+        case 'First Name':
+          compare = a.firstName.compareTo(b.firstName);
+          break;
+        case 'Year':
+          compare = a.year.toString().compareTo(b.year.toString());
+          break;
+        default:
+          compare = 0;
+      }
+      return sortAscendingStudent ? compare : -compare;
+    });
+
+    notifyListeners();
+  }
+
+  void handleEventJsonFaculty(CRUDReturn result) {
+    try {
+      if (result.data.isNotEmpty) {
+        filteredFaculties = List<Faculty>.from(
+          result.data.map((facultyJson) => Faculty.fromJson(facultyJson)),
+        );
+        filteredFaculties = filteredFaculties;
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonFaculty $e $stacktrace');
+    }
+  }
+
+  Future<void> getFaculties() async {
+    try {
+      CRUDReturn response = await FacultyService.getFaculties();
+      if (response.success) {
+        print('response.success');
+        handleEventJsonFaculty(response);
+      }
+    } catch (e, stacktrace) {
+      print(' getFaculties $e $stacktrace');
+    }
+  }
+
+  void searchFaculties(String query) {
+    filteredFaculties = filteredFaculties
+        .where((faculty) =>
+            faculty.firstName.toLowerCase().contains(query.toLowerCase()) ||
+            faculty.lastName.toLowerCase().contains(query.toLowerCase()) ||
+            faculty.facultyNo.toString().contains(query))
+        .toList();
+    notifyListeners();
+  }
+
+  void sortFaculties(String column) {
+    if (sortColumnFaculties == column) {
+      sortAscendingFaculties = !sortAscendingFaculties;
+    } else {
+      sortColumnFaculties = column;
+      sortAscendingFaculties = true;
+    }
+
+    filteredFaculties.sort((a, b) {
+      int compare;
+      switch (column) {
+        case 'Faculty No':
+          compare = a.facultyNo.compareTo(b.facultyNo);
+          break;
+        case 'Last Name':
+          compare = a.lastName.compareTo(b.lastName);
+          break;
+        case 'First Name':
+          compare = a.firstName.compareTo(b.firstName);
+          break;
+        default:
+          compare = 0;
+      }
+      return sortAscendingFaculties ? compare : -compare;
+    });
+
+    notifyListeners();
   }
 }

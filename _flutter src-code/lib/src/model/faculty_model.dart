@@ -16,19 +16,26 @@ class Faculty {
   });
 
   static Faculty fromJson(Map<String, dynamic> json) {
-    return Faculty(
-      facultyId: json['facultyId'],
-      facultyNo: json['facultyNo'],
-      lastName: json['lastName'],
-      firstName: json['firstName'],
-      subjects: json['subjects'] != null
-          ? List<Subject>.from(
-              json['subjects']
-                  .map((x) => x != null ? Subject.fromJson(x) : null)
-                  .where((x) => x != null),
-            )
-          : null,
-    );
+    try {
+      return Faculty(
+        facultyId: json['facultyId'],
+        facultyNo: json['facultyNo'],
+        lastName: json['lastName'],
+        firstName: json['firstName'],
+        subjects: json['subjects'] != null
+            ? List<Subject>.from(
+                json['subjects']
+                    .map((x) => x != null && x['faculties'] != null
+                        ? Subject.fromJson(x)
+                        : null)
+                    .where((x) => x != null),
+              )
+            : null,
+      );
+    } catch (e, stacktrace) {
+      print('fromJson $e $stacktrace');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toJson() {
