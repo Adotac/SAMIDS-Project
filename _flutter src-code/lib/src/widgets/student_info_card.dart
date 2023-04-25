@@ -23,71 +23,70 @@ class StudentInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var user;
     return Container(
-      constraints: const BoxConstraints(minWidth: double.infinity),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 26, left: 26),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const CircleAvatar(
-                backgroundImage: AssetImage('assets/images/montero.jpg'),
-                radius: 40,
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      text: '$firstName $lastName ',
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.titleLarge!.color,
-                      ),
-                      children: [
-                        isFaculty
-                            ? TextSpan(
-                                text: ' Faculty',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              )
-                            : const TextSpan(
-                                text: '',
+      constraints:
+          const BoxConstraints(maxHeight: 150, minWidth: double.infinity),
+      padding: const EdgeInsets.only(left: 26),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              backgroundImage: AssetImage('assets/images/montero.jpg'),
+              radius: 40,
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    text: '$firstName $lastName ',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).textTheme.titleLarge!.color,
+                    ),
+                    children: [
+                      isFaculty
+                          ? TextSpan(
+                              text: ' Faculty',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).primaryColor,
                               ),
-                      ],
-                    ),
+                            )
+                          : const TextSpan(
+                              text: '',
+                            ),
+                    ],
                   ),
-                  Text(
-                    "Department of Computer Studies",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      // ignore: deprecated_member_use
-                      color: Theme.of(context).textTheme.subtitle1!.color,
-                    ),
+                ),
+                Text(
+                  "Department of Computer Studies",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    // ignore: deprecated_member_use
+                    color: Theme.of(context).textTheme.subtitle1!.color,
                   ),
-                  const SizedBox(
-                    height: 10,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  currentUser.loggedInUser?.email ?? 'No email',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
+                    color: Theme.of(context).textTheme.bodySmall!.color,
                   ),
-                  Text(
-                    currentUser.loggedInUser?.email ?? 'No email',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w300,
-                      color: Theme.of(context).textTheme.bodySmall!.color,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

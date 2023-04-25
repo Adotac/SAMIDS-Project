@@ -82,10 +82,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 8.0, right: 8.0, bottom: 8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: SingleChildScrollView(
                             child: Column(
                               children: [
                                 // StudentInfoCard(student: _sdController.student),
@@ -94,11 +93,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                   children: [
                                     Flexible(
                                         flex: 1,
-                                        child: StudentInfoCard(
-                                          firstName:
-                                              _sdController.student.firstName,
-                                          lastName:
-                                              _sdController.student.lastName,
+                                        child: Card(
+                                          child: StudentInfoCard(
+                                            firstName:
+                                                _sdController.student.firstName,
+                                            lastName:
+                                                _sdController.student.lastName,
+                                          ),
                                         )),
                                     Flexible(
                                       flex: 1,
@@ -106,29 +107,24 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 8),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: _webRecentLogsCard(
-                                          context,
-                                        ),
+
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: _webRecentLogsCard(
+                                        context,
                                       ),
-                                      Expanded(
-                                        child: _myClassesCard(
-                                          context,
-                                        ),
+                                    ),
+                                    Expanded(
+                                      child: _myClassesCard(
+                                        context,
                                       ),
-                                      // _myClassesCard(context)
-                                    ],
-                                  ),
+                                    ),
+                                    // _myClassesCard(context)
+                                  ],
                                 ),
                                 SizedBox(height: 8),
                               ],
@@ -171,34 +167,41 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   Widget _myClassesCard(context) {
     return Card(
-      child: CardSmall(
-        flexValue: 1,
-        title: "My Classes",
-        isShadow: false,
-        child: _dataTableClasses(context),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TitleMediumText(title: "My Classes"),
+            _dataTableClasses(context),
+          ],
+        ),
       ),
     );
   }
 
   Widget _dataTableClasses(context) {
-    return DataTable(
-      columns: [
-        DataColumn(
-          label: Expanded(child: Text('Subject')),
-        ),
-        DataColumn(
-          label: Text('Room'),
-        ),
-        DataColumn(
-          label: Text('Time'),
-        ),
-        DataColumn(
-          label: Text('Day'),
-        ),
-      ],
-      rows: _sdController.studentClasses
-          .map((attendance) => _buildDataRowClasses(context, attendance))
-          .toList(),
+    return SizedBox(
+      width: double.infinity,
+      child: DataTable(
+        columns: [
+          DataColumn(
+            label: Text('Subject'),
+          ),
+          DataColumn(
+            label: Text('Room'),
+          ),
+          DataColumn(
+            label: Text('Time'),
+          ),
+          DataColumn(
+            label: Text('Day'),
+          ),
+        ],
+        rows: _sdController.studentClasses
+            .map((attendance) => _buildDataRowClasses(context, attendance))
+            .toList(),
+      ),
     );
   }
 
@@ -243,86 +246,92 @@ class _StudentDashboardState extends State<StudentDashboard> {
     return '$timeStart - $timeEnd';
   }
 
-  DataRow classesSampleDataRow(context) {
-    return DataRow(
-      cells: <DataCell>[
-        DataCell(Text('10:30am - 11:30am ')),
-        DataCell(Expanded(
-          child: Text(
-            textAlign: TextAlign.start,
-            '10023 - Programming 1',
-            overflow: TextOverflow.ellipsis,
-          ),
-        )),
-        DataCell(Text(
-          'On Going',
-          style: TextStyle(color: Colors.green),
-        )),
-      ],
-    );
-  }
-
-  Widget _dataTableRecentLogs(context) {
-    return DataTable(
-      columns: [
-        DataColumn(
-          label: Expanded(child: Text('Subject')),
-        ),
-        DataColumn(
-          label: Text('Room'),
-        ),
-        DataColumn(
-          label: Text('Time'),
-        ),
-        DataColumn(
-          label: Text('Remarks'),
-        ),
-      ],
-      rows: _sdController.allAttendanceList
-          .map((attendance) => _buildDataRowRecentLogs(context, attendance))
-          .toList(),
-    );
-  }
-
   DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
         DataCell(
-          Text(
-            attendance.subjectSchedule?.subject?.subjectName ??
-                'No subject name',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        DataCell(
-          Text(
-            attendance.subjectSchedule?.room.toString() ?? 'No subject id',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        DataCell(
-          Text(
-            _sdController.formatTime(_getActualTime(attendance)),
-            style: TextStyle(
-              fontSize: 14,
+          Expanded(
+            child: Text(
+              attendance.subjectSchedule?.subject?.subjectName ??
+                  'No subject name',
+              style: TextStyle(fontSize: 14),
             ),
           ),
         ),
         DataCell(
-          _sdController.getStatusText(attendance.remarks.name),
+          Expanded(
+            child: Text(
+              attendance.subjectSchedule?.room.toString() ?? 'No subject id',
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+        DataCell(
+          Expanded(
+            child: Text(
+              _sdController.formatTime(_getActualTime(attendance)),
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        DataCell(
+          Expanded(child: _sdController.getStatusText(attendance.remarks.name)),
         ),
       ],
     );
   }
 
-  Widget _webRecentLogsCard(context) {
+  // Widget _webRecentLogsCard(context) {
+  //   return Card(
+  //     child: CardSmall(
+  //       title: "Recent Activity",
+  //       isShadow: false,
+  //       child:
+  //           // SizedBox(width: 800, child: Text('No recent activity')),
+  //           _dataTableRecentLogs(context),
+  //     ),
+  //   );
+  // }
+  Widget _webRecentLogsCard(BuildContext context) {
     return Card(
-      child: CardSmall(
-        title: "Recent Activity",
-        isShadow: false,
-        child:
-            // SizedBox(width: 800, child: Text('No recent activity')),
-            _dataTableRecentLogs(context),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TitleMediumText(title: "Recent Activity"),
+              ],
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: DataTable(
+                columns: [
+                  DataColumn(
+                    label: Text('Subject'),
+                  ),
+                  DataColumn(
+                    label: Text('Room'),
+                  ),
+                  DataColumn(
+                    label: Text('Time'),
+                  ),
+                  DataColumn(
+                    label: Text('Remarks'),
+                  ),
+                ],
+                rows: _sdController.allAttendanceList
+                    .map((attendance) =>
+                        _buildDataRowRecentLogs(context, attendance))
+                    .toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
