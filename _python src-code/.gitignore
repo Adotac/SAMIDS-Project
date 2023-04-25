@@ -5,6 +5,7 @@
 /demo/__pycache__
 /dataset
 /models
+/videodata
 
 /demo/custom/images/*
 !demo/custom/images/person/
