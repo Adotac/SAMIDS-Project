@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'attendance_dialog_report.dart';
-
-
+import 'package:samids_web_app/src/widgets/pagination/attendance_dialog_report.dart';
 
 class AttendanceTile extends StatelessWidget {
   final String subject;

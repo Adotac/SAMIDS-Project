@@ -13,7 +13,9 @@ import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
+import '../model/config_model.dart';
 import '../model/faculty_model.dart';
+import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
 
@@ -42,6 +44,31 @@ class FacultyController with ChangeNotifier {
 
   static FacultyController get I => GetIt.instance<FacultyController>();
   static FacultyController get instance => GetIt.instance<FacultyController>();
+
+  Config? config;
+
+  void handleEventJsonConfig(CRUDReturn result) {
+    try {
+      if (result.data.isNotEmpty) {
+        config = Config.fromJson(result.data);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonConfig $e $stacktrace');
+    }
+  }
+
+  Future<void> getConfig() async {
+    try {
+      CRUDReturn response = await ConfigService.getConfig();
+      if (response.success) {
+        handleEventJsonConfig(response);
+      }
+    } catch (e, stacktrace) {
+      print('ConfigController getConfig $e $stacktrace');
+    }
+  }
+
   logout() {
     isStudentClassesCollected = false;
     isCountCalculated = false;
@@ -121,13 +148,17 @@ class FacultyController with ChangeNotifier {
     }
   }
 
-  Future<void> getAttendanceAll() async {
+  Future<void> getAttendanceAll(String? date) async {
     try {
       if (isAllAttendanceCollected) return;
-      CRUDReturn response = await AttendanceService.getAll(
-        studentNo: faculty.facultyNo,
-      );
-
+      CRUDReturn response = date != null
+          ? await AttendanceService.getAll(
+              studentNo: faculty.facultyNo,
+              date: date,
+            )
+          : await AttendanceService.getAll(
+              studentNo: faculty.facultyNo,
+            );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();

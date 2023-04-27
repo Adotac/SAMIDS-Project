@@ -1,8 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/widgets/notification_tile_list.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
+
+import '../controllers/admin_controller.dart';
+import '../controllers/auth.controller.dart';
+import '../controllers/student_controller.dart';
 
 enum FilterOptions { subjectId, date, time }
 
@@ -12,6 +17,10 @@ class WebView extends StatefulWidget {
   final int selectedWidgetMarker;
   final bool showBackButton;
   final Widget? appBarActionWidget;
+  final AuthController authController = AuthController.instance;
+  final FacultyController? facultyController;
+  final StudentController? studentController;
+  final AdminController? adminController;
 
   WebView({
     Key? key,
@@ -20,6 +29,9 @@ class WebView extends StatefulWidget {
     required this.selectedWidgetMarker,
     this.showBackButton = false,
     this.appBarActionWidget,
+    this.facultyController,
+    this.studentController,
+    this.adminController,
   }) : super(key: key);
 
   @override
@@ -28,48 +40,24 @@ class WebView extends StatefulWidget {
 
 class _WebViewState extends State<WebView> {
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
+  AuthController get authController => widget.authController;
+  FacultyController? get facultyController => widget.facultyController;
+  StudentController? get studentController => widget.studentController;
+  AdminController? get adminController => widget.adminController;
   final DateFormat _displayDateFormat = DateFormat('MMMM d, y');
-  DateTime _selectedDate = DateTime.now();
+  DateTime? _selectedDate;
 
-  List<Widget> _appBarActions(BuildContext context) {
-    switch (widget.appBarTitle) {
-      case 'Dashboard':
-        return [
-          Center(
-            child: Text(
-              _displayDateFormat.format(_selectedDate),
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor),
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.date_range),
-            onPressed: () async {
-              DateTime? selectedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime.now().subtract(Duration(days: 365)),
-                lastDate: DateTime.now().add(Duration(days: 365)),
-              );
-              if (selectedDate != null) {
-                setState(() {
-                  _selectedDate = selectedDate;
-                });
-              }
-            },
-          ),
-        ];
-      case 'Attendance':
-        return [
-          _searchBar(context),
-        ];
-      case 'Settings':
-        return [];
-      default:
-        return [];
-    }
+  String currentTerm = '';
+  String currentYear = '';
+  @override
+  void initState() {
+    _getConfigData();
+    super.initState();
+  }
+
+  void _getConfigData() async {
+    // await _getConfig();
+    await _getCurrentTerm();
   }
 
   Widget _buildNotificationsList(BuildContext context) {
@@ -100,66 +88,76 @@ class _WebViewState extends State<WebView> {
     );
   }
 
-  Widget _searchBar(BuildContext context) {
-    ThemeData currentTheme = Theme.of(context);
-    return Container(
-      width: 500,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: TextField(
-        onSubmitted: (textEditingController) {
-          if (kDebugMode) {
-            print(textEditingController.toString());
-          }
-        },
-        // controller: _textEditingController,
-        decoration: InputDecoration(
-          suffixIcon: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PopupMenuButton<FilterOptions>(
-                icon: const Icon(Icons.filter_list),
-                onSelected: (FilterOptions filterOption) {
-                  // Implement your filter selection logic here
-                  switch (filterOption) {
-                    case FilterOptions.subjectId:
-                      // Filter by subject id
-                      break;
-                    case FilterOptions.date:
-                      // Filter by date
-                      break;
-                    case FilterOptions.time:
-                      // Filter by time
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) {
-                  return [
-                    PopupMenuItem<FilterOptions>(
-                      value: FilterOptions.subjectId,
-                      child: Text('Filter by Subject ID'),
-                    ),
-                    PopupMenuItem<FilterOptions>(
-                      value: FilterOptions.date,
-                      child: Text('Filter by Date'),
-                    ),
-                    PopupMenuItem<FilterOptions>(
-                      value: FilterOptions.time,
-                      child: Text('Filter by Time'),
-                    ),
-                  ];
-                },
-              ),
-              Icon(Icons.search_outlined, color: Theme.of(context).hintColor),
-              const SizedBox(width: 12)
-            ],
-          ),
-          border: InputBorder.none,
-          hintText: 'Search',
-          hintStyle: TextStyle(color: currentTheme.hintColor),
-        ),
-      ),
-    );
+  _getConfig() async {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+
+    switch (userType) {
+      case 0:
+        await studentController!.getConfig();
+        break;
+      case 1:
+        await facultyController!.getConfig();
+        break;
+      default:
+        await adminController!.getConfig();
+        break;
+    }
+  }
+
+  _getCurrentTerm() {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+
+    setState(() {
+      switch (userType) {
+        case 0:
+          currentTerm = studentController!.config?.currentTerm ?? '';
+          currentYear = studentController!.config?.currentYear ?? '';
+          break;
+        case 1:
+          currentTerm = facultyController!.config?.currentTerm ?? '';
+          currentYear = facultyController!.config?.currentYear ?? '';
+          break;
+        default:
+          currentTerm = adminController!.config?.currentTerm ?? '';
+          currentYear = adminController!.config?.currentYear ?? '';
+      }
+    });
+  }
+
+  _getAttendanceByDate() async {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+
+    switch (userType) {
+      case 0:
+        await studentController!.getAttendanceAll(
+          _dateFormat.format(_selectedDate!),
+        );
+        break;
+      case 1:
+        await facultyController!.getAttendanceAll(
+          _dateFormat.format(_selectedDate!),
+        );
+        break;
+      default:
+        await adminController!.getAttendanceAll(
+          _dateFormat.format(_selectedDate!),
+        );
+    }
+  }
+
+  _getAttendanceAll() async {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+
+    switch (userType) {
+      case 0:
+        await studentController!.getAttendanceAll(null);
+        break;
+      case 1:
+        await facultyController!.getAttendanceAll(null);
+        break;
+      default:
+        await adminController!.getAttendanceAll(null);
+    }
   }
 
   @override
@@ -182,25 +180,34 @@ class _WebViewState extends State<WebView> {
                       width: 40,
                     ),
                     const SizedBox(width: 8),
-                    Text('BiSAMS'),
+                    const Text('BiSAMS'),
                     const SizedBox(width: 158),
                     Text(widget.appBarTitle),
                   ],
                 ),
               ),
-              if (widget.appBarActionWidget != null) ...[
-                widget.appBarActionWidget!
-              ],
               // if (widget.appBarActionWidget == null) _searchBar(context),
             ],
           ),
         ),
         actions: [
+          if (widget.appBarActionWidget != null)
+            Center(child: widget.appBarActionWidget!),
+          if (widget.appBarActionWidget != null)
+            IconButton(
+              icon: const Icon(Icons.file_download_rounded),
+              onPressed: () async {},
+            ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.13,
+          ),
           Visibility(
-            visible: widget.appBarTitle == "Dashboard",
+            visible: widget.appBarTitle != "Settings",
             child: Center(
               child: Text(
-                _displayDateFormat.format(_selectedDate),
+                _selectedDate == null
+                    ? '$currentTerm-$currentYear'
+                    : _displayDateFormat.format(_selectedDate!),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -210,20 +217,25 @@ class _WebViewState extends State<WebView> {
             ),
           ),
           Visibility(
-            visible: widget.appBarTitle == "Dashboard",
+            visible: widget.appBarTitle != "Settings",
             child: IconButton(
               icon: const Icon(Icons.date_range),
               onPressed: () async {
                 DateTime? selectedDate = await showDatePicker(
+                  selectableDayPredicate: (date) =>
+                      date.isBefore(DateTime.now()),
                   context: context,
-                  initialDate: DateTime.now(),
+                  initialDate: _selectedDate ?? DateTime.now(),
                   firstDate: DateTime.now().subtract(const Duration(days: 365)),
                   lastDate: DateTime.now().add(const Duration(days: 365)),
                 );
                 if (selectedDate != null) {
                   setState(() {
                     _selectedDate = selectedDate;
+                    _getAttendanceByDate();
                   });
+                } else {
+                  _getAttendanceAll();
                 }
               },
             ),

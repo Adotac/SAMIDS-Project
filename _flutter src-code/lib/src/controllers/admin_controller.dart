@@ -260,11 +260,15 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getAttendanceAll() async {
+  Future<void> getAttendanceAll(String? date) async {
     try {
       if (isAllAttendanceCollected) return;
-      CRUDReturn response = await AttendanceService.getAll();
 
+      CRUDReturn response = date != null
+          ? await AttendanceService.getAll(
+              date: date,
+            )
+          : await AttendanceService.getAll();
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         isAllAttendanceCollected = true;

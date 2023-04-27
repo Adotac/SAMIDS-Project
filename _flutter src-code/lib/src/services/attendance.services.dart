@@ -27,21 +27,21 @@ class AttendanceService {
   }
 
   static Future<CRUDReturn> getAll({
-    DateTime? date,
+    String? date,
     String? room,
     int? studentNo,
     Remarks? remarks,
   }) async {
     try {
       Map<String, dynamic>? query = {};
-      // if (date != null) query['date'] = date;
+      if (date != null) query['date'] = date;
       if (room != null) query['room'] = room;
       if (studentNo != null) query['studentNo'] = studentNo.toString();
       if (remarks != null) query['remarks'] = remarks;
 
       final response =
           await HttpService.get('$_baseUrl/Attendance', query: query);
-
+      if (kDebugMode) Logger().i('${query} ${date != null}');
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           // if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');

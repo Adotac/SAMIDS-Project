@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:samids_web_app/src/widgets/mobile_view.dart';
 
 import '../../model/attendance_model.dart';
-
+import 'package:intl/intl.dart';
 import '../../widgets/attendance_tile.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/pagination/student_attendance_data_source.dart';
@@ -59,8 +59,14 @@ class _StudentAttendanceState extends State<StudentAttendance>
     );
   }
 
+  void _getAttendanceWithDate(DateTime? dateTime) async {
+    final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
+    await _sdController.getAttendanceAll(_dateFormat.format(dateTime!));
+  }
+
   Widget _webView(BuildContext context) {
     return WebView(
+      studentController: _sdController,
       appBarTitle: "Attendance",
       appBarActionWidget: _searchBar(context),
       selectedWidgetMarker: 1,
@@ -83,57 +89,66 @@ class _StudentAttendanceState extends State<StudentAttendance>
 
   Widget _webAttendanceBody(BuildContext context) {
     return SingleChildScrollView(
-      child: SizedBox(
-          child: Expanded(child: Card(child: _dataTableAttendance(context)))),
+      padding: EdgeInsets.symmetric(horizontal: 6.0),
+      child: Card(
+          child: Container(
+        margin: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(onPressed: () {}, child: Text("Download Table")),
+                TextButton(
+                    onPressed: () {
+                      _sdController.attendanceReset();
+                    },
+                    child: Text("Reset"))
+              ],
+            ),
+            _dataTableAttendance(context),
+          ],
+        ),
+      )),
     );
   }
 
   Widget _dataTableAttendance(context) {
-    return Container(
-      margin: EdgeInsets.all(10),
-      padding: const EdgeInsets.all(8.0),
-      child: PaginatedDataTable(
-            columns:  [
-            _dataColumn(
-             'Reference No',
-            ),
-            _dataColumn(
-              ''
-            ),
-            _dataColumn(
-              label: Text('Room'),
-            ),
-            _dataColumn(
-              label: Text('Time in'),
-            ),
-            _dataColumn(
-              label: Text('Time out'),
-            ),
-            _dataColumn(
-              label: Text('Remarks'),
-            ),
-            _dataColumn(
-              label: Text('Actions'),
-            ),
-          ],
-         showFirstLastButtons: true,
-      rowsPerPage: 20,
-      onPageChanged: (int value) {
-        print('Page changed to $value');
-      },
-          source: _createAttendanceDataSource()
-        ),
-      
-    );
+    return StreamBuilder<Object>(
+        stream: null,
+        builder: (context, snapshot) {
+          return Container(
+            // width: MediaQuery.of(context).size.width,
+            width: double.infinity,
+            child: PaginatedDataTable(
+                columns: [
+                  _dataColumn('Reference No'),
+                  _dataColumn("Subject"),
+                  _dataColumn("Date"),
+                  _dataColumn("Day"),
+                  _dataColumn("Room"),
+                  _dataColumn("Time in"),
+                  _dataColumn('Time out'),
+                  _dataColumn('Remarks'),
+                  _dataColumn('Action'),
+                ],
+                showFirstLastButtons: true,
+                rowsPerPage: 20,
+                onPageChanged: (int value) {
+                  print('Page changed to $value');
+                },
+                source: _createAttendanceDataSource()),
+          );
+        });
   }
 
   AttendanceDataSourceSt _createAttendanceDataSource() {
     return AttendanceDataSourceSt(
-      _sdController.filteredAttendanceList,
-      _sdController, context
-    );
+        _sdController.filteredAttendanceList, _sdController, context);
   }
-DataColumn _dataColumn(String title) {
+
+  DataColumn _dataColumn(String title) {
     bool isSortedColumn = _sdController.sortColumn == title;
 
     return DataColumn(
@@ -167,7 +182,6 @@ DataColumn _dataColumn(String title) {
       numeric: false,
     );
   }
-  
 
   List<Widget> _mobileAttendanceBody(BuildContext context) {
     return [
@@ -210,7 +224,7 @@ DataColumn _dataColumn(String title) {
       child: TextField(
         autofocus: true,
         onSubmitted: (query) {
-          // _dataController.filterAttendance(query);
+          _sdController.filterAttendance(query);
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

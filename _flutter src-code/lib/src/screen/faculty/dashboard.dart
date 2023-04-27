@@ -38,7 +38,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   // add on init
   @override
   void initState() {
-    _sdController.getAttendanceAll();
+    _sdController.getConfig();
+    _sdController.getAttendanceAll(null);
     _sdController.getFacultyClasses();
 
     super.initState();

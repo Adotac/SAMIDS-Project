@@ -1,55 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/controllers/student_controller.dart';
 
 import '../../model/attendance_model.dart';
 
 class AttendanceDataSourceSt extends DataTableSource {
-  final List<Attendance> _attendanceList;
-  final _sdController;
+  final List<Attendance> attendanceList;
+  final StudentController sdController;
   final BuildContext context;
 
-  AttendanceDataSourceSt(this._attendanceList, this._sdController, this.context);
+  AttendanceDataSourceSt(
+      this.attendanceList, this.sdController, this.context);
   @override
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => _attendanceList.length;
+  int get rowCount => attendanceList.length;
   @override
   int get selectedRowCount => 0;
 
   @override
-  DataRow getRow( int index) {
+  DataRow getRow(int index) {
     assert(index >= 0);
-    if (index >= _attendanceList.length) return const DataRow(cells: []);
-    final Attendance attendance = _attendanceList[index];
+    if (index >= attendanceList.length) return const DataRow(cells: []);
+    final Attendance attendance = attendanceList[index];
     return _buildAttendanceRow(context, attendance);
   }
 
   DataRow _buildAttendanceRow(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
-        dataCell(
-          attendance.attendanceId.toString(),
-        ),
-        dataCell(
-          attendance.subjectSchedule?.subject?.subjectName ??
-                'No subject name',
-        ),
+        dataCell(attendance.attendanceId.toString()),
+        dataCell(attendance.subjectSchedule?.subject?.subjectName ??
+            'No subject name'),
+        dataCell(sdController.formatDate(attendance.actualTimeIn!)),
+        dataCell(attendance.subjectSchedule?.day.name ?? 'No Date'),
         dataCell(
           attendance.subjectSchedule?.room.toString() ?? 'No room code',
         ),
-        dataCell(
-          attendance.actualTimeIn != null
-                ? _sdController.formatTime(attendance.actualTimeIn!)
-                : 'No Time In',
-        ),
-        dataCell(
-          attendance.actualTimeOut != null
-                ? _sdController.formatTime(attendance.actualTimeOut!)
-                : 'No Time Out',
-        ),
-        dataCell(
-          _sdController.getStatusText(attendance.remarks.name),
-        ),
+        dataCell(attendance.actualTimeIn != null
+            ? sdController.formatTime(attendance.actualTimeIn!)
+            : 'No Time In'),
+        dataCell(attendance.actualTimeOut != null
+            ? sdController.formatTime(attendance.actualTimeOut!)
+            : 'No Time Out'),
+        DataCell(sdController.getStatusText(attendance.remarks.name)),
         DataCell(
           Row(
             children: [
@@ -65,24 +59,25 @@ class AttendanceDataSourceSt extends DataTableSource {
       ],
     );
   }
-Future<void> _showReportAttendanceDialog(BuildContext context) async {
+
+  Future<void> _showReportAttendanceDialog(BuildContext context) async {
     TextEditingController _textFieldController = TextEditingController();
 
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Report Attendance Issue'),
+          title: const Text('Report Attendance Issue'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(
+                const Text(
                   'Please provide a brief description of the issue:',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _textFieldController,
-                  decoration: InputDecoration(
+                  decoration:const  InputDecoration(
                     hintText: 'Enter issue description',
                     border: OutlineInputBorder(),
                   ),
@@ -94,13 +89,13 @@ Future<void> _showReportAttendanceDialog(BuildContext context) async {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Submit'),
+              child: const Text('Submit'),
               onPressed: () async {
                 // Process the submitted issue
                 Navigator.of(context).pop();
@@ -138,7 +133,6 @@ Future<void> _showReportAttendanceDialog(BuildContext context) async {
     );
   }
 
-  
   DataCell dataCell(String data) {
     return DataCell(
       SingleChildScrollView(

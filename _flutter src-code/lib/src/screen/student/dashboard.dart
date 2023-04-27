@@ -39,8 +39,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
   // add on init
   @override
   void initState() {
+    _sdController.getConfig();
     _sdController.getAttendanceToday();
-    _sdController.getAttendanceAll();
+    _sdController.getAttendanceAll(null);
     _sdController.getStudentClasses();
 
     super.initState();
@@ -62,28 +63,28 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Widget _webView() {
-    return WebView(
-      appBarTitle: "Dashboard",
-      selectedWidgetMarker: 0,
-      body: AnimatedBuilder(
-        animation: _sdController,
-        builder: (context, child) {
-          return !_sdController.isAllAttendanceCollected
-              ? Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor, // Customize the color
-                    ),
+    return AnimatedBuilder(
+      animation: _sdController,
+      builder: (context, child) {
+        return !_sdController.isAllAttendanceCollected
+            ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor, // Customize the color
                   ),
-                )
-              : Container(
+                ),
+              )
+            : WebView(
+                appBarTitle: "Dashboard",
+                selectedWidgetMarker: 0,
+                body: Container(
                   alignment: Alignment.topCenter,
                   child: Row(
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
@@ -134,9 +135,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                       ),
                     ],
                   ),
-                );
-        },
-      ),
+                ),
+              );
+      },
     );
   }
 
