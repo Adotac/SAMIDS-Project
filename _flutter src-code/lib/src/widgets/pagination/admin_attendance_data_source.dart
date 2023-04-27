@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../model/attendance_model.dart';
+import '../../model/attendance_model.dart';
 
-class AttendanceDataSource extends DataTableSource {
+class AttendanceDataSourceAd extends DataTableSource {
   final List<Attendance> _attendanceList;
   final _dataController;
 
-  AttendanceDataSource(this._attendanceList, this._dataController);
+  AttendanceDataSourceAd(this._attendanceList, this._dataController);
   @override
   bool get isRowCountApproximate => false;
 

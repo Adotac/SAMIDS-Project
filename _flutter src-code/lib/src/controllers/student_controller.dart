@@ -17,11 +17,14 @@ class StudentController with ChangeNotifier {
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
-
+  List<Attendance> filteredAttendanceList = [];
+  
   double onTimeCount = 0;
   double lateCount = 0;
   double absentCount = 0;
   double cuttingCount = 0;
+  bool sortAscending = true;
+  String sortColumn = "";
 
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;

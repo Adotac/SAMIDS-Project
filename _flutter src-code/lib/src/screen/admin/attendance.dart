@@ -9,7 +9,7 @@ import '../../controllers/admin_controller.dart';
 import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
-import '../../widgets/attendance_data_source.dart';
+import '../../widgets/pagination/admin_attendance_data_source.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/mobile_view.dart';
 import '../../widgets/web_view.dart';
@@ -121,8 +121,8 @@ class _AdminAttendanceState extends State<AdminAttendance> {
   //   );
   // }
 
-  AttendanceDataSource _createAttendanceDataSource() {
-    return AttendanceDataSource(
+  AttendanceDataSourceAd _createAttendanceDataSource() {
+    return AttendanceDataSourceAd(
       _dataController.filteredAttendanceList,
       _dataController,
     );

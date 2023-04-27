@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/admin_controller.dart';
 
-import '../model/faculty_model.dart';
+import '../../model/faculty_model.dart';
 
 class FacultyDataSource extends DataTableSource {
   final List<Faculty> _faculties;

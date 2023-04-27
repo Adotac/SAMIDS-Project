@@ -24,7 +24,7 @@ class StudentInfoCard extends StatelessWidget {
     var user;
     return Container(
       constraints:
-          const BoxConstraints(maxHeight: 150, minWidth: double.infinity),
+          const BoxConstraints(maxHeight: 148, minWidth: double.infinity),
       padding: const EdgeInsets.only(left: 26),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,

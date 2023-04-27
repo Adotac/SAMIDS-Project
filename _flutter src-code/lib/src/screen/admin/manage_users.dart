@@ -11,9 +11,9 @@ import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/student_model.dart';
 import '../../model/subjectSchedule_model.dart';
-import '../../widgets/attendance_data_source.dart';
+import '../../widgets/pagination/admin_attendance_data_source.dart';
 import '../../widgets/card_small.dart';
-import '../../widgets/faculties_data_source.dart';
+import '../../widgets/pagination/faculties_data_source.dart';
 import '../../widgets/students_data_source.dart';
 import '../../widgets/web_view.dart';
 
