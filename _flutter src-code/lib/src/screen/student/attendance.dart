@@ -91,11 +91,15 @@ class _StudentAttendanceState extends State<StudentAttendance>
     );
   }
 
-  String getCurrentYearTerm() {
+  String _getCurrentYearTerm() {
     String currentTerm = _sdController.config?.currentTerm ?? '';
     String currentYear = _sdController.config?.currentYear ?? '';
 
     return '$currentTerm-$currentYear';
+  }
+
+  String _getCurrentYearTermMobile() {
+    return _sdController.config?.currentTerm ?? '';
   }
 
   Widget _webAttendanceBody(BuildContext context) {
@@ -112,7 +116,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
               children: [
                 Text(
                   _sdController.dateSelected == null
-                      ? getCurrentYearTerm()
+                      ? _getCurrentYearTerm()
                       : _displayDateFormat.format(_sdController.dateSelected!),
                   style: TextStyle(
                     fontSize: 18,
@@ -237,6 +241,62 @@ class _StudentAttendanceState extends State<StudentAttendance>
       _searchBarMobile(context),
       SizedBox(height: 8),
       Container(
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        child: Card(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 8.0,
+              ),
+              Text(
+                _sdController.dateSelected == null
+                    ? _getCurrentYearTermMobile()
+                    : _displayDateFormat.format(_sdController.dateSelected!),
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.date_range),
+                onPressed: () async {
+                  DateTime? selectedDate = await showDatePicker(
+                    selectableDayPredicate: (date) =>
+                        date.isBefore(DateTime.now()),
+                    context: context,
+                    initialDate: _sdController.dateSelected ?? DateTime.now(),
+                    firstDate:
+                        DateTime.now().subtract(const Duration(days: 365)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (selectedDate != null) {
+                    setState(() {
+                      _sdController.dateSelected = selectedDate;
+                      _sdController.getAttendanceAll(
+                        _dateFormat.format(_sdController.dateSelected!),
+                      );
+                    });
+                  } else {
+                    _sdController.attendanceReset();
+                  }
+                },
+              ),
+              Spacer(),
+              TextButton(
+                  onPressed: () async {
+                    await _sdController.downloadData(context);
+                  },
+                  child: Text("Download Table")),
+              TextButton(
+                  onPressed: () {
+                    _sdController.attendanceReset();
+                  },
+                  child: Text("Reset"))
+            ],
+          ),
+        ),
+      ),
+      SizedBox(
         height: MediaQuery.of(context).size.height * 0.8,
         child: ListView.builder(
           itemCount: _sdController.filteredAttendanceList.length,
