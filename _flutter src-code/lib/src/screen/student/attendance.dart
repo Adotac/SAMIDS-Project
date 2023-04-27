@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:http/retry.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 
 import 'package:samids_web_app/src/widgets/app_bar.dart';
@@ -32,7 +33,8 @@ class _StudentAttendanceState extends State<StudentAttendance>
     with SingleTickerProviderStateMixin {
   final _textEditingController = TextEditingController();
   StudentController get _sdController => widget.sdController;
-
+  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
+  final DateFormat _displayDateFormat = DateFormat('MMMM d, y');
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
   }
@@ -47,21 +49,21 @@ class _StudentAttendanceState extends State<StudentAttendance>
     super.dispose();
   }
 
-  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 768) {
-          return _mobileView(context);
+          return AnimatedBuilder(
+            animation: _sdController,
+            builder: (context, child) {
+              return _mobileView(context);
+            },
+          );
+        } else {
+          return _webView(context);
         }
-        return _webView(context);
       },
     );
-  }
-
-  void _getAttendanceWithDate(DateTime? dateTime) async {
-    final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
-    await _sdController.getAttendanceAll(_dateFormat.format(dateTime!));
   }
 
   Widget _webView(BuildContext context) {
@@ -83,8 +85,17 @@ class _StudentAttendanceState extends State<StudentAttendance>
       appBarOnly: true,
       appBarTitle: 'Attendance',
       currentIndex: 1,
-      body: _mobileAttendanceBody(context),
+      body:
+          // Text("Attendance")],
+          _mobileAttendanceBody(context),
     );
+  }
+
+  String getCurrentYearTerm() {
+    String currentTerm = _sdController.config?.currentTerm ?? '';
+    String currentYear = _sdController.config?.currentYear ?? '';
+
+    return '$currentTerm-$currentYear';
   }
 
   Widget _webAttendanceBody(BuildContext context) {
@@ -99,7 +110,46 @@ class _StudentAttendanceState extends State<StudentAttendance>
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: () {}, child: Text("Download Table")),
+                Text(
+                  _sdController.dateSelected == null
+                      ? getCurrentYearTerm()
+                      : _displayDateFormat.format(_sdController.dateSelected!),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.date_range),
+                  onPressed: () async {
+                    DateTime? selectedDate = await showDatePicker(
+                      selectableDayPredicate: (date) =>
+                          date.isBefore(DateTime.now()),
+                      context: context,
+                      initialDate: _sdController.dateSelected ?? DateTime.now(),
+                      firstDate:
+                          DateTime.now().subtract(const Duration(days: 365)),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (selectedDate != null) {
+                      setState(() {
+                        _sdController.dateSelected = selectedDate;
+                        _sdController.getAttendanceAll(
+                          _dateFormat.format(_sdController.dateSelected!),
+                        );
+                      });
+                    } else {
+                      _sdController.attendanceReset();
+                    }
+                  },
+                ),
+                Spacer(),
+                TextButton(
+                    onPressed: () async {
+                      await _sdController.downloadData(context);
+                    },
+                    child: Text("Download Table")),
                 TextButton(
                     onPressed: () {
                       _sdController.attendanceReset();
@@ -107,7 +157,10 @@ class _StudentAttendanceState extends State<StudentAttendance>
                     child: Text("Reset"))
               ],
             ),
-            _dataTableAttendance(context),
+            SizedBox(
+              width: double.infinity,
+              child: _dataTableAttendance(context),
+            ),
           ],
         ),
       )),
@@ -118,28 +171,24 @@ class _StudentAttendanceState extends State<StudentAttendance>
     return StreamBuilder<Object>(
         stream: null,
         builder: (context, snapshot) {
-          return Container(
-            // width: MediaQuery.of(context).size.width,
-            width: double.infinity,
-            child: PaginatedDataTable(
-                columns: [
-                  _dataColumn('Reference No'),
-                  _dataColumn("Subject"),
-                  _dataColumn("Date"),
-                  _dataColumn("Day"),
-                  _dataColumn("Room"),
-                  _dataColumn("Time in"),
-                  _dataColumn('Time out'),
-                  _dataColumn('Remarks'),
-                  _dataColumn('Action'),
-                ],
-                showFirstLastButtons: true,
-                rowsPerPage: 20,
-                onPageChanged: (int value) {
-                  print('Page changed to $value');
-                },
-                source: _createAttendanceDataSource()),
-          );
+          return PaginatedDataTable(
+              columns: [
+                _dataColumn('Reference No'),
+                _dataColumn("Subject"),
+                _dataColumn("Date"),
+                _dataColumn("Day"),
+                _dataColumn("Room"),
+                _dataColumn("Time in"),
+                _dataColumn('Time out'),
+                _dataColumn('Remarks'),
+                _dataColumn('Action'),
+              ],
+              showFirstLastButtons: true,
+              rowsPerPage: 20,
+              onPageChanged: (int value) {
+                print('Page changed to $value');
+              },
+              source: _createAttendanceDataSource());
         });
   }
 
@@ -185,13 +234,14 @@ class _StudentAttendanceState extends State<StudentAttendance>
 
   List<Widget> _mobileAttendanceBody(BuildContext context) {
     return [
-      _searchBar(context),
+      _searchBarMobile(context),
       SizedBox(height: 8),
-      Expanded(
+      Container(
+        height: MediaQuery.of(context).size.height * 0.8,
         child: ListView.builder(
-          itemCount: _sdController.allAttendanceList.length,
+          itemCount: _sdController.filteredAttendanceList.length,
           itemBuilder: (BuildContext context, int i) {
-            Attendance attendance = _sdController.allAttendanceList[i];
+            Attendance attendance = _sdController.filteredAttendanceList[i];
             return AttendanceTile(
               subject: attendance.subjectSchedule?.subject?.subjectName ??
                   'No Subject',
@@ -224,6 +274,27 @@ class _StudentAttendanceState extends State<StudentAttendance>
       child: TextField(
         autofocus: true,
         onSubmitted: (query) {
+          _sdController.filterAttendance(query);
+        },
+        controller: _textEditingController,
+        decoration: const InputDecoration(
+          suffixIcon: Icon(Icons.search_outlined),
+          suffixIconColor: Colors.grey,
+          border: InputBorder.none,
+          hintText: 'Search',
+        ),
+      ),
+    );
+  }
+
+  Widget _searchBarMobile(context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 8.0),
+      width: double.infinity,
+      child: TextField(
+        autofocus: true,
+        onSubmitted: (query) {
+          print(query);
           _sdController.filterAttendance(query);
         },
         controller: _textEditingController,

@@ -56,7 +56,7 @@ class _WebViewState extends State<WebView> {
   }
 
   void _getConfigData() async {
-    // await _getConfig();
+    await _getConfig();
     await _getCurrentTerm();
   }
 
@@ -130,7 +130,7 @@ class _WebViewState extends State<WebView> {
     switch (userType) {
       case 0:
         await studentController!.getAttendanceAll(
-          _dateFormat.format(_selectedDate!),
+          _dateFormat.format(studentController!.dateSelected!),
         );
         break;
       case 1:
@@ -158,6 +158,35 @@ class _WebViewState extends State<WebView> {
       default:
         await adminController!.getAttendanceAll(null);
     }
+  }
+
+  _setSelectedDate(DateTime? date) async {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+    switch (userType) {
+      case 0:
+        studentController?.dateSelected = date;
+        break;
+      case 1:
+        facultyController!.getAttendanceAll(null);
+        break;
+      default:
+        adminController!.getAttendanceAll(null);
+    }
+  }
+
+  DateTime? _getSelectedDate() {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+    switch (userType) {
+      case 0:
+        print(studentController?.dateSelected);
+        return studentController?.dateSelected;
+      case 1:
+        facultyController!.getAttendanceAll(null);
+        break;
+      default:
+        adminController!.getAttendanceAll(null);
+    }
+    return null;
   }
 
   @override
@@ -193,53 +222,48 @@ class _WebViewState extends State<WebView> {
         actions: [
           if (widget.appBarActionWidget != null)
             Center(child: widget.appBarActionWidget!),
-          if (widget.appBarActionWidget != null)
-            IconButton(
-              icon: const Icon(Icons.file_download_rounded),
-              onPressed: () async {},
-            ),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.13,
+            width: MediaQuery.of(context).size.width * 0.2,
           ),
-          Visibility(
-            visible: widget.appBarTitle != "Settings",
-            child: Center(
-              child: Text(
-                _selectedDate == null
-                    ? '$currentTerm-$currentYear'
-                    : _displayDateFormat.format(_selectedDate!),
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.titleLarge?.color,
-                ),
-              ),
-            ),
-          ),
-          Visibility(
-            visible: widget.appBarTitle != "Settings",
-            child: IconButton(
-              icon: const Icon(Icons.date_range),
-              onPressed: () async {
-                DateTime? selectedDate = await showDatePicker(
-                  selectableDayPredicate: (date) =>
-                      date.isBefore(DateTime.now()),
-                  context: context,
-                  initialDate: _selectedDate ?? DateTime.now(),
-                  firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                  lastDate: DateTime.now().add(const Duration(days: 365)),
-                );
-                if (selectedDate != null) {
-                  setState(() {
-                    _selectedDate = selectedDate;
-                    _getAttendanceByDate();
-                  });
-                } else {
-                  _getAttendanceAll();
-                }
-              },
-            ),
-          ),
+          // Visibility(
+          //   visible: widget.appBarTitle != "Settings",
+          //   child: Center(
+          //     child: Text(
+          //       _getSelectedDate() == null
+          //           ? '$currentTerm-$currentYear'
+          //           : _displayDateFormat.format(_getSelectedDate()!),
+          //       style: TextStyle(
+          //         fontSize: 18,
+          //         fontWeight: FontWeight.bold,
+          //         color: Theme.of(context).textTheme.titleLarge?.color,
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          // Visibility(
+          //   visible: widget.appBarTitle != "Settings",
+          //   child: IconButton(
+          //     icon: const Icon(Icons.date_range),
+          //     onPressed: () async {
+          //       DateTime? selectedDate = await showDatePicker(
+          //         selectableDayPredicate: (date) =>
+          //             date.isBefore(DateTime.now()),
+          //         context: context,
+          //         initialDate: _selectedDate ?? DateTime.now(),
+          //         firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          //         lastDate: DateTime.now().add(const Duration(days: 365)),
+          //       );
+          //       if (selectedDate != null) {
+          //         setState(() {
+          //           _setSelectedDate(selectedDate);
+          //           _getAttendanceByDate();
+          //         });
+          //       } else {
+          //         _getAttendanceAll();
+          //       }
+          //     },
+          //   ),
+          // ),
           Builder(
             builder: (BuildContext context) {
               return IconButton(

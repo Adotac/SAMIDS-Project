@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:html';
+import 'dart:io' as io;
 
+import 'package:csv/csv.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-
+import 'package:path_provider/path_provider.dart';
 import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
@@ -20,14 +23,17 @@ class StudentController with ChangeNotifier {
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
   List<Attendance> filteredAttendanceList = [];
+  DateTime? dateSelected;
 
   double onTimeCount = 0;
   double lateCount = 0;
   double absentCount = 0;
   double cuttingCount = 0;
   bool sortAscending = true;
+
   String sortColumn = "";
   String searchQueryAttendance = "";
+
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
@@ -280,6 +286,8 @@ class StudentController with ChangeNotifier {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
         isAllAttendanceCollected = true;
+
+        dateSelected = null;
         notifyListeners();
       }
     } catch (e, stacktrace) {
@@ -357,6 +365,55 @@ class StudentController with ChangeNotifier {
       }
     } catch (e, stacktrace) {
       print('getRemarksCount $e $stacktrace');
+    }
+  }
+
+  Future<void> downloadData(context) async {
+    List<List<dynamic>> csvData = [
+      // Add headers to the CSV file
+      [
+        "Reference No",
+        "Subject",
+        "Date",
+        "Day",
+        "Room",
+        "Time in",
+        "Time out",
+        "Remarks"
+      ],
+    ];
+
+    for (Attendance attendance in filteredAttendanceList) {
+      List<dynamic> row = [
+        attendance.attendanceId,
+        attendance.subjectSchedule?.subject?.subjectName ?? '',
+        attendance.date?.toIso8601String() ?? '',
+        attendance.subjectSchedule?.day?.toString() ?? '',
+        attendance.subjectSchedule?.room ?? '',
+        attendance.actualTimeIn?.hour.toString() ?? '',
+        attendance.actualTimeOut?.hour.toString() ?? '',
+        attendance.remarks.index,
+      ];
+      csvData.add(row);
+    }
+
+    String csv = const ListToCsvConverter().convert(csvData);
+
+    if (kIsWeb) {
+      // Web implementation
+      AnchorElement(href: "data:text/csv;charset=utf-8,$csv")
+        ..setAttribute("download", "attendance_data.csv")
+        ..click();
+    } else {
+// Mobile implementation
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final file = io.File('$path/attendance_data.csv');
+      await file.writeAsString(csv);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('CSV file saved to: ${file.path}')),
+      );
     }
   }
 }

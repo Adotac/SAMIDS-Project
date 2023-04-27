@@ -348,9 +348,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
       title: "Recent Activity",
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: _sdController.attendance.length,
+        itemCount: _sdController.allAttendanceList.length,
         itemBuilder: (BuildContext context, int index) {
-          Attendance attendance = _sdController.attendance[index];
+          Attendance attendance = _sdController.allAttendanceList[index];
           return CustomListTile(
             title: attendance.subjectSchedule?.subject?.subjectName ??
                 'No subject name',
