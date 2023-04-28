@@ -32,7 +32,7 @@ class StudentAttendance extends StatefulWidget {
 class _StudentAttendanceState extends State<StudentAttendance>
     with SingleTickerProviderStateMixin {
   final _textEditingController = TextEditingController();
-  StudentController get _sdController => widget.sdController;
+  StudentController get _dataController => widget.sdController;
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
   final DateFormat _displayDateFormat = DateFormat('MMMM d, y');
   bool isMobile(BoxConstraints constraints) {
@@ -54,7 +54,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
       builder: (BuildContext context, BoxConstraints constraints) {
         if (constraints.maxWidth < 768) {
           return AnimatedBuilder(
-            animation: _sdController,
+            animation: _dataController,
             builder: (context, child) {
               return _mobileView(context);
             },
@@ -68,12 +68,12 @@ class _StudentAttendanceState extends State<StudentAttendance>
 
   Widget _webView(BuildContext context) {
     return WebView(
-      studentController: _sdController,
+      studentController: _dataController,
       appBarTitle: "Attendance",
       appBarActionWidget: _searchBar(context),
       selectedWidgetMarker: 1,
       body: AnimatedBuilder(
-          animation: _sdController,
+          animation: _dataController,
           builder: (context, child) {
             return _webAttendanceBody(context);
           }),
@@ -92,14 +92,14 @@ class _StudentAttendanceState extends State<StudentAttendance>
   }
 
   String _getCurrentYearTerm() {
-    String currentTerm = _sdController.config?.currentTerm ?? '';
-    String currentYear = _sdController.config?.currentYear ?? '';
+    String currentTerm = _dataController.config?.currentTerm ?? '';
+    String currentYear = _dataController.config?.currentYear ?? '';
 
-    return '$currentTerm-$currentYear';
+    return '$currentTerm - $currentYear';
   }
 
   String _getCurrentYearTermMobile() {
-    return _sdController.config?.currentTerm ?? '';
+    return _dataController.config?.currentTerm ?? '';
   }
 
   Widget _webAttendanceBody(BuildContext context) {
@@ -115,9 +115,10 @@ class _StudentAttendanceState extends State<StudentAttendance>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  _sdController.dateSelected == null
+                  _dataController.dateSelected == null
                       ? _getCurrentYearTerm()
-                      : _displayDateFormat.format(_sdController.dateSelected!),
+                      : _displayDateFormat
+                          .format(_dataController.dateSelected!),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -131,32 +132,33 @@ class _StudentAttendanceState extends State<StudentAttendance>
                       selectableDayPredicate: (date) =>
                           date.isBefore(DateTime.now()),
                       context: context,
-                      initialDate: _sdController.dateSelected ?? DateTime.now(),
+                      initialDate:
+                          _dataController.dateSelected ?? DateTime.now(),
                       firstDate:
                           DateTime.now().subtract(const Duration(days: 365)),
                       lastDate: DateTime.now().add(const Duration(days: 365)),
                     );
                     if (selectedDate != null) {
                       setState(() {
-                        _sdController.dateSelected = selectedDate;
-                        _sdController.getAttendanceAll(
-                          _dateFormat.format(_sdController.dateSelected!),
+                        _dataController.dateSelected = selectedDate;
+                        _dataController.getAttendanceAll(
+                          _dateFormat.format(_dataController.dateSelected!),
                         );
                       });
                     } else {
-                      _sdController.attendanceReset();
+                      _dataController.attendanceReset();
                     }
                   },
                 ),
                 Spacer(),
                 TextButton(
                     onPressed: () async {
-                      await _sdController.downloadData(context);
+                      await _dataController.downloadData(context);
                     },
                     child: Text("Download Table")),
                 TextButton(
                     onPressed: () {
-                      _sdController.attendanceReset();
+                      _dataController.attendanceReset();
                     },
                     child: Text("Reset"))
               ],
@@ -198,18 +200,18 @@ class _StudentAttendanceState extends State<StudentAttendance>
 
   AttendanceDataSourceSt _createAttendanceDataSource() {
     return AttendanceDataSourceSt(
-        _sdController.filteredAttendanceList, _sdController, context);
+        _dataController.filteredAttendanceList, _dataController, context);
   }
 
   DataColumn _dataColumn(String title) {
-    bool isSortedColumn = _sdController.sortColumn == title;
+    bool isSortedColumn = _dataController.sortColumn == title;
 
     return DataColumn(
       label: SizedBox(
         width: 100,
         child: InkWell(
           onTap: () {
-            _sdController.sortAttendance(title);
+            _dataController.sortAttendance(title);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -223,7 +225,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
               ),
               if (isSortedColumn)
                 Icon(
-                  _sdController.sortAscending
+                  _dataController.sortAscending
                       ? Icons.arrow_drop_up_rounded
                       : Icons.arrow_drop_down_rounded,
                   color: Theme.of(context).primaryColor,
@@ -250,9 +252,9 @@ class _StudentAttendanceState extends State<StudentAttendance>
                 width: 8.0,
               ),
               Text(
-                _sdController.dateSelected == null
+                _dataController.dateSelected == null
                     ? _getCurrentYearTermMobile()
-                    : _displayDateFormat.format(_sdController.dateSelected!),
+                    : _displayDateFormat.format(_dataController.dateSelected!),
                 style: TextStyle(
                   color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
@@ -264,32 +266,32 @@ class _StudentAttendanceState extends State<StudentAttendance>
                     selectableDayPredicate: (date) =>
                         date.isBefore(DateTime.now()),
                     context: context,
-                    initialDate: _sdController.dateSelected ?? DateTime.now(),
+                    initialDate: _dataController.dateSelected ?? DateTime.now(),
                     firstDate:
                         DateTime.now().subtract(const Duration(days: 365)),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (selectedDate != null) {
                     setState(() {
-                      _sdController.dateSelected = selectedDate;
-                      _sdController.getAttendanceAll(
-                        _dateFormat.format(_sdController.dateSelected!),
+                      _dataController.dateSelected = selectedDate;
+                      _dataController.getAttendanceAll(
+                        _dateFormat.format(_dataController.dateSelected!),
                       );
                     });
                   } else {
-                    _sdController.attendanceReset();
+                    _dataController.attendanceReset();
                   }
                 },
               ),
               Spacer(),
               TextButton(
                   onPressed: () async {
-                    await _sdController.downloadData(context);
+                    await _dataController.downloadData(context);
                   },
                   child: Text("Download Table")),
               TextButton(
                   onPressed: () {
-                    _sdController.attendanceReset();
+                    _dataController.attendanceReset();
                   },
                   child: Text("Reset"))
             ],
@@ -299,21 +301,21 @@ class _StudentAttendanceState extends State<StudentAttendance>
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.8,
         child: ListView.builder(
-          itemCount: _sdController.filteredAttendanceList.length,
+          itemCount: _dataController.filteredAttendanceList.length,
           itemBuilder: (BuildContext context, int i) {
-            Attendance attendance = _sdController.filteredAttendanceList[i];
+            Attendance attendance = _dataController.filteredAttendanceList[i];
             return AttendanceTile(
               subject: attendance.subjectSchedule?.subject?.subjectName ??
                   'No Subject',
               room: attendance.subjectSchedule?.room ?? 'No Room',
-              date: _sdController.formatDate(_getActualTime(attendance)),
+              date: _dataController.formatDate(_getActualTime(attendance)),
               timeIn: attendance.actualTimeIn != null
-                  ? _sdController.formatTime(attendance.actualTimeIn!)
+                  ? _dataController.formatTime(attendance.actualTimeIn!)
                   : 'No Time In',
               timeOut: attendance.actualTimeOut != null
-                  ? _sdController.formatTime(attendance.actualTimeOut!)
+                  ? _dataController.formatTime(attendance.actualTimeOut!)
                   : 'No Time Out',
-              remarks: _sdController.getStatusText(attendance.remarks.name),
+              remarks: _dataController.getStatusText(attendance.remarks.name),
             );
           },
         ),
@@ -334,7 +336,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
       child: TextField(
         autofocus: true,
         onSubmitted: (query) {
-          _sdController.filterAttendance(query);
+          _dataController.filterAttendance(query);
         },
         controller: _textEditingController,
         decoration: const InputDecoration(
@@ -355,7 +357,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
         autofocus: true,
         onSubmitted: (query) {
           print(query);
-          _sdController.filterAttendance(query);
+          _dataController.filterAttendance(query);
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

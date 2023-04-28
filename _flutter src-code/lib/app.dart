@@ -22,7 +22,6 @@ import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:samids_web_app/src/settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {

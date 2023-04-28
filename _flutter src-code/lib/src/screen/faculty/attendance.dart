@@ -51,6 +51,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
 
   Widget _webView(BuildContext context) {
     return WebView(
+      facultyController: _dataController,
       appBarTitle: "Attendance",
       appBarActionWidget: _searchBar(context),
       selectedWidgetMarker: 1,
@@ -75,6 +76,10 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
   }
 
   Widget _dataTableAttendance(context) {
+    print([
+      '_dataController.allAttendanceList',
+      _dataController.allAttendanceList.length
+    ]);
     return Container(
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.all(16.0),
@@ -145,22 +150,13 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
     );
   }
 
-  Container _searchBar(context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      height: 42,
+  Widget _searchBar(context) {
+    return SizedBox(
       width: MediaQuery.of(context).size.width * .30,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
         autofocus: true,
-        onSubmitted: (_textEditingController) {
-          if (kDebugMode) {
-            print(_textEditingController.toString());
-          }
+        onSubmitted: (query) {
+          _dataController.filterAttendance(query);
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

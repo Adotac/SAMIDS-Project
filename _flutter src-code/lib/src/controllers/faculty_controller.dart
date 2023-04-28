@@ -157,8 +157,8 @@ class FacultyController with ChangeNotifier {
               date: date,
             )
           : await AttendanceService.getAll(
-              studentNo: faculty.facultyNo,
-            );
+              // studentNo: faculty.facultyNo,
+              );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
@@ -242,4 +242,6 @@ class FacultyController with ChangeNotifier {
       print('getRemarksCount $e $stacktrace');
     }
   }
+
+  void filterAttendance(String query) {}
 }
