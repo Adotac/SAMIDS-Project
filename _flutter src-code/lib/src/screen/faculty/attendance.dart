@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
+import 'package:samids_web_app/src/widgets/pagination/faculty_attendance_data_source.dart';
 
 import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/web_view.dart';
+import 'package:intl/intl.dart';
 
 class FacultyAttendance extends StatefulWidget {
   static const routeName = '/faculty-attendance';
@@ -23,7 +25,8 @@ class FacultyAttendance extends StatefulWidget {
 
 class _FacultyAttendanceState extends State<FacultyAttendance> {
   final _textEditingController = TextEditingController();
-
+  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
+  final DateFormat _displayDateFormat = DateFormat('MMMM d, y');
   FacultyController get _dataController => widget.dataController;
 
   @override
@@ -64,15 +67,83 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
   }
 
   Widget _webAttendanceBody(BuildContext context) {
-    return Align(
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 6.0),
       alignment: Alignment.topLeft,
       child: Card(
         child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: _dataTableAttendance(context),
+          padding: EdgeInsets.symmetric(horizontal: 6.0),
+          child: Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _dataController.dateSelected == null
+                            ? _getCurrentYearTerm()
+                            : _displayDateFormat
+                                .format(_dataController.dateSelected!),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.titleLarge?.color,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.date_range),
+                        onPressed: () async {
+                          DateTime? selectedDate = await showDatePicker(
+                            selectableDayPredicate: (date) =>
+                                date.isBefore(DateTime.now()),
+                            context: context,
+                            initialDate:
+                                _dataController.dateSelected ?? DateTime.now(),
+                            firstDate: DateTime.now()
+                                .subtract(const Duration(days: 365)),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
+                          );
+                          if (selectedDate != null) {
+                            setState(() {
+                              _dataController.dateSelected = selectedDate;
+                              _dataController.getAttendanceAll(
+                                _dateFormat
+                                    .format(_dataController.dateSelected!),
+                              );
+                            });
+                          } else {
+                            _dataController.attendanceReset();
+                          }
+                        },
+                      ),
+                      Spacer(),
+                      TextButton(
+                          onPressed: () async {
+                            await _dataController.downloadData(context);
+                          },
+                          child: Text("Download Table")),
+                      TextButton(
+                          onPressed: () {
+                            _dataController.attendanceReset();
+                          },
+                          child: Text("Reset"))
+                    ],
+                  ),
+                  _dataTableAttendance(context),
+                ],
+              )),
         ),
       ),
     );
+  }
+
+  String _getCurrentYearTerm() {
+    String currentTerm = _dataController.config?.currentTerm ?? '';
+    String currentYear = _dataController.config?.currentYear ?? '';
+
+    return '$currentTerm - $currentYear';
   }
 
   Widget _dataTableAttendance(context) {
@@ -80,26 +151,33 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
       '_dataController.allAttendanceList',
       _dataController.allAttendanceList.length
     ]);
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.all(16.0),
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: DataTable(
-        columns: [
-          _dataColumn("Student ID"),
-          _dataColumn("Name"),
-          _dataColumn("Reference ID"),
-          _dataColumn("Room"),
-          _dataColumn("Subject"),
-          _dataColumn("Date"),
-          _dataColumn("Time In"),
-          _dataColumn("Time Out"),
-          _dataColumn("Remarks"),
-        ],
-        rows: _dataController.allAttendanceList
-            .map((attendance) => _buildAttendanceRow(context, attendance))
-            .toList(),
-      ),
+    return PaginatedDataTable(
+      columns: [
+        _dataColumn("Student ID"),
+        _dataColumn("Name"),
+        _dataColumn("Reference ID"),
+        _dataColumn("Room"),
+        _dataColumn("Subject"),
+        _dataColumn("Date"),
+        _dataColumn("Day"),
+        _dataColumn("Time In"),
+        _dataColumn("Time Out"),
+        _dataColumn("Remarks"),
+      ],
+      showFirstLastButtons: true,
+      rowsPerPage: 20,
+      onPageChanged: (int value) {
+        print('Page changed to $value');
+      },
+      source: _createAttendanceDataSource(),
+    );
+  }
+
+  AttendanceDataSourceFac _createAttendanceDataSource() {
+    return AttendanceDataSourceFac(
+      _dataController.filteredAttendanceList,
+      _dataController,
+      context,
     );
   }
 
@@ -111,42 +189,38 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
     );
   }
 
-  DataRow _buildAttendanceRow(BuildContext context, Attendance attendance) {
-    return DataRow(
-      cells: [
-        dataCell(attendance.student?.studentID.toString() ?? 'No student ID'),
-        dataCell(
-            '${attendance.student?.firstName} ${attendance.student?.lastName}'),
-        dataCell(attendance.attendanceId.toString()),
-        dataCell(attendance.subjectSchedule?.room ?? 'No Room'),
-        dataCell(attendance.subjectSchedule?.subject?.subjectName ??
-            'No subject name'),
-        dataCell(attendance.subjectSchedule?.day.name ?? 'No Day'),
-        dataCell(attendance.actualTimeIn != null
-            ? _dataController.formatTime(attendance.actualTimeIn!)
-            : 'No Time In'),
-        dataCell(attendance.actualTimeOut != null
-            ? _dataController.formatTime(attendance.actualTimeOut!)
-            : 'No Time Out'),
-        DataCell(
-          _dataController.getStatusText(attendance.remarks.name),
-        ),
-      ],
-    );
-  }
-
   DataColumn _dataColumn(String title) {
+    bool isSortedColumn = _dataController.sortColumn == title;
+
     return DataColumn(
       label: SizedBox(
-        width: 100, // Set a fixed width as per your requirement
-        child: Flexible(
-          child: Text(
-            title,
-            style: TextStyle(fontStyle: FontStyle.italic),
-            overflow: TextOverflow.ellipsis,
+        width: 100,
+        child: InkWell(
+          onTap: () {
+            _dataController.sortAttendance(title);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  overflow: TextOverflow.ellipsis,
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              if (isSortedColumn)
+                Icon(
+                  _dataController.sortAscending
+                      ? Icons.arrow_drop_up_rounded
+                      : Icons.arrow_drop_down_rounded,
+                  color: Theme.of(context).primaryColor,
+                ),
+            ],
           ),
         ),
       ),
+      numeric: false,
     );
   }
 
