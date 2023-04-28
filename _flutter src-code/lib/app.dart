@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:samids_web_app/src/auth/login.dart';
 import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/controllers/admin_controller.dart';
+import 'package:samids_web_app/src/controllers/auth.controller.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/admin/attendance.dart';
@@ -247,6 +248,12 @@ class MyApp extends StatelessWidget {
               case SettingsPage.routeName:
                 return MaterialPageRoute(
                     builder: (_) => SettingsPage(
+                          controller: AuthController
+                                      .instance.loggedInUser!.type.index ==
+                                  0
+                              ? StudentController.instance
+                              : FacultyController.instance,
+
                           settingsController:
                               settingsController, // Add this line
                         ));

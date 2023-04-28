@@ -30,7 +30,7 @@ class Student {
       lastName: json['lastName'],
       firstName: json['firstName'],
       course: json['course'],
-      year: yearValues.map[json['year'].toString()] ?? Year.first,
+      year: yearValues.map[json['year'].toString()] ?? Year.First,
       subjects: json['subjects'] != null
           ? List<Subject>.from(
               json['subjects'].map((x) => Subject.fromJson(x)),
@@ -55,11 +55,7 @@ class Student {
   }
 }
 
-enum Year { first, second, third, fourth }
+enum Year { First, Second, Third, Fourth }
 
-final yearValues = EnumValues({
-  0: Year.first,
-  1: Year.second,
-  2: Year.third,
-  3: Year.fourth
-});
+final yearValues =
+    EnumValues({0: Year.First, 1: Year.Second, 2: Year.Third, 3: Year.Fourth});

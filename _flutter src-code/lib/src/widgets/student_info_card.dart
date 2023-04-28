@@ -10,13 +10,19 @@ class StudentInfoCard extends StatelessWidget {
   final currentUser = AuthController.instance;
   final String firstName;
   final String lastName;
+  final String? year;
+  final int id;
+  final String course;
   bool isFaculty;
 
   StudentInfoCard(
       {Key? key,
       this.isFaculty = false,
       required this.firstName,
-      required this.lastName})
+      required this.lastName,
+      this.year,
+      required this.course,
+      required this.id})
       : super(key: key);
 
   @override
@@ -31,10 +37,10 @@ class StudentInfoCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              backgroundImage: AssetImage('assets/images/montero.jpg'),
-              radius: 40,
-            ),
+            // const CircleAvatar(
+            //   backgroundImage: AssetImage('assets/images/montero.jpg'),
+            //   radius: 40,
+            // ),
             const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +48,7 @@ class StudentInfoCard extends StatelessWidget {
               children: [
                 RichText(
                   text: TextSpan(
-                    text: '$firstName $lastName ',
+                    text: '$firstName $lastName - $id',
                     style: TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w600,
@@ -65,7 +71,7 @@ class StudentInfoCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Department of Computer Studies",
+                  '$course ${year != null ? '- Year: $year' : ''}',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,

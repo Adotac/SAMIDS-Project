@@ -369,6 +369,27 @@ class StudentController with ChangeNotifier {
   }
 
   Future<void> downloadData(context) async {
+    if (filteredAttendanceList.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('No attendance data found'),
+            content: Text('There is no attendance data to download.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     List<List<dynamic>> csvData = [
       // Add headers to the CSV file
       [

@@ -89,13 +89,17 @@ class _StudentDashboardState extends State<StudentDashboard> {
                             child: Column(
                               children: [
                                 // StudentInfoCard(student: _sdController.student),
-
                                 Row(
                                   children: [
                                     Flexible(
                                         flex: 1,
                                         child: Card(
                                           child: StudentInfoCard(
+                                            id: _sdController.student.studentNo,
+                                            year:
+                                                _sdController.student.year.name,
+                                            course:
+                                                _sdController.student.course,
                                             firstName:
                                                 _sdController.student.firstName,
                                             lastName:
@@ -173,7 +177,18 @@ class _StudentDashboardState extends State<StudentDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TitleMediumText(title: "My Classes"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TitleMediumText(title: "My Classes"),
+                Text(
+                  _getCurrentYearTerm(),
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
             _dataTableClasses(context),
           ],
         ),
@@ -295,6 +310,13 @@ class _StudentDashboardState extends State<StudentDashboard> {
   //     ),
   //   );
   // }
+  String _getCurrentYearTerm() {
+    String currentTerm = _sdController.config?.currentTerm ?? '';
+    String currentYear = _sdController.config?.currentYear ?? '';
+
+    return '$currentTerm-$currentYear';
+  }
+
   Widget _webRecentLogsCard(BuildContext context) {
     return Card(
       child: Padding(
@@ -306,6 +328,12 @@ class _StudentDashboardState extends State<StudentDashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TitleMediumText(title: "Recent Activity"),
+                Text(
+                  _formatCurrentDate(),
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
               ],
             ),
             SizedBox(

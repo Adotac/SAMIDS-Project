@@ -126,7 +126,7 @@ class _StudentClassesState extends State<StudentClasses> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
-            "subject.name",
+            subject?.subjectName ?? '',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(

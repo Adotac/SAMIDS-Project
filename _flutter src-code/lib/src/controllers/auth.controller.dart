@@ -47,6 +47,23 @@ class AuthController with ChangeNotifier {
     }
   }
 
+  Future<void> changePassword(
+      String password, int userNo, String userType) async {
+    try {
+      final result =
+          await AuthService.changePassword(password, userNo, userType);
+
+      if (result.success) {
+        // handle success
+      } else {
+        throw result.data;
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' changePassword $e $stacktrace');
+      rethrow;
+    }
+  }
+
   Future<bool> register(
       int userId, String email, String password, int type) async {
     try {
@@ -68,22 +85,6 @@ class AuthController with ChangeNotifier {
     } catch (e) {
       print('Error registering user: $e');
       rethrow;
-    }
-  }
-
-  Future<bool> changePassword(String newPassword, User user) async {
-    try {
-      CRUDReturn result = await AuthService.changePassword(newPassword, user);
-      if (result.success) {
-        // Update user object
-        loggedInUser = User.fromJson(jsonDecode(result.data));
-        notifyListeners();
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      return false;
     }
   }
 

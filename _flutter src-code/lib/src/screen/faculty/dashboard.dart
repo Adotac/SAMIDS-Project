@@ -86,6 +86,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                                   child: Column(
                                     children: [
                                       StudentInfoCard(
+                                          course: "Faculty",
+                                          id: _sdController.faculty.facultyId,
                                           firstName:
                                               _sdController.faculty.firstName,
                                           lastName:

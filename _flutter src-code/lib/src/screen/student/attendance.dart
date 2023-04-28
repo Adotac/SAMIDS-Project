@@ -241,7 +241,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
       _searchBarMobile(context),
       SizedBox(height: 8),
       Container(
-        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        margin: EdgeInsets.symmetric(horizontal: 6.0),
         child: Card(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,

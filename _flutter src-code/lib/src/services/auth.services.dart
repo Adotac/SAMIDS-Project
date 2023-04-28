@@ -44,14 +44,33 @@ class AuthService {
     }
   }
 
+  // static Future<CRUDReturn> changePassword(
+  //     String newPassword, User user) async {
+  //   final response =
+  //       await HttpService.patch('$_baseUrl/change-password', body: {
+  //     'newPassword': newPassword,
+  //     'user': user.toJson(),
+  //   });
+  //   final jsonResponse = jsonDecode(response.body);
+  //   return CRUDReturn.fromJson(jsonResponse);
+  // }
+
   static Future<CRUDReturn> changePassword(
-      String newPassword, User user) async {
-    final response =
-        await HttpService.patch('$_baseUrl/change-password', body: {
-      'newPassword': newPassword,
-      'user': user.toJson(),
-    });
-    final jsonResponse = jsonDecode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
+      String newPassword, int userNo, String userType) async {
+    try {
+      final response = await HttpService.patch(
+        '$_baseUrl/change-password?newPassword=$newPassword&$userType=$userNo',
+        headers: {'accept': 'text/plain'},
+      );
+      if (kDebugMode) {
+        print(
+            'AuthService changePassword ${response.statusCode} ${response.body}');
+      }
+      final jsonResponse = jsonDecode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('AuthService changePassword $e $stacktrace');
+      return CRUDReturn(success: false, data: e);
+    }
   }
 }
