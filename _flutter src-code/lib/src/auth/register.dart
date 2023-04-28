@@ -158,7 +158,7 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         bool success = await _authController.register(
           int.parse(_userIdController.text),
-          _emailController.text,
+          _emailController.text.toLowerCase().trim(),
           _passwordController.text,
           _userType,
         );

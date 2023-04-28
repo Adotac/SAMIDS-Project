@@ -69,87 +69,120 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             return WebView(
               appBarTitle: 'Dashboard',
               selectedWidgetMarker: 0,
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              children: [
-                                Card(
-                                  child: Column(
-                                    children: [
-                                      StudentInfoCard(
-                                          course: "Faculty",
-                                          id: _sdController.faculty.facultyId,
-                                          firstName:
-                                              _sdController.faculty.firstName,
-                                          lastName:
-                                              _sdController.faculty.lastName,
-                                          isFaculty: true),
-                                      SizedBox(
-                                        height: 80,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          _buildLegendContainer(
-                                              Colors.red, 16, 'Absent'),
-                                          SizedBox(width: 8),
-                                          _buildLegendContainer(
-                                              Colors.yellow.shade700,
-                                              16,
-                                              'Cutting'),
-                                          SizedBox(width: 8),
-                                          _buildLegendContainer(
-                                              Colors.green, 16, 'On-Time'),
-                                          SizedBox(width: 8),
-                                          _buildLegendContainer(
-                                              Colors.orange, 16, 'Late'),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                          height: 240,
-                                          child: TestLineChart(
-                                              isShowingMainData: false)),
-                                    ],
-                                  ),
-                                ),
-
-                                // SizedBox(
-                                //     height: 250,
-                                //     child: TestLineChart(
-                                //         isShowingMainData: false)),
-                                // StudentInfoCard(
-                                //     user: _sdController.student,
-                                //     isFaculty: true),
-                                // buildLineChart(context),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: _myScheduleClass(),
-                          )
-                        ],
-                      )),
-                  Expanded(
-                      child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
-                    child: _buildGridView(constraints),
-                  )),
-                ],
+              body: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildListView()),
+                    Expanded(child: _chartInfo()),
+                    // Expanded(
+                    //     child: Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                    //   child: _buildGridView(constraints),
+                    // )),
+                  ],
+                ),
               ),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _chartInfo() {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Card(
+                child: Column(
+                  children: [
+                    StudentInfoCard(
+                        course: "Faculty",
+                        id: _sdController.faculty.facultyNo,
+                        firstName: _sdController.faculty.firstName,
+                        lastName: _sdController.faculty.lastName,
+                        isFaculty: true),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildLegendContainer(Colors.red, 16, 'Absent'),
+                        SizedBox(width: 8),
+                        _buildLegendContainer(
+                            Colors.yellow.shade700, 16, 'Cutting'),
+                        SizedBox(width: 8),
+                        _buildLegendContainer(Colors.green, 16, 'On-Time'),
+                        SizedBox(width: 8),
+                        _buildLegendContainer(Colors.orange, 16, 'Late'),
+                      ],
+                    ),
+                    SizedBox(
+                        height: 232,
+                        child: TestLineChart(isShowingMainData: false)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          _myScheduleClass(),
+        ],
+      ),
+    );
+  }
+
+  Widget mobileBody() {
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 6.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text(
+                      'Dashboard',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLegendContainer(Colors.red, 16, 'Absent'),
+                      SizedBox(width: 8),
+                      _buildLegendContainer(
+                          Colors.yellow.shade700, 16, 'Cutting'),
+                      SizedBox(width: 8),
+                      _buildLegendContainer(Colors.green, 16, 'On-Time'),
+                      SizedBox(width: 8),
+                      _buildLegendContainer(Colors.orange, 16, 'Late'),
+                    ],
+                  ),
+                  SizedBox(
+                      height: 232,
+                      child: TestLineChart(isShowingMainData: false)),
+                ],
+              ),
+            ),
+            Column(
+              children:
+                  List<Widget>.generate(sampleOverviewData.length, (int index) {
+                return _overviewCard(index, context);
+              }),
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -246,18 +279,22 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             appBarTitle: 'Dashboard',
             userName:
                 '${_sdController.faculty.firstName} ${_sdController.faculty.lastName}',
-            body: _sdController.isCountCalculated
-                ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard()]
-                : [
-                    Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 4,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).primaryColor, // Customize the color
-                        ),
-                      ),
-                    ),
-                  ]);
+            body: [
+              mobileBody(),
+            ]);
+
+        // body: _sdController.isCountCalculated
+        //     ? [_mobileOverviewCard(2, 0), _mobileRecentLogsCard()]
+        //     : [
+        //         Center(
+        //           child: CircularProgressIndicator(
+        //             strokeWidth: 4,
+        //             valueColor: AlwaysStoppedAnimation<Color>(
+        //               Theme.of(context).primaryColor, // Customize the color
+        //             ),
+        //           ),
+        //         ),
+        //       ]);
       },
     );
   }
@@ -438,8 +475,9 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   Widget _myScheduleClass() {
     return Card(
         child: Container(
-      width: MediaQuery.of(context).size.width * 0.4,
-      height: 445,
+      // width: MediaQuery.of(context).size.width * 0.4,
+      width: double.infinity,
+      // height: 445,
       padding: EdgeInsets.all(16),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -452,7 +490,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             ),
             SizedBox(height: 8),
             Text(
-              '1st Semester - 2023',
+              _getCurrentYearTerm(),
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
@@ -464,6 +502,13 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         ),
       ),
     ));
+  }
+
+  String _getCurrentYearTerm() {
+    String currentTerm = _sdController.config?.currentTerm ?? '';
+    String currentYear = _sdController.config?.currentYear ?? '';
+
+    return '$currentTerm - $currentYear';
   }
 
   String _formatCurrentDate() {
@@ -564,34 +609,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   //   );
   // }
 
-  Widget _mobileRecentLogsCard() {
-    return MobileSmallCard(
-      isShadow: false,
-      sideTitle: _formatCurrentDate(),
-      title: "Recent Activity",
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: sampleRecentLogsData.length,
-        itemBuilder: (BuildContext context, int index) {
-          Map<String, dynamic> attendance = sampleRecentLogsData[index];
-          return CustomListTile(
-            title: attendance['subjectName'],
-            subtitle: Text(attendance['statusText'],
-                style:
-                    TextStyle(color: attendance['statusColor'], fontSize: 14)),
-            leadingIcon: Icon(
-              attendance['statusIcon'],
-              color: Theme.of(context).scaffoldBackgroundColor,
-            ),
-            leadingColors: attendance['statusColor'],
-            trailingText: _sdController.formatTime(attendance['time']),
-            subTrailingText: attendance['roomId'],
-          );
-        },
-      ),
-    );
-  }
-
   DateTime _getActualTime(Attendance attendance) =>
       attendance.actualTimeOut != null
           ? attendance.actualTimeOut!
@@ -648,92 +665,161 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   List<Widget> _buildOverviewCard(
       Map<String, dynamic> attendance, BuildContext context, double totalLogs) {
     return [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            attendance['subjectName'],
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Spacer(),
-          TextButton(
-            onPressed: () {
-              _showMyClassesDialog(context, attendance['subjectName']);
-            },
-            child: Text('Class List'),
-          ),
-          TextButton(
-            onPressed: () {
-              _showAttendanceDialog(context, attendance['subjectName']);
-            },
-            child: Text('Attendance List'),
-          ),
-        ],
-      ),
-      SizedBox(height: 18.0),
-      Row(
-        children: [
-          Column(
+      LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          double fontSize = constraints.maxWidth <= 450 ? 16 : 24;
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (constraints.maxWidth >= 450)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      attendance['subjectName'],
+                      style: TextStyle(
+                          fontSize: fontSize, fontWeight: FontWeight.bold),
+                    ),
+                    Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        _showMyClassesDialog(
+                            context, attendance['subjectName']);
+                      },
+                      child: Text('Class List'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _showAttendanceDialog(
+                            context, attendance['subjectName']);
+                      },
+                      child: Text('Attendance List'),
+                    ),
+                  ],
+                ),
+              if (constraints.maxWidth < 450)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      attendance['subjectName'],
+                      style: TextStyle(
+                          fontSize: fontSize, fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            _showMyClassesDialog(
+                                context, attendance['subjectName']);
+                          },
+                          child: Text('Class List'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _showAttendanceDialog(
+                                context, attendance['subjectName']);
+                          },
+                          child: Text('Attendance List'),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              SizedBox(height: constraints.maxWidth >= 450 ? 18.0 : 0),
               Row(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text('Code:'),
-                      Text('Time:'),
-                      Text('Dates:'),
-                    ],
-                  ),
-                  SizedBox(width: 8.0),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(attendance['room']),
-                      Text(
-                        DateFormat('hh:mm a').format(attendance['timeStart']) +
-                            ' - ' +
-                            DateFormat('hh:mm a').format(attendance['timeEnd']),
+                      Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text('Code:'),
+                              Text('Time:'),
+                              Text('Dates:'),
+                            ],
+                          ),
+                          SizedBox(width: 8.0),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(attendance['room']),
+                              Text(
+                                  '${DateFormat('hh:mm a').format(attendance['timeStart'])} - ${DateFormat('hh:mm a').format(attendance['timeEnd'])}'),
+                              Text(attendance['day']),
+                            ],
+                          ),
+                        ],
                       ),
-                      Text(attendance['day']),
+                      Visibility(
+                        visible: constraints.maxWidth < 450,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Row(
+                              children: [
+                                circularData(attendance['absentCount'],
+                                    'Absent', Colors.red, totalLogs),
+                                circularData(
+                                    attendance['cuttingCount'],
+                                    'Cutting',
+                                    Colors.yellow.shade700,
+                                    totalLogs),
+                                circularData(attendance['onTimeCount'],
+                                    'On-Time', Colors.green, totalLogs),
+                                circularData(attendance['lateCount'], 'Late',
+                                    Colors.orange, totalLogs),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: constraints.maxWidth >= 450 ? 18.0 : 0),
+                      DataNumber(
+                        number: totalLogs.toString(),
+                        description: "Total logs",
+                      ),
                     ],
                   ),
+                  Visibility(
+                    visible: constraints.maxWidth >= 450,
+                    child: Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              circularData(attendance['absentCount'], 'Absent',
+                                  Colors.red, totalLogs),
+                              circularData(attendance['cuttingCount'],
+                                  'Cutting', Colors.yellow.shade700, totalLogs),
+                              circularData(attendance['onTimeCount'], 'On-Time',
+                                  Colors.green, totalLogs),
+                              circularData(attendance['lateCount'], 'Late',
+                                  Colors.orange, totalLogs),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
-              SizedBox(height: 18.0),
-              DataNumber(
-                number: totalLogs.toString(),
-                description: "Total logs",
-              ),
+              SizedBox(height: 16.0),
             ],
-          ),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    circularData(attendance['absentCount'], 'Absent',
-                        Colors.red, totalLogs),
-                    circularData(attendance['cuttingCount'], 'Cutting',
-                        Colors.yellow.shade700, totalLogs),
-                    circularData(attendance['onTimeCount'], 'On-Time',
-                        Colors.green, totalLogs),
-                    circularData(attendance['lateCount'], 'Late', Colors.orange,
-                        totalLogs),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
+          );
+        },
       ),
-      SizedBox(height: 16.0),
     ];
   }
 
@@ -863,29 +949,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
               },
             ),
           ],
-        );
-      },
-    );
-  }
-
-  Widget _mobileOverviewCard(leadingFlex, [flexValue = 1]) {
-    return AnimatedBuilder(
-      animation: _sdController,
-      builder: (context, child) {
-        double totalLogs = _sdController.allAttendanceList.length.toDouble();
-        return MobileSmallCard(
-          isShadow: true,
-          sideTitle: "Total logs",
-          sideTitleTrailer: "19",
-          title: "Overview",
-          child: Row(
-            children: [
-              circularData(2, 'Absent', Colors.red, 19),
-              circularData(2, 'Cutting', Colors.yellow, 19),
-              circularData(12, 'On-Time', Colors.green, 19),
-              circularData(3, 'Late', Color.fromRGBO(255, 152, 0, 1), 19),
-            ],
-          ),
         );
       },
     );
@@ -1109,15 +1172,32 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     },
   ];
 
-  GridView _buildGridView(BoxConstraints constraints) {
-    return GridView.builder(
+  // GridView _buildGridView(BoxConstraints constraints) {
+  //   return GridView.builder(
+  //     itemCount: sampleOverviewData.length,
+  //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+  //       crossAxisCount: 2,
+  //       childAspectRatio: constraints.maxWidth / 2 / 256,
+  //     ),
+  //     itemBuilder: (BuildContext context, int index) {
+  //       return _overviewCard(index, context);
+  //     },
+  //   );
+  // }
+  ListView _buildListView() {
+    return ListView.builder(
       itemCount: sampleOverviewData.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: constraints.maxWidth / 2 / 256,
-      ),
       itemBuilder: (BuildContext context, int index) {
         return _overviewCard(index, context);
+      },
+    );
+  }
+
+  ListView _mobileBuildListView() {
+    return ListView.builder(
+      itemCount: sampleOverviewData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Text("index, context");
       },
     );
   }
