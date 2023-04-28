@@ -10,18 +10,11 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+import onnx
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
 workers = 0 if os.name == 'nt' else 4
-
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-print(f'Running on device: {device}')
-
-# Define MTCNN module
-mtcnn = MTCNN(
-    image_size=160, margin=0, min_face_size=20,
-    thresholds=[0.6, 0.7, 0.7], factor=0.709, post_process=True,
-    device=device
-)
-
 
 weights_path = './models/facenet-vggface2.pt'  # Replace with the correct path to your downloaded weights file
 resnet = InceptionResnetV1()
@@ -30,7 +23,7 @@ resnet = InceptionResnetV1()
 # state_dict = torch.load(weights_path)
 # state_dict = {k: v for k, v in state_dict.items() if k not in ['logits.weight', 'logits.bias']}
 # resnet.load_state_dict(state_dict, strict=False)
-resnet.eval().to(device)
+resnet.eval()
 
 # Define a dataset and data loader
 path = os.path.abspath('D:\Code Files\_dataset\lfwBiSAM')
