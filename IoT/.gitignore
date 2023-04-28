@@ -1,0 +1,11 @@
+!.gitignore
+.idea
+
+*/defines.h
+*/data
+
+*.gz
+*.zip
+*.rar
+*.tgz
+*.tar
