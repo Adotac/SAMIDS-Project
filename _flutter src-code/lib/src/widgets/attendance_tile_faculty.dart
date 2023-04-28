@@ -2,15 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/attendance_dialog_report.dart';
 
-class AttendanceTile extends StatelessWidget {
+class AttendanceTileFac extends StatelessWidget {
+  final String studentNo;
   final String subject;
-  final String room;
+  final String name;
+  final String referenceNo;
   final String date;
+  final String day;
+  final String room;
   final String timeIn;
   final String timeOut;
   final Widget remarks;
 
-  const AttendanceTile({
+  const AttendanceTileFac({
     Key? key,
     required this.subject,
     required this.room,
@@ -18,6 +22,10 @@ class AttendanceTile extends StatelessWidget {
     required this.timeIn,
     required this.timeOut,
     required this.remarks,
+    required this.name,
+    required this.referenceNo,
+    required this.day,
+    required this.studentNo,
   }) : super(key: key);
 
   Future<void> _showLoadingDialog(BuildContext context) async {
@@ -111,8 +119,11 @@ class AttendanceTile extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Reference No: $referenceNo'),
+            Text('Name: $name'),
             Text('Room: $room'),
             Text('Date: $date'),
+            Text('Day: $day'),
             Text('Time In: $timeIn'),
             Text('Time Out: $timeOut'),
           ],
@@ -122,16 +133,6 @@ class AttendanceTile extends StatelessWidget {
           children: [
             remarks,
             const Spacer(),
-            Expanded(
-              child: IconButton(
-                  onPressed: () {
-                    const EditAttendanceDialog();
-                  },
-                  icon: Icon(
-                    Icons.report_gmailerrorred_outlined,
-                    color: Theme.of(context).primaryColor,
-                  )),
-            ),
           ],
         ),
       ),

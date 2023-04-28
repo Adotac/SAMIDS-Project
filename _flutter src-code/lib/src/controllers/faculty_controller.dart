@@ -70,8 +70,9 @@ class FacultyController with ChangeNotifier {
   Future<void> attendanceReset() async {
     try {
       CRUDReturn response = await AttendanceService.getAll(
-        studentNo: faculty.facultyNo,
-      );
+          // studentNo: faculty.facultyNo,
+          // studentNo: 91204,
+          );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
@@ -181,11 +182,14 @@ class FacultyController with ChangeNotifier {
       CRUDReturn response = date != null
           ? await AttendanceService.getAll(
               // studentNo: faculty.facultyNo,
+              studentNo: 91204,
+
               date: date,
             )
           : await AttendanceService.getAll(
               // studentNo: faculty.facultyNo,
-              );
+              studentNo: 91204,
+            );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();

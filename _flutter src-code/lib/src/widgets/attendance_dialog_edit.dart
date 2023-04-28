@@ -37,14 +37,14 @@ class _ReportAttendanceDialogState extends State<ReportAttendanceDialog> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Report Attendance Issue'),
+          title: const Text('Edit Attendance'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(
+                const Text(
                   'Please provide a brief description of the issue:',
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _textFieldController,
                   decoration: InputDecoration(
@@ -87,7 +87,7 @@ class _ReportAttendanceDialogState extends State<ReportAttendanceDialog> {
         _showReportAttendanceDialog(context);
       },
       icon: Icon(
-        Icons.report_gmailerrorred_outlined,
+        Icons.edit_outlined,
         color: Theme.of(context).primaryColor,
       ),
     );
