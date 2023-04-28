@@ -9,7 +9,7 @@ import ConvertFromVideotoDataset as CFVD
 
 server_process = None
 
-face_cropper = CFVD.FaceCropper("dummy", "dummy")
+face_cropper = CFVD.FrameExtractor("dummy", "dummy")
 
 def browse_directory(entry):
     dirname = filedialog.askdirectory()
@@ -31,7 +31,7 @@ def start_process_videos():
         root.update_idletasks()
 
     def run_process_videos():
-        face_cropper = CFVD.FaceCropper(vidpath, oupath, progress_callback=update_progress)
+        face_cropper = CFVD.FrameExtractor(vidpath, oupath, progress_callback=update_progress)
         result = face_cropper.process_videos()
         print(result)
 
