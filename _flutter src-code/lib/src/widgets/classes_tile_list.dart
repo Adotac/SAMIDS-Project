@@ -25,19 +25,6 @@ class ClassesListTile extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 8.0),
           padding: const EdgeInsets.all(16.0),
-          // decoration: BoxDecoration(
-          //   boxShadow: enableShadow
-          //       ? const [
-          //           BoxShadow(
-          //             spreadRadius: -2,
-          //             blurRadius: 10,
-          //             color: Colors.black26,
-          //             offset: Offset(5, 8),
-          //           ),
-          //         ]
-          //       : null,
-          //   color: Colors.white,
-          // ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

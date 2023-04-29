@@ -20,6 +20,7 @@ import '../../widgets/mobile_view.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/web_view.dart';
+import 'class_list.dart';
 
 // ignore: must_be_immutable
 class FacultyDashboard extends StatefulWidget {
@@ -306,27 +307,25 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         return AlertDialog(
           title: Text('$title   Attendance '),
           content: SizedBox(
-            child: Card(
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                    label: Expanded(child: Text('Subject')),
-                  ),
-                  DataColumn(
-                    label: Text('Room'),
-                  ),
-                  DataColumn(
-                    label: Text('Time'),
-                  ),
-                  DataColumn(
-                    label: Text('Remarks'),
-                  ),
-                ],
-                rows: _sdController.allAttendanceList
-                    .map((attendance) =>
-                        _buildDataRowRecentLogs(context, attendance))
-                    .toList(),
-              ),
+            child: DataTable(
+              columns: [
+                DataColumn(
+                  label: Expanded(child: Text('Subject')),
+                ),
+                DataColumn(
+                  label: Text('Room'),
+                ),
+                DataColumn(
+                  label: Text('Time'),
+                ),
+                DataColumn(
+                  label: Text('Remarks'),
+                ),
+              ],
+              rows: _sdController.allAttendanceList
+                  .map((attendance) =>
+                      _buildDataRowRecentLogs(context, attendance))
+                  .toList(),
             ),
           ),
         );
@@ -407,28 +406,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _dataTableRecentLogs(context) {
-    return DataTable(
-      columns: [
-        DataColumn(
-          label: Expanded(child: Text('Subject')),
-        ),
-        DataColumn(
-          label: Text('Room'),
-        ),
-        DataColumn(
-          label: Text('Time'),
-        ),
-        DataColumn(
-          label: Text('Remarks'),
-        ),
-      ],
-      rows: _sdController.allAttendanceList
-          .map((attendance) => _buildDataRowRecentLogs(context, attendance))
-          .toList(),
     );
   }
 
@@ -713,8 +690,15 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                       children: [
                         TextButton(
                           onPressed: () {
-                            _showMyClassesDialog(
-                                context, attendance['subjectName']);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FacultyClassesList(
+                                  title: attendance['subjectName'] ?? '',
+                                  dataController: _sdController,
+                                ),
+                              ),
+                            );
                           },
                           child: Text('Class List'),
                         ),
@@ -1189,15 +1173,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       itemCount: sampleOverviewData.length,
       itemBuilder: (BuildContext context, int index) {
         return _overviewCard(index, context);
-      },
-    );
-  }
-
-  ListView _mobileBuildListView() {
-    return ListView.builder(
-      itemCount: sampleOverviewData.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Text("index, context");
       },
     );
   }

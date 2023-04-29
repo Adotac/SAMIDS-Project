@@ -5,6 +5,7 @@ import '../controllers/auth.controller.dart';
 import '../screen/admin/attendance.dart';
 import '../screen/admin/dashboard.dart';
 import '../screen/faculty/attendance.dart';
+import '../screen/faculty/classes.dart';
 import '../screen/faculty/dashboard.dart';
 import '../screen/settings.dart';
 import '../screen/student/attendance.dart';
@@ -19,17 +20,19 @@ class MobileView extends StatefulWidget {
   bool showBottomNavBar;
   bool showAppBar;
   bool appBarOnly;
+  bool implyLeading;
   final int currentIndex;
-  MobileView({
-    Key? key,
-    required this.body,
-    required this.appBarTitle,
-    required this.currentIndex,
-    this.userName = '',
-    this.showBottomNavBar = true,
-    this.showAppBar = true,
-    this.appBarOnly = false,
-  }) : super(key: key);
+  MobileView(
+      {Key? key,
+      required this.body,
+      required this.appBarTitle,
+      required this.currentIndex,
+      this.userName = '',
+      this.showBottomNavBar = true,
+      this.showAppBar = true,
+      this.appBarOnly = false,
+      this.implyLeading = false})
+      : super(key: key);
   final AuthController authController = AuthController.instance;
   @override
   State<MobileView> createState() => _MobileViewState();
@@ -92,9 +95,9 @@ class _MobileViewState extends State<MobileView> {
       selectedItemColor: selectedItemColor,
       items: items,
       onTap: (int index) {
+        int userType = _authController.loggedInUser?.type.index ?? -1;
         switch (index) {
           case 0:
-            int userType = _authController.loggedInUser?.type.index ?? -1;
             switch (userType) {
               case 0:
                 Navigator.popAndPushNamed(context, StudentDashboard.routeName);
@@ -111,7 +114,6 @@ class _MobileViewState extends State<MobileView> {
 
             break;
           case 1:
-            int userType = _authController.loggedInUser?.type.index ?? -1;
             switch (userType) {
               case 0:
                 Navigator.popAndPushNamed(context, StudentAttendance.routeName);
@@ -128,10 +130,24 @@ class _MobileViewState extends State<MobileView> {
             }
             break;
           case 2:
-            Navigator.of(context).popAndPushNamed(StudentClasses.routeName);
+            switch (userType) {
+              case 0:
+                Navigator.popAndPushNamed(context, StudentClasses.routeName);
+                break;
+              case 1:
+                Navigator.popAndPushNamed(context, FacultyClasses.routeName);
+                break;
+
+              default:
+                Navigator.popAndPushNamed(
+                  context,
+                  AdminAttendance.routeName,
+                );
+            }
             break;
           case 3:
             Navigator.of(context).popAndPushNamed(SettingsPage.routeName);
+
             break;
           default:
             Navigator.of(context).popAndPushNamed(PageNotFound.routeName);
@@ -253,15 +269,18 @@ class _MobileViewState extends State<MobileView> {
                   },
                 ),
               ],
-              leading: Container(
-                margin: const EdgeInsets.only(left: 16),
-                child: Image.asset(
-                  'assets/images/BiSAM.png',
-                  height: 24,
-                  width: 24,
+              leading: Visibility(
+                visible: !widget.implyLeading,
+                child: Container(
+                  margin: const EdgeInsets.only(left: 16),
+                  child: Image.asset(
+                    'assets/images/BiSAM.png',
+                    height: 24,
+                    width: 24,
+                  ),
                 ),
               ),
-              automaticallyImplyLeading: false,
+              automaticallyImplyLeading: widget.implyLeading,
               leadingWidth: 48,
               title: Text(widget.appBarTitle),
             )
@@ -287,16 +306,19 @@ class _MobileViewState extends State<MobileView> {
                       },
                     ),
                   ],
-                  leading: Container(
-                    margin: const EdgeInsets.only(left: 16),
-                    child: Image.asset(
-                      'assets/images/BiSAM.png',
-                      height: 24,
-                      width: 24,
+                  leading: Visibility(
+                    visible: !widget.implyLeading,
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 16),
+                      child: Image.asset(
+                        'assets/images/BiSAM.png',
+                        height: 24,
+                        width: 24,
+                      ),
                     ),
                   ),
                   leadingWidth: 48,
-                  automaticallyImplyLeading: false,
+                  automaticallyImplyLeading: widget.implyLeading,
                   pinned: true,
                   floating: true,
                   expandedHeight: 100.0,

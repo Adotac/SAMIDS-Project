@@ -162,4 +162,17 @@ class StudentService {
       rethrow;
     }
   }
+
+  static Future<CRUDReturn> getStudentsBySchedId(int schedId) async {
+    try {
+      final response = await HttpService.get(
+        '$_baseUrl/Student/BySchedId?schedId=$schedId',
+        headers: {'accept': 'text/plain'},
+      );
+      return CRUDReturn.fromJson(jsonDecode(response.body));
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' getStudentsBySchedId $e $stacktrace');
+      rethrow;
+    }
+  }
 }

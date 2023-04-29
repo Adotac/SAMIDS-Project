@@ -13,6 +13,7 @@ import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/admin/manage_users.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
+import 'package:samids_web_app/src/screen/faculty/classes.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 
 import 'package:samids_web_app/src/screen/page_not_found.dart';
@@ -223,6 +224,11 @@ class MyApp extends StatelessWidget {
                     adminController: AdminController.instance,
                   ),
                 );
+              case FacultyClasses.routeName:
+                return MaterialPageRoute(
+                    builder: (_) => FacultyClasses(
+                          dataController: FacultyController.instance,
+                        ));
               case FacultyDashboard.routeName:
                 return MaterialPageRoute(
                     builder: (_) => FacultyDashboard(

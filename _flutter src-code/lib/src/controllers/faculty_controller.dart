@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
+import 'package:samids_web_app/src/model/student_model.dart';
 
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
@@ -24,6 +25,7 @@ import '../services/student.services.dart';
 
 class FacultyController with ChangeNotifier {
   final Faculty faculty;
+  final List<Student> students = [];
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
@@ -36,7 +38,7 @@ class FacultyController with ChangeNotifier {
   double lateCount = 0;
   double absentCount = 0;
   double cuttingCount = 0;
-
+  bool isStudentsCollected = false;
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
@@ -67,6 +69,19 @@ class FacultyController with ChangeNotifier {
     }
   }
 
+  // Future<void> getFacultyClasses() async {
+  //   try {
+  //     if (isStudentClassesCollected) return;
+  //     CRUDReturn response =
+  //         await StudentService.getStudentClasses(faculty.facultyNo);
+  //     if (response.success) {
+  //       handleEventJsonStudentClasses(response);
+  //     }
+  //     notifyListeners();
+  //   } catch (e, stacktrace) {
+  //     print('StudentDashboardController getStudentClasses $e $stacktrace');
+  //   }
+  // }
   Future<void> attendanceReset() async {
     try {
       CRUDReturn response = await AttendanceService.getAll(
@@ -158,6 +173,31 @@ class FacultyController with ChangeNotifier {
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonStudentClasses $e $stacktrace');
+    }
+  }
+
+  void handleEventJsonStudentList(CRUDReturn result) {
+    try {
+      if (students.isNotEmpty) students.clear();
+      for (Map<String, dynamic> map in result.data) {
+        students.add(Student.fromJson(map));
+      }
+      isStudentsCollected = true;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonStudentList $e $stacktrace');
+    }
+  }
+
+  Future<void> getStudentListbySchedId(int schedId) async {
+    try {
+      CRUDReturn response = await StudentService.getStudentsBySchedId(schedId);
+      if (response.success) {
+        handleEventJsonStudentList(response);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('StudentListController getStudentListbySchedId $e $stacktrace');
     }
   }
 
