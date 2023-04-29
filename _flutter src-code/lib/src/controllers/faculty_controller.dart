@@ -857,6 +857,74 @@ class FacultyController with ChangeNotifier {
   // }
 
   List<Map<String, Map<Remarks, int>>> remarksCountList = [];
+
+  // void getRemarksCountForPercentiles() {
+  //   print('getRemarksCountForPercentiles');
+
+  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+
+  //   Set<DateTime> uniqueDates = {};
+
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       DateTime dateOnly = DateTime(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+
+  //       uniqueDates.add(dateOnly);
+  //     }
+  //   }
+
+  //   int numOfPercentiles = (uniqueDates.length / 6).ceil();
+
+  //   for (int i = 0; i < numOfPercentiles; i++) {
+  //     List<DateTime> percentileDates = uniqueDates.skip(i * 6).take(6).toList();
+  //     String percentileLabel =
+  //         '${percentileDates.first} - ${percentileDates.last}';
+
+  //     Map<Remarks, int> remarksCount = {
+  //       Remarks.onTime: 0,
+  //       Remarks.late: 0,
+  //       Remarks.cutting: 0,
+  //       Remarks.absent: 0
+  //     };
+
+  //     for (Attendance attendance in allAttendanceList) {
+  //       if (attendance.date != null) {
+  //         DateTime dateOnly = DateTime(attendance.date!.year,
+  //             attendance.date!.month, attendance.date!.day);
+
+  //         if (percentileDates.contains(dateOnly)) {
+  //           remarksCount[attendance.remarks] =
+  //               remarksCount[attendance.remarks]! + 1;
+  //         }
+  //       }
+  //     }
+
+  //     remarksCountList.add({percentileLabel: remarksCount});
+  //   }
+
+  //   for (Map<String, Map<Remarks, int>> data in remarksCountList) {
+  //   String dateRange = data.keys.first;
+  //   Map<Remarks, int> remarksCount = data.values.first;
+
+  //   DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
+  //   DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
+
+  //   String formattedDateRange =
+  //       '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('MMMM d').format(endDate)}';
+
+  //   print(formattedDateRange);
+
+  //   for (Remarks remark in remarksCount.keys) {
+  //     int count = remarksCount[remark]!;
+  //     print('$remark: $count');
+  //   }
+  // }
+
+  //   // print(remarksCountList);
+  //   notifyListeners();
+  // }
+
   void getRemarksCountForPercentiles() {
     print('getRemarksCountForPercentiles');
 
@@ -873,10 +941,13 @@ class FacultyController with ChangeNotifier {
       }
     }
 
-    int numOfPercentiles = (uniqueDates.length / 6).ceil();
+    int datesPerPercentile = (uniqueDates.length / 6).ceil();
 
-    for (int i = 0; i < numOfPercentiles; i++) {
-      List<DateTime> percentileDates = uniqueDates.skip(i * 6).take(6).toList();
+    for (int i = 0; i < 6; i++) {
+      List<DateTime> percentileDates = uniqueDates
+          .skip(i * datesPerPercentile)
+          .take(datesPerPercentile)
+          .toList();
       String percentileLabel =
           '${percentileDates.first} - ${percentileDates.last}';
 
@@ -901,8 +972,23 @@ class FacultyController with ChangeNotifier {
 
       remarksCountList.add({percentileLabel: remarksCount});
     }
-    print(remarksCountList);
+    for (Map<String, Map<Remarks, int>> data in remarksCountList) {
+      String dateRange = data.keys.first;
+      Map<Remarks, int> remarksCount = data.values.first;
 
+      DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
+      DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
+
+      String formattedDateRange =
+          '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('MMMM d').format(endDate)}';
+
+      print(formattedDateRange);
+
+      for (Remarks remark in remarksCount.keys) {
+        int count = remarksCount[remark]!;
+        print('$remark: $count');
+      }
+    }
     notifyListeners();
   }
 }
