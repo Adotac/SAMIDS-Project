@@ -27,7 +27,7 @@ class FacultyService {
   static Future<CRUDReturn> getFacultyClasses(int id) async {
     try {
       final response =
-          await HttpService.get('$_baseUrl/Faculty/Classes/?facultyNo=$id');
+          await HttpService.get('$_baseUrl/Faculty/classes/?facultyNo=$id');
       if (kDebugMode) {
         _logger
             .i('getFacultiesClasses ${response.statusCode} ${response.body}');

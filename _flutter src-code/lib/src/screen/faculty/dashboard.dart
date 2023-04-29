@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
@@ -12,6 +13,7 @@ import 'package:samids_web_app/src/widgets/student_info_card.dart';
 import '../../model/attendance_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../model/student_model.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
@@ -20,6 +22,7 @@ import '../../widgets/mobile_view.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/web_view.dart';
+import 'attendance_list.dart';
 import 'class_list.dart';
 
 // ignore: must_be_immutable
@@ -34,14 +37,14 @@ class FacultyDashboard extends StatefulWidget {
 }
 
 class _FacultyDashboardState extends State<FacultyDashboard> {
-  FacultyController get _sdController => widget.dataController;
+  FacultyController get _dataController => widget.dataController;
 
   // add on init
   @override
   void initState() {
-    _sdController.getConfig();
-    _sdController.getAttendanceAll(null);
-    _sdController.getFacultyClasses();
+    _dataController.getConfig();
+    _dataController.getAttendanceAll(null);
+    _dataController.getFacultyClasses();
 
     super.initState();
   }
@@ -63,7 +66,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
 
   Widget _webView() {
     return AnimatedBuilder(
-      animation: _sdController,
+      animation: _dataController,
       builder: (context, child) {
         return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -106,9 +109,9 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   children: [
                     StudentInfoCard(
                         course: "Faculty",
-                        id: _sdController.faculty.facultyNo,
-                        firstName: _sdController.faculty.firstName,
-                        lastName: _sdController.faculty.lastName,
+                        id: _dataController.faculty.facultyNo,
+                        firstName: _dataController.faculty.firstName,
+                        lastName: _dataController.faculty.lastName,
                         isFaculty: true),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +128,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                     ),
                     SizedBox(
                         height: 232,
-                        child: TestLineChart(isShowingMainData: false)),
+                        child: TestLineChart(
+                          isShowingMainData: false,
+                          facultyController: _dataController,
+                        )),
                   ],
                 ),
               ),
@@ -150,10 +156,20 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      'Dashboard',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Dashboard',
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          _dataController.config?.currentTerm ?? 'Term',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
                   ),
                   Row(
@@ -171,13 +187,16 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   ),
                   SizedBox(
                       height: 232,
-                      child: TestLineChart(isShowingMainData: false)),
+                      child: TestLineChart(
+                        isShowingMainData: false,
+                        facultyController: _dataController,
+                      )),
                 ],
               ),
             ),
             Column(
-              children:
-                  List<Widget>.generate(sampleOverviewData.length, (int index) {
+              children: List<Widget>.generate(
+                  _dataController.facultyClasses.length, (int index) {
                 return _overviewCard(index, context);
               }),
             )
@@ -250,10 +269,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
               lineBarsData: [
                 LineChartBarData(
                   spots: [
-                    FlSpot(0, _sdController.absentCount.toDouble()),
-                    FlSpot(1, _sdController.cuttingCount.toDouble()),
-                    FlSpot(2, _sdController.onTimeCount.toDouble()),
-                    FlSpot(3, _sdController.lateCount.toDouble()),
+                    FlSpot(0, _dataController.absentCount.toDouble()),
+                    FlSpot(1, _dataController.cuttingCount.toDouble()),
+                    FlSpot(2, _dataController.onTimeCount.toDouble()),
+                    FlSpot(3, _dataController.lateCount.toDouble()),
                   ],
                   isCurved: true,
                   curveSmoothness: 0.3,
@@ -273,13 +292,13 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
 
   Widget _mobileView() {
     return AnimatedBuilder(
-      animation: _sdController,
+      animation: _dataController,
       builder: (context, child) {
         return MobileView(
             currentIndex: 0,
             appBarTitle: 'Dashboard',
             userName:
-                '${_sdController.faculty.firstName} ${_sdController.faculty.lastName}',
+                '${_dataController.faculty.firstName} ${_dataController.faculty.lastName}',
             body: [
               mobileBody(),
             ]);
@@ -300,32 +319,54 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  void _showAttendanceDialog(BuildContext context, String title) {
+  void _showAttendanceDialog(
+      BuildContext context, int subjectId, String title, int schedId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('$title   Attendance '),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('$title - Attendance List'),
+              TextButton(
+                  onPressed: () async {
+                    await _dataController.downloadAttendanceBySchedId(
+                        context, schedId, title, subjectId);
+                  },
+                  child: Text("Download Table")),
+            ],
+          ),
           content: SizedBox(
-            child: DataTable(
-              columns: [
-                DataColumn(
-                  label: Expanded(child: Text('Subject')),
-                ),
-                DataColumn(
-                  label: Text('Room'),
-                ),
-                DataColumn(
-                  label: Text('Time'),
-                ),
-                DataColumn(
-                  label: Text('Remarks'),
-                ),
-              ],
-              rows: _sdController.allAttendanceList
-                  .map((attendance) =>
-                      _buildDataRowRecentLogs(context, attendance))
-                  .toList(),
+            child: SingleChildScrollView(
+              child: DataTable(
+                columns: [
+                  DataColumn(
+                    label: Expanded(
+                      child: Text('Reference No.'),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text('First Name'),
+                  ),
+                  DataColumn(
+                    label: Text('Last Name'),
+                  ),
+                  DataColumn(
+                    label: Text('Time In'),
+                  ),
+                  DataColumn(
+                    label: Text('Time out'),
+                  ),
+                  DataColumn(
+                    label: Text('Remarks'),
+                  ),
+                ],
+                rows: _dataController.attendanceBySchedId[schedId]!
+                    .map((attendance) =>
+                        _buildAttendanceList(context, attendance))
+                    .toList(),
+              ),
             ),
           ),
         );
@@ -334,10 +375,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   }
 
   String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
-    final timeStart =
-        _sdController.formatTime(subjectSchedule?.timeStart ?? DateTime.now());
+    final timeStart = _dataController
+        .formatTime(subjectSchedule?.timeStart ?? DateTime.now());
     final timeEnd =
-        _sdController.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
+        _dataController.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
     return '$timeStart - $timeEnd';
   }
 
@@ -359,27 +400,30 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       ],
     );
   }
+  // customDataColumn(label: Text('Student No.'), flex: 3),
+  // customDataColumn(label: Text('First Name'), flex: 1),
+  // customDataColumn(label: Text('Last Name'), flex: 1),
+  // customDataColumn(label: Text('Year'), flex: 1),
+  // customDataColumn(label: Text('Course'), flex: 1),
 
-  // Widget _dataTableClasses(context) {
-  //   return DataTable(
-  //     columns: [
-  //       customDataColumn(label: Text('Subject'), flex: 3),
-  //       customDataColumn(label: Text('Room'), flex: 1),
-  //       customDataColumn(label: Text('Time'), flex: 1),
-  //       customDataColumn(label: Text('Day'), flex: 1),
-  //     ],
-  //     rows: _sdController.studentClasses
-  //         .map((attendance) => _buildDataRowClasses(context, attendance))
-  //         .toList(),
-  //   );
-  // }
+  DataRow _buildDataRowClassList(BuildContext context, Student student) {
+    return DataRow(
+      cells: [
+        _tableDataCell(student.studentNo.toString()),
+        _tableDataCell(student.firstName),
+        _tableDataCell(student.lastName),
+        _tableDataCell(student.year.name),
+        _tableDataCell(student.course),
+      ],
+    );
+  }
 
   DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
     return DataRow(
       cells: [
         DataCell(
           Text(
-            schedule.subject?.subjectName ?? 'No subject name',
+            "${schedule.subject?.subjectID ?? 'No Code'} - ${schedule.subject?.subjectName ?? 'No subject name'}",
             style: TextStyle(fontSize: 14),
           ),
         ),
@@ -418,34 +462,33 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  DataRow _buildDataRowRecentLogs(BuildContext context, Attendance attendance) {
+  DataRow _buildAttendanceList(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
+        _tableDataCell(attendance.attendanceId.toString()),
+        _tableDataCell(attendance.student?.firstName ?? 'No First Name'),
+        _tableDataCell(attendance.student?.lastName ?? 'No Last Name'),
+        _tableDataCell(attendance.actualTimeIn != null
+            ? _dataController.formatTime(attendance.actualTimeIn!)
+            : 'No Time In'),
+        _tableDataCell(attendance.actualTimeOut != null
+            ? _dataController.formatTime(attendance.actualTimeOut!)
+            : 'No Time Out'),
         DataCell(
-          Text(
-            attendance.subjectSchedule?.subject?.subjectName ??
-                'No subject name',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        DataCell(
-          Text(
-            attendance.subjectSchedule?.room.toString() ?? 'No subject id',
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-        DataCell(
-          Text(
-            _sdController.formatTime(_getActualTime(attendance)),
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
-        ),
-        DataCell(
-          _sdController.getStatusText(attendance.remarks.name),
+          _dataController.getStatusText(attendance.remarks.name),
         ),
       ],
+    );
+  }
+
+  _tableDataCell(String text) {
+    return DataCell(
+      Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+        ),
+      ),
     );
   }
 
@@ -482,8 +525,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   }
 
   String _getCurrentYearTerm() {
-    String currentTerm = _sdController.config?.currentTerm ?? '';
-    String currentYear = _sdController.config?.currentYear ?? '';
+    String currentTerm = _dataController.config?.currentTerm ?? '';
+    String currentYear = _dataController.config?.currentYear ?? '';
 
     return '$currentTerm - $currentYear';
   }
@@ -492,72 +535,72 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     return DateFormat('MMMM d, y').format(DateTime.now());
   }
 
-  List<Map<String, dynamic>> sampleRecentLogsData = [
-    {
-      'subjectName': 'Data Structures',
-      'statusText': 'On Time',
-      'statusIcon': Icons.timer_outlined,
-      'statusColor': Colors.green,
-      'time': DateTime(2023, 4, 12, 9, 30),
-      'roomId': 'BCL1',
-    },
-    {
-      'subjectName': 'Algorithms',
-      'statusText': 'Late',
-      'statusIcon': Icons.access_time,
-      'statusColor': Colors.orange,
-      'time': DateTime(2023, 4, 12, 11, 15),
-      'roomId': 'BCL2',
-    },
-    {
-      'subjectName': 'Computer Networks',
-      'statusText': 'Absent',
-      'statusIcon': Icons.access_time,
-      'statusColor': Colors.red,
-      'time': DateTime(2023, 4, 11, 14, 0),
-      'roomId': 'BCL3',
-    },
-    {
-      'subjectName': 'Database Systems',
-      'statusText': 'On Time',
-      'statusIcon': Icons.timer_outlined,
-      'statusColor': Colors.green,
-      'time': DateTime(2023, 4, 11, 16, 30),
-      'roomId': 'BCL4',
-    },
-    {
-      'subjectName': 'Operating Systems',
-      'statusText': 'Late',
-      'statusIcon': Icons.access_time,
-      'statusColor': Colors.orange,
-      'time': DateTime(2023, 4, 10, 10, 45),
-      'roomId': 'BCL5',
-    },
-    {
-      'subjectName': 'Software Engineering',
-      'statusText': 'Cutting',
-      'statusIcon': Icons.access_time,
-      'statusColor': Colors.yellow.shade700,
-      'time': DateTime(2023, 4, 10, 13, 15),
-      'roomId': 'BCL6',
-    },
-    {
-      'subjectName': 'Artificial Intelligence',
-      'statusText': 'On Time',
-      'statusIcon': Icons.timer_outlined,
-      'statusColor': Colors.green,
-      'time': DateTime(2023, 4, 9, 9, 0),
-      'roomId': 'BCL7',
-    },
-    {
-      'subjectName': 'Machine Learning',
-      'statusText': 'Late',
-      'statusIcon': Icons.access_time,
-      'statusColor': Colors.orange,
-      'time': DateTime(2023, 4, 9, 15, 45),
-      'roomId': 'BCL8',
-    },
-  ];
+  // List<Map<String, dynamic>> sampleRecentLogsData = [
+  //   {
+  //     'subjectName': 'Data Structures',
+  //     'statusText': 'On Time',
+  //     'statusIcon': Icons.timer_outlined,
+  //     'statusColor': Colors.green,
+  //     'time': DateTime(2023, 4, 12, 9, 30),
+  //     'roomId': 'BCL1',
+  //   },
+  //   {
+  //     'subjectName': 'Algorithms',
+  //     'statusText': 'Late',
+  //     'statusIcon': Icons.access_time,
+  //     'statusColor': Colors.orange,
+  //     'time': DateTime(2023, 4, 12, 11, 15),
+  //     'roomId': 'BCL2',
+  //   },
+  //   {
+  //     'subjectName': 'Computer Networks',
+  //     'statusText': 'Absent',
+  //     'statusIcon': Icons.access_time,
+  //     'statusColor': Colors.red,
+  //     'time': DateTime(2023, 4, 11, 14, 0),
+  //     'roomId': 'BCL3',
+  //   },
+  //   {
+  //     'subjectName': 'Database Systems',
+  //     'statusText': 'On Time',
+  //     'statusIcon': Icons.timer_outlined,
+  //     'statusColor': Colors.green,
+  //     'time': DateTime(2023, 4, 11, 16, 30),
+  //     'roomId': 'BCL4',
+  //   },
+  //   {
+  //     'subjectName': 'Operating Systems',
+  //     'statusText': 'Late',
+  //     'statusIcon': Icons.access_time,
+  //     'statusColor': Colors.orange,
+  //     'time': DateTime(2023, 4, 10, 10, 45),
+  //     'roomId': 'BCL5',
+  //   },
+  //   {
+  //     'subjectName': 'Software Engineering',
+  //     'statusText': 'Cutting',
+  //     'statusIcon': Icons.access_time,
+  //     'statusColor': Colors.yellow.shade700,
+  //     'time': DateTime(2023, 4, 10, 13, 15),
+  //     'roomId': 'BCL6',
+  //   },
+  //   {
+  //     'subjectName': 'Artificial Intelligence',
+  //     'statusText': 'On Time',
+  //     'statusIcon': Icons.timer_outlined,
+  //     'statusColor': Colors.green,
+  //     'time': DateTime(2023, 4, 9, 9, 0),
+  //     'roomId': 'BCL7',
+  //   },
+  //   {
+  //     'subjectName': 'Machine Learning',
+  //     'statusText': 'Late',
+  //     'statusIcon': Icons.access_time,
+  //     'statusColor': Colors.orange,
+  //     'time': DateTime(2023, 4, 9, 15, 45),
+  //     'roomId': 'BCL8',
+  //   },
+  // ];
 
   // Widget _mobileRecentLogsCard() {
   //   return MobileSmallCard(
@@ -605,13 +648,32 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     }
   }
 
-  void _showMyClassesDialog(BuildContext context, title) {
+  void _showMyClassesDialog(
+      BuildContext context, subjectId, title, int schedId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('$title   Class List '),
-          content: _dataTableClasses(context),
+        return AnimatedBuilder(
+          animation: _dataController,
+          builder: (context, _) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('$title - Class List'),
+                  TextButton(
+                      onPressed: () async {
+                        await _dataController.downloadClassListSchedId(
+                            context, schedId, title, subjectId);
+                      },
+                      child: Text("Download Table")),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: _dataTableClassList(context, schedId),
+              ),
+            );
+          },
         );
       },
     );
@@ -621,26 +683,38 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     return attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject';
   }
 
-  // Widget _overviewCard(index, BuildContext context) {
-  //   Attendance attendance = _sdController.allAttendanceList[index];
-  //   double totalLogs = _sdController.allAttendanceList.length.toDouble();
-  //   return StatefulBuilder(builder: (context, setState) {
-  //     return SizedBox(
-  //       child: Card(
-  //         child: Container(
-  //           padding: EdgeInsets.all(16.0),
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: _buildOverviewCard(attendance, context, totalLogs),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-  //   });
-  // }
-  List<Widget> _buildOverviewCard(
-      Map<String, dynamic> attendance, BuildContext context, double totalLogs) {
+  Widget _overviewCard(index, BuildContext context) {
+    SubjectSchedule subjectSchedule = _dataController.facultyClasses[index];
+    int schedId = subjectSchedule.schedId;
+    double totalLogs =
+        _dataController.attendanceBySchedId[schedId]?.length.toDouble() ?? 0.0;
+
+    Map<Remarks, int> remarksCount =
+        _dataController.remarksBySchedId[schedId] ?? {};
+
+    return StatefulBuilder(builder: (context, setState) {
+      if (!_dataController.isRemarksCountBySchedId) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      return SizedBox(
+        child: Card(
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildOverviewCard(
+                  remarksCount, subjectSchedule, context, totalLogs),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  List<Widget> _buildOverviewCard(Map<Remarks, int> remarksCount,
+      SubjectSchedule subjectSchedule, BuildContext context, double totalLogs) {
     return [
       LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -648,13 +722,14 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              //web
               if (constraints.maxWidth >= 450)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      attendance['subjectName'],
+                      "${subjectSchedule.subject?.subjectID ?? 'No Code'} - ${subjectSchedule.subject?.subjectName ?? 'No subject name'}",
                       style: TextStyle(
                           fontSize: fontSize, fontWeight: FontWeight.bold),
                     ),
@@ -662,26 +737,35 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                     TextButton(
                       onPressed: () {
                         _showMyClassesDialog(
-                            context, attendance['subjectName']);
+                          context,
+                          subjectSchedule.subject?.subjectID ?? 'No Code',
+                          subjectSchedule.subject?.subjectName ?? 'No Subject',
+                          subjectSchedule.schedId,
+                        );
                       },
                       child: Text('Class List'),
                     ),
                     TextButton(
                       onPressed: () {
                         _showAttendanceDialog(
-                            context, attendance['subjectName']);
+                            context,
+                            subjectSchedule.subject?.subjectID ?? 0,
+                            subjectSchedule.subject?.subjectName ??
+                                'No Subject',
+                            subjectSchedule.schedId);
                       },
                       child: Text('Attendance List'),
                     ),
                   ],
                 ),
+              //mobile
               if (constraints.maxWidth < 450)
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      attendance['subjectName'],
+                      subjectSchedule.subject?.subjectName ?? 'No Subject',
                       style: TextStyle(
                           fontSize: fontSize, fontWeight: FontWeight.bold),
                     ),
@@ -693,9 +777,14 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FacultyClassesList(
-                                  title: attendance['subjectName'] ?? '',
-                                  dataController: _sdController,
+                                builder: (context) => FacultySubjectClassList(
+                                  subjectId: subjectSchedule.subject?.subjectID
+                                          .toString() ??
+                                      'No Code ',
+                                  title: subjectSchedule.subject?.subjectName ??
+                                      'No Subject',
+                                  dataController: _dataController,
+                                  schedId: subjectSchedule.schedId,
                                 ),
                               ),
                             );
@@ -704,8 +793,21 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                         ),
                         TextButton(
                           onPressed: () {
-                            _showAttendanceDialog(
-                                context, attendance['subjectName']);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FacultySubjectAttendanceList(
+                                  subjectId: subjectSchedule.subject?.subjectID
+                                          .toString() ??
+                                      'No Code ',
+                                  title: subjectSchedule.subject?.subjectName ??
+                                      'No Subject',
+                                  dataController: _dataController,
+                                  schedId: subjectSchedule.schedId,
+                                ),
+                              ),
+                            );
                           },
                           child: Text('Attendance List'),
                         ),
@@ -725,7 +827,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text('Code:'),
+                              Text('Room:'),
                               Text('Time:'),
                               Text('Dates:'),
                             ],
@@ -735,10 +837,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text(attendance['room']),
+                              Text(subjectSchedule.room.toString()),
                               Text(
-                                  '${DateFormat('hh:mm a').format(attendance['timeStart'])} - ${DateFormat('hh:mm a').format(attendance['timeEnd'])}'),
-                              Text(attendance['day']),
+                                  '${DateFormat('hh:mm a').format(subjectSchedule.timeStart)} - ${DateFormat('hh:mm a').format(subjectSchedule.timeEnd)}'),
+                              Text(subjectSchedule.day.name),
                             ],
                           ),
                         ],
@@ -751,17 +853,30 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                           children: [
                             Row(
                               children: [
-                                circularData(attendance['absentCount'],
-                                    'Absent', Colors.red, totalLogs),
                                 circularData(
-                                    attendance['cuttingCount'],
-                                    'Cutting',
-                                    Colors.yellow.shade700,
-                                    totalLogs),
-                                circularData(attendance['onTimeCount'],
-                                    'On-Time', Colors.green, totalLogs),
-                                circularData(attendance['lateCount'], 'Late',
-                                    Colors.orange, totalLogs),
+                                  remarksCount[Remarks.absent] ?? 0,
+                                  'Absent',
+                                  Colors.red,
+                                  totalLogs,
+                                ),
+                                circularData(
+                                  remarksCount[Remarks.cutting] ?? 0,
+                                  'Cutting',
+                                  Colors.yellow.shade700,
+                                  totalLogs,
+                                ),
+                                circularData(
+                                  remarksCount[Remarks.onTime] ?? 0,
+                                  'On-Time',
+                                  Colors.green,
+                                  totalLogs,
+                                ),
+                                circularData(
+                                  remarksCount[Remarks.late] ?? 0,
+                                  'Late',
+                                  Colors.orange,
+                                  totalLogs,
+                                ),
                               ],
                             ),
                           ],
@@ -783,14 +898,30 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                         children: [
                           Row(
                             children: [
-                              circularData(attendance['absentCount'], 'Absent',
-                                  Colors.red, totalLogs),
-                              circularData(attendance['cuttingCount'],
-                                  'Cutting', Colors.yellow.shade700, totalLogs),
-                              circularData(attendance['onTimeCount'], 'On-Time',
-                                  Colors.green, totalLogs),
-                              circularData(attendance['lateCount'], 'Late',
-                                  Colors.orange, totalLogs),
+                              circularData(
+                                remarksCount[Remarks.absent] ?? 0,
+                                'Absent',
+                                Colors.red,
+                                totalLogs,
+                              ),
+                              circularData(
+                                remarksCount[Remarks.cutting] ?? 0,
+                                'Cutting',
+                                Colors.yellow.shade700,
+                                totalLogs,
+                              ),
+                              circularData(
+                                remarksCount[Remarks.onTime] ?? 0,
+                                'On-Time',
+                                Colors.green,
+                                totalLogs,
+                              ),
+                              circularData(
+                                remarksCount[Remarks.late] ?? 0,
+                                'Late',
+                                Colors.orange,
+                                totalLogs,
+                              ),
                             ],
                           ),
                         ],
@@ -939,7 +1070,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   }
 
   Widget circularData(value, description, color, [maxValue]) {
-    maxValue ??= _sdController.allAttendanceList.length.toDouble();
+    maxValue ??= _dataController.allAttendanceList.length.toDouble();
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         double radius = 40.0;
@@ -1073,6 +1204,26 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     }).toList();
   }
 
+  Widget _dataTableClassList(context, int schedId) {
+    _dataController.getStudentListbySchedId(schedId);
+    // if (_dataController.isGetStudentListByLoading) {
+    //   return Center(child: CircularProgressIndicator());
+    // }
+
+    return DataTable(
+      columns: [
+        customDataColumn(label: Text('Student No.'), flex: 3),
+        customDataColumn(label: Text('First Name'), flex: 1),
+        customDataColumn(label: Text('Last Name'), flex: 1),
+        customDataColumn(label: Text('Year'), flex: 1),
+        customDataColumn(label: Text('Course'), flex: 1),
+      ],
+      rows: _dataController.students
+          .map((student) => _buildDataRowClassList(context, student))
+          .toList(),
+    );
+  }
+
   Widget _dataTableClasses(context) {
     return DataTable(
       columns: [
@@ -1081,80 +1232,80 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         customDataColumn(label: Text('Time'), flex: 1),
         customDataColumn(label: Text('Day'), flex: 1),
       ],
-      rows: _sdController.studentClasses
+      rows: _dataController.facultyClasses
           .map((attendance) => _buildDataRowClasses(context, attendance))
           .toList(),
     );
   }
 
-  List<Map<String, dynamic>> sampleOverviewData = [
-    {
-      'subjectName': 'Data Structures and Algorithms',
-      'room': 'BCL1',
-      'timeStart': DateTime(2023, 4, 1, 5, 30),
-      'timeEnd': DateTime(2023, 4, 1, 6, 30),
-      'day': 'Mon, Wed, Fri',
-      'absentCount': 2,
-      'cuttingCount': 10,
-      'onTimeCount': 5,
-      'lateCount': 15,
-    },
-    {
-      'subjectName': 'Operating Systems',
-      'room': 'BCL2',
-      'timeStart': DateTime(2023, 4, 1, 10, 0),
-      'timeEnd': DateTime(2023, 4, 1, 11, 30),
-      'day': 'Tue, Thu',
-      'absentCount': 0,
-      'cuttingCount': 5,
-      'onTimeCount': 20,
-      'lateCount': 10,
-    },
-    {
-      'subjectName': 'Design and Analysis of Algorithms',
-      'room': 'BCL3',
-      'timeStart': DateTime(2023, 4, 1, 2, 0),
-      'timeEnd': DateTime(2023, 4, 1, 3, 30),
-      'day': 'Mon, Wed, Fri',
-      'absentCount': 7,
-      'cuttingCount': 5,
-      'onTimeCount': 5,
-      'lateCount': 10,
-    },
-    {
-      'subjectName': 'Natural Language Processing',
-      'room': 'BCL4',
-      'timeStart': DateTime(2023, 4, 1, 13, 0),
-      'timeEnd': DateTime(2023, 4, 1, 14, 30),
-      'day': 'Tue, Thu',
-      'absentCount': 2,
-      'cuttingCount': 15,
-      'onTimeCount': 10,
-      'lateCount': 10,
-    },
-    {
-      'subjectName': 'Programming Languages',
-      'room': 'BCL5',
-      'timeStart': DateTime(2023, 4, 1, 16, 0),
-      'timeEnd': DateTime(2023, 4, 1, 17, 30),
-      'day': 'Mon, Wed, Fri',
-      'absentCount': 3,
-      'cuttingCount': 5,
-      'onTimeCount': 10,
-      'lateCount': 15,
-    },
-    {
-      'subjectName': 'Machine Learning',
-      'room': 'BCL7',
-      'timeStart': DateTime(2023, 4, 1, 14, 30),
-      'timeEnd': DateTime(2023, 4, 1, 16, 0),
-      'day': 'Mon, Wed, Fri',
-      'absentCount': 0,
-      'cuttingCount': 10,
-      'onTimeCount': 15,
-      'lateCount': 10,
-    },
-  ];
+  // List<Map<String, dynamic>> sampleOverviewData = [
+  //   {
+  //     'subjectName': 'Data Structures and Algorithms',
+  //     'room': 'BCL1',
+  //     'timeStart': DateTime(2023, 4, 1, 5, 30),
+  //     'timeEnd': DateTime(2023, 4, 1, 6, 30),
+  //     'day': 'Mon, Wed, Fri',
+  //     'absentCount': 2,
+  //     'cuttingCount': 10,
+  //     'onTimeCount': 5,
+  //     'lateCount': 15,
+  //   },
+  //   {
+  //     'subjectName': 'Operating Systems',
+  //     'room': 'BCL2',
+  //     'timeStart': DateTime(2023, 4, 1, 10, 0),
+  //     'timeEnd': DateTime(2023, 4, 1, 11, 30),
+  //     'day': 'Tue, Thu',
+  //     'absentCount': 0,
+  //     'cuttingCount': 5,
+  //     'onTimeCount': 20,
+  //     'lateCount': 10,
+  //   },
+  //   {
+  //     'subjectName': 'Design and Analysis of Algorithms',
+  //     'room': 'BCL3',
+  //     'timeStart': DateTime(2023, 4, 1, 2, 0),
+  //     'timeEnd': DateTime(2023, 4, 1, 3, 30),
+  //     'day': 'Mon, Wed, Fri',
+  //     'absentCount': 7,
+  //     'cuttingCount': 5,
+  //     'onTimeCount': 5,
+  //     'lateCount': 10,
+  //   },
+  //   {
+  //     'subjectName': 'Natural Language Processing',
+  //     'room': 'BCL4',
+  //     'timeStart': DateTime(2023, 4, 1, 13, 0),
+  //     'timeEnd': DateTime(2023, 4, 1, 14, 30),
+  //     'day': 'Tue, Thu',
+  //     'absentCount': 2,
+  //     'cuttingCount': 15,
+  //     'onTimeCount': 10,
+  //     'lateCount': 10,
+  //   },
+  //   {
+  //     'subjectName': 'Programming Languages',
+  //     'room': 'BCL5',
+  //     'timeStart': DateTime(2023, 4, 1, 16, 0),
+  //     'timeEnd': DateTime(2023, 4, 1, 17, 30),
+  //     'day': 'Mon, Wed, Fri',
+  //     'absentCount': 3,
+  //     'cuttingCount': 5,
+  //     'onTimeCount': 10,
+  //     'lateCount': 15,
+  //   },
+  //   {
+  //     'subjectName': 'Machine Learning',
+  //     'room': 'BCL7',
+  //     'timeStart': DateTime(2023, 4, 1, 14, 30),
+  //     'timeEnd': DateTime(2023, 4, 1, 16, 0),
+  //     'day': 'Mon, Wed, Fri',
+  //     'absentCount': 0,
+  //     'cuttingCount': 10,
+  //     'onTimeCount': 15,
+  //     'lateCount': 10,
+  //   },
+  // ];
 
   // GridView _buildGridView(BoxConstraints constraints) {
   //   return GridView.builder(
@@ -1170,36 +1321,37 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   // }
   ListView _buildListView() {
     return ListView.builder(
-      itemCount: sampleOverviewData.length,
+      itemCount: _dataController.facultyClasses.length,
       itemBuilder: (BuildContext context, int index) {
+        // return Text('asdf');
         return _overviewCard(index, context);
       },
     );
   }
 
-  Widget _overviewCard(index, BuildContext context) {
-    Map<String, dynamic> attendance = sampleOverviewData[index];
-    double totalLogs = attendance['onTimeCount'] +
-        attendance['lateCount'] +
-        attendance['absentCount'] +
-        attendance['cuttingCount'];
-    return StatefulBuilder(builder: (context, setState) {
-      return SizedBox(
-        child: Card(
-          child: Container(
-            padding: EdgeInsets.only(
-              top: 16.0,
-              left: 16.0,
-              right: 16.0,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [..._buildOverviewCard(attendance, context, totalLogs)],
-            ),
-          ),
-        ),
-      );
-    });
-  }
+  // Widget _overviewCard(index, BuildContext context) {
+  //   Map<String, dynamic> attendance = _dataController.facultyClasses. [index];
+  //   double totalLogs = attendance['onTimeCount'] +
+  //       attendance['lateCount'] +
+  //       attendance['absentCount'] +
+  //       attendance['cuttingCount'];
+  //   return StatefulBuilder(builder: (context, setState) {
+  //     return SizedBox(
+  //       child: Card(
+  //         child: Container(
+  //           padding: EdgeInsets.only(
+  //             top: 16.0,
+  //             left: 16.0,
+  //             right: 16.0,
+  //           ),
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.start,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [..._buildOverviewCard(attendance, context, totalLogs)],
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   });
+  // }
 }

@@ -4,160 +4,137 @@ import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import '../../controllers/student_controller.dart';
 import '../../model/Subject_model.dart';
 import '../../model/attendance_model.dart';
+import '../../model/student_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/classes_tile_list.dart';
 import '../../widgets/mobile_view.dart';
 
-class FacultyClassesList extends StatefulWidget {
+class FacultySubjectClassList extends StatefulWidget {
   final FacultyController dataController;
   final String title;
+  final String subjectId;
+  final int schedId;
   static const routeName = '/faculty-classes-list';
-  const FacultyClassesList(
-      {Key? key, required this.dataController, required this.title})
+  const FacultySubjectClassList(
+      {Key? key,
+      required this.dataController,
+      required this.title,
+      required this.schedId,
+      required this.subjectId})
       : super(key: key);
 
   @override
-  State<FacultyClassesList> createState() => _FacultyClassesListState();
+  State<FacultySubjectClassList> createState() =>
+      _FacultySubjectClassListState();
 }
 
-class _FacultyClassesListState extends State<FacultyClassesList> {
+class _FacultySubjectClassListState extends State<FacultySubjectClassList> {
   FacultyController get _dataController => widget.dataController;
-
+  int get schedId => widget.schedId;
+  String get subjectId => widget.subjectId;
   String get title => widget.title;
 
   @override
   void initState() {
+    _dataController.getStudentListbySchedId(schedId);
     super.initState();
     // _dataController.getFacultyClasses();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
-      if (constraints.maxWidth <= 450) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(title),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2),
-            child: _buildClassList(context),
-          ),
-        );
-      } else {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text("Classes"),
-          ),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: Text(
-                  '1st Semester 2023',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+    return AnimatedBuilder(
+      animation: _dataController,
+      builder: (BuildContext context, Widget? child) {
+        return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+          if (constraints.maxWidth <= 450) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('$subjectId - $title'),
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                child: Text(
-                  'Total Units: 18',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                // _buildClasses(context),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: _buildClassList(context),
               ),
-            ],
-          ),
-        );
-      }
-    });
+            );
+          } else {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text("Classes"),
+              ),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                    child: Text(
+                      '1st Semester 2023',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                    child: Text(
+                      'Total Units: 18',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    // _buildClasses(context),
+                  ),
+                ],
+              ),
+            );
+          }
+        });
+      },
+    );
   }
-
-  // bool _isSubjectToday(Subject subject) {
-  //   final DateTime now = DateTime.now();
-  //   final int today = now.weekday;
-  //   final String daySchedule = subject.daySchedule.toUpperCase();
-
-  //   if (today == DateTime.monday && daySchedule.contains('M')) {
-  //     return true;
-  //   } else if (today == DateTime.tuesday && daySchedule.contains('T')) {
-  //     return true;
-  //   } else if (today == DateTime.wednesday && daySchedule.contains('W')) {
-  //     return true;
-  //   } else if (today == DateTime.thursday && daySchedule.contains('H')) {
-  //     return true;
-  //   } else if (today == DateTime.friday && daySchedule.contains('F')) {
-  //     return true;
-  //   } else if (today == DateTime.saturday && daySchedule.contains('S')) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
 
   Widget _buildClassList(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _dataController.studentClasses.length + 1,
-      itemBuilder: (BuildContext context, int index) {
-        if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Class list',
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor),
-            ),
-          );
-        }
-        SubjectSchedule schedule = _dataController.studentClasses[index - 1];
-        return _classList(schedule);
-      },
+    return SingleChildScrollView(
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _dataController.students.length + 1,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Class list',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor),
+                  ),
+                  TextButton(
+                      onPressed: () async {
+                        await _dataController.downloadClassListSchedId(
+                            context, schedId, title, int.parse(subjectId));
+                      },
+                      child: const Text("Download List")),
+                ],
+              ),
+            );
+          }
+          Student student = _dataController.students[index - 1];
+          return _classList(student);
+        },
+      ),
     );
   }
 
-  void _showSubjectDetails(
-      BuildContext context, SubjectSchedule subjectSchedule, Subject? subject) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(
-            subject?.subjectName ?? '',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                Text('Code: ${subject?.subjectID}'),
-                Text('Subject Description: ${subject?.subjectDescription}'),
-                Text('Schedule Time: ${getTimeStartEnd(subjectSchedule)}'),
-                Text('Schedule Day: ${subjectSchedule.day.name}'),
-                Text(
-                    'Subject Teacher: ${subject?.faculties?[0].firstName} ${subject?.faculties?[0].lastName}'),
-                Text('Subject Room: ${subjectSchedule.room}'),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  Widget _classList(Student student) {
+    if (_dataController.isGetStudentListByLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-  Widget _classList(SubjectSchedule schedule) {
     return Card(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 8.0),
@@ -170,41 +147,40 @@ class _FacultyClassesListState extends State<FacultyClassesList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    schedule.subject?.subjectName ?? 'No subject name',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
+                    'Student No. ${student.studentNo}',
                   ),
-                  SizedBox(height: 4),
                   Text(
-                    schedule.room.toString(),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).textTheme.caption?.color,
-                    ),
+                    'First Name ${student.firstName}',
+                  ),
+                  Text(
+                    'Last Name: ${student.lastName}',
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  getTimeStartEnd(schedule),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
                 const SizedBox(height: 4),
                 Text(
-                  schedule.day.name,
+                  'Year: ${student.year.name}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Theme.of(context).textTheme.bodySmall?.color,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: 150,
+                  child: Text(
+                    'Course: ${student.course}',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
                   ),
                 ),
               ],

@@ -105,9 +105,9 @@ class _FacultyClassesState extends State<FacultyClasses> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: _dataController.studentClasses.length,
+      itemCount: _dataController.facultyClasses.length,
       itemBuilder: (BuildContext context, int index) {
-        SubjectSchedule schedule = _dataController.studentClasses[index];
+        SubjectSchedule schedule = _dataController.facultyClasses[index];
         return ClassesListTile(
           subjectSchedule: schedule,
           subject: schedule.subject,

@@ -31,13 +31,17 @@ class AttendanceService {
     String? room,
     int? studentNo,
     Remarks? remarks,
+    int? schedId,
+    int? facultyNo,
   }) async {
     try {
       Map<String, dynamic>? query = {};
       if (date != null) query['date'] = date;
       if (room != null) query['room'] = room;
       if (studentNo != null) query['studentNo'] = studentNo.toString();
+      if (facultyNo != null) query['facultyNo'] = facultyNo.toString();
       if (remarks != null) query['remarks'] = remarks;
+      if (schedId != null) query['schedId'] = schedId.toString();
 
       final response =
           await HttpService.get('$_baseUrl/Attendance', query: query);

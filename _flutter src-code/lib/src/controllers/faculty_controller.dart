@@ -28,8 +28,9 @@ class FacultyController with ChangeNotifier {
   final List<Student> students = [];
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
-  List<SubjectSchedule> studentClasses = [];
-
+  List<SubjectSchedule> facultyClasses = [];
+  Map<int, List<Attendance>> attendanceBySchedId = {};
+  Map<int, Map<Remarks, int>> remarksBySchedId = {};
   DateTime? dateSelected;
   bool sortAscending = true;
   String sortColumn = "";
@@ -38,6 +39,9 @@ class FacultyController with ChangeNotifier {
   double lateCount = 0;
   double absentCount = 0;
   double cuttingCount = 0;
+
+  bool isGetStudentListByLoading = false;
+  bool isRemarksCountBySchedId = false;
   bool isStudentsCollected = false;
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
@@ -101,6 +105,24 @@ class FacultyController with ChangeNotifier {
     }
   }
 
+  Future<void> getAttendanceBySchedId(int schedId) async {
+    try {
+      CRUDReturn response = await AttendanceService.getAll(
+        schedId: schedId,
+        // studentNo: faculty.facultyNo,
+        // studentNo: 91204,
+      );
+      if (response.success) {
+        handleEventJsonAttendanceBySchedId(response, schedId);
+
+        dateSelected = null;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+    }
+  }
+
   Future<void> getConfig() async {
     try {
       CRUDReturn response = await ConfigService.getConfig();
@@ -125,7 +147,7 @@ class FacultyController with ChangeNotifier {
 
     attendance.clear();
     allAttendanceList.clear();
-    studentClasses.clear();
+    facultyClasses.clear();
   }
 
   handEventJsonAttendance(CRUDReturn result) {
@@ -148,6 +170,17 @@ class FacultyController with ChangeNotifier {
     notifyListeners();
   }
 
+  void handleEventJsonAttendanceBySchedId(CRUDReturn result, int schedId) {
+    print('handleEventJsonAttendanceBySchedId');
+    attendanceBySchedId.putIfAbsent(schedId, () => []);
+
+    for (Map<String, dynamic> map in result.data) {
+      attendanceBySchedId[schedId]?.add(Attendance.fromJson(map));
+    }
+
+    notifyListeners();
+  }
+
   // Future<void> getStudentClasses() async {
   //   try {
   //     if (isStudentClassesCollected) return;
@@ -162,11 +195,11 @@ class FacultyController with ChangeNotifier {
   //   }
   // }
 
-  void handleEventJsonStudentClasses(CRUDReturn result) {
+  void handleEventJsonFacultyClasses(CRUDReturn result) {
     try {
-      if (studentClasses.isNotEmpty) studentClasses.clear();
+      if (facultyClasses.isNotEmpty) facultyClasses.clear();
       for (Map<String, dynamic> map in result.data) {
-        studentClasses.add(SubjectSchedule.fromJson(map));
+        facultyClasses.add(SubjectSchedule.fromJson(map));
       }
 
       isStudentClassesCollected = true;
@@ -191,10 +224,13 @@ class FacultyController with ChangeNotifier {
 
   Future<void> getStudentListbySchedId(int schedId) async {
     try {
+      isGetStudentListByLoading = true;
+      notifyListeners();
       CRUDReturn response = await StudentService.getStudentsBySchedId(schedId);
       if (response.success) {
         handleEventJsonStudentList(response);
       }
+      isGetStudentListByLoading = false;
       notifyListeners();
     } catch (e, stacktrace) {
       print('StudentListController getStudentListbySchedId $e $stacktrace');
@@ -208,7 +244,11 @@ class FacultyController with ChangeNotifier {
       CRUDReturn response =
           await FacultyService.getFacultyClasses(faculty.facultyNo);
       if (response.success) {
-        handleEventJsonStudentClasses(response);
+        handleEventJsonFacultyClasses(response);
+        for (final element in facultyClasses) {
+          await getAttendanceBySchedId(element.schedId);
+        }
+        getRemarksCountBySchedId();
       }
       notifyListeners();
     } catch (e, stacktrace) {
@@ -221,18 +261,19 @@ class FacultyController with ChangeNotifier {
       if (isAllAttendanceCollected && date == null) return;
       CRUDReturn response = date != null
           ? await AttendanceService.getAll(
+              facultyNo: faculty.facultyId,
               // studentNo: faculty.facultyNo,
-              studentNo: 91204,
-
+              // studentNo: 91204,
               date: date,
             )
           : await AttendanceService.getAll(
-              // studentNo: faculty.facultyNo,
-              studentNo: 91204,
+              facultyNo: faculty.facultyId,
+              // studentNo: 91204,
             );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
+        getRemarksCountForPercentiles();
         isAllAttendanceCollected = true;
         filteredAttendanceList = allAttendanceList;
         notifyListeners();
@@ -383,6 +424,49 @@ class FacultyController with ChangeNotifier {
     }
   }
 
+  void getRemarksCountBySchedId() {
+    try {
+//final Map<int, Map<Remarks, int>> remarksBySchedId = {};
+      for (var entry in attendanceBySchedId.entries) {
+        int schedId = entry.key;
+        List<Attendance> attendanceList = entry.value;
+
+        final remarksCount = <Remarks, int>{};
+        for (var attendance in attendanceList) {
+          if (remarksCount.containsKey(attendance.remarks)) {
+            remarksCount[attendance.remarks] =
+                remarksCount[attendance.remarks]! + 1;
+          } else {
+            remarksCount[attendance.remarks] = 1;
+          }
+        }
+
+        remarksBySchedId[schedId] = remarksCount;
+
+        // print('Remarks count for schedId $schedId:');
+        // for (var entry in remarksCount.entries) {
+        //   Remarks remarks = entry.key;
+        //   int count = entry.value;
+
+        //   print('$remarks: $count');
+        // }
+      }
+
+      // print('Remarks count by schedId:');
+      // remarksBySchedId.forEach((schedId, remarksCount) {
+      //   String output = 'schedId $schedId:';
+      //   remarksCount.forEach((remarks, count) {
+      //     output += ' $remarks: $count,';
+      //   });
+      //   print(output.substring(0, output.length - 1));
+      // });
+      isRemarksCountBySchedId = true;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('getRemarksCountBySchedId $e $stacktrace');
+    }
+  }
+
   void filterAttendance(String query) {
     if (query.isEmpty) {
       filteredAttendanceList = allAttendanceList;
@@ -408,6 +492,23 @@ class FacultyController with ChangeNotifier {
       }).toList();
     }
     notifyListeners();
+  }
+
+  void getRemarksCountByClasses() {
+    try {
+      if (isCountCalculated) return;
+
+      for (Attendance attendance in allAttendanceList) {
+        if (attendance.remarks == Remarks.late) lateCount += 1;
+        if (attendance.remarks == Remarks.onTime) onTimeCount += 1;
+        if (attendance.remarks == Remarks.absent) absentCount += 1;
+        if (attendance.remarks == Remarks.cutting) cuttingCount += 1;
+        isCountCalculated = true;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      print('getRemarksCount $e $stacktrace');
+    }
   }
 
   Future<void> downloadData(context) async {
@@ -482,5 +583,326 @@ class FacultyController with ChangeNotifier {
         SnackBar(content: Text('CSV file saved to: ${file.path}')),
       );
     }
+  }
+
+  Future<void> downloadAttendanceBySchedId(
+      context, int schedId, String subjectName, int subjectId) async {
+    if (attendanceBySchedId[schedId]!.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('No attendance data found'),
+            content: Text('There is no attendance data to download.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    List<List<dynamic>> csvData = [
+      // Add headers to the CSV file
+      [
+        "Reference ID",
+        "Name",
+        "Time In",
+        "Time out",
+        "Remarks",
+      ],
+    ];
+
+    for (Attendance attendance in attendanceBySchedId[schedId]!) {
+      List<dynamic> row = [
+        attendance.attendanceId,
+        '${attendance.student?.firstName ?? ''} ${attendance.student?.lastName ?? ''}',
+        attendance.actualTimeIn?.toString() ?? '',
+        attendance.actualTimeOut?.toString() ?? '',
+        attendance.remarks.name,
+      ];
+      csvData.add(row);
+    }
+
+    String csv = const ListToCsvConverter().convert(csvData);
+    String fileName = "${subjectId}_${subjectName}_Attendance_List.csv";
+    if (kIsWeb) {
+      // Web implementation
+      AnchorElement(href: "data:text/csv;charset=utf-8,$csv")
+        ..setAttribute("download", fileName)
+        ..click();
+    } else {
+// Mobile implementation
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final file = io.File('$path/$fileName');
+      await file.writeAsString(csv);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('CSV file saved to: ${file.path}')),
+      );
+    }
+  }
+
+  Future<void> downloadClassListSchedId(
+      context, int schedId, String subjectName, int subjectId) async {
+    if (students.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('No attendance data found'),
+            content: const Text('There is no attendance data to download.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    List<List<dynamic>> csvData = [
+      // Add headers to the CSV file
+      [
+        "Student No",
+        "Name",
+        "Year",
+        "Course",
+      ],
+    ];
+
+    for (Student student in students) {
+      List<dynamic> row = [
+        student.studentNo,
+        '${student.firstName} ${student.lastName}',
+        student.year.name,
+        student.course,
+      ];
+      csvData.add(row);
+    }
+
+    String csv = const ListToCsvConverter().convert(csvData);
+    String fileName = "${subjectId}_${subjectName}_Class_List.csv";
+    if (kIsWeb) {
+      // Web implementation
+      AnchorElement(href: "data:text/csv;charset=utf-8,$csv")
+        ..setAttribute("download", fileName)
+        ..click();
+    } else {
+// Mobile implementation
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final file = io.File('$path/fileName');
+      await file.writeAsString(csv);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('CSV file saved to: ${file.path}')),
+      );
+    }
+  }
+
+  // bool _isDateWithinPastSixDays(DateTime date) {
+  //   DateTime now = DateTime.now();
+  //   DateTime sixDaysAgo = now.subtract(Duration(days: 6));
+  //   return date.isAfter(sixDaysAgo) && date.isBefore(now);
+  // }
+
+  // Map<Remarks, int> countMap = {
+  //   Remarks.onTime: 0,
+  //   Remarks.late: 0,
+  //   Remarks.cutting: 0,
+  //   Remarks.absent: 0,
+  // };
+  // void getRemarksCountAllAtt() {
+  //   print('getRemarksCountAllAtt');
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null &&
+  //         _isDateWithinPastSixDays(attendance.date!)) {
+  //       countMap[attendance.remarks] = countMap[attendance.remarks]! + 1;
+  //     }
+  //   }
+
+  //   print(countMap);
+  //   notifyListeners();
+  // }
+
+  // List<Remarks> getLastSixRecordedDaysRemarks() {
+  //   print('getLastSixRecordedDaysRemarks');
+  //   List<Remarks> lastSixDaysRemarks = [];
+
+  //   // Create a map to group attendance by date
+  //   Map<DateTime, List<Attendance>> attendanceByDate = {};
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       DateTime date = DateTime.utc(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+  //       attendanceByDate[date] = attendanceByDate[date] ?? [];
+  //       attendanceByDate[date]!.add(attendance);
+  //     }
+  //   }
+
+  //   // Iterate through the map to get the last 6 recorded days
+  //   List<DateTime> lastSixRecordedDays = [];
+  //   DateTime today = DateTime.now().toUtc();
+  //   for (int i = 0; i < 6; i++) {
+  //     DateTime day = today.subtract(Duration(days: i));
+  //     if (attendanceByDate.containsKey(day)) {
+  //       lastSixRecordedDays.add(day);
+  //     }
+  //   }
+
+  //   // Iterate through the attendance list and add the remarks for the last 6 recorded days
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       DateTime date = DateTime.utc(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+  //       if (lastSixRecordedDays.contains(date)) {
+  //         lastSixDaysRemarks.add(attendance.remarks);
+  //       }
+  //     }
+  //   }
+
+  //   print(lastSixDaysRemarks);
+  //   print('lastSixDaysRemarks');
+  //   return lastSixDaysRemarks;
+  // }
+
+  // List<Remarks> getLastSixDaysRemarks() {
+  //   print('lastSixDaysRemarks');
+  //   List<Remarks> lastSixDaysRemarks = [];
+
+  //   // Sort the allAttendanceList in descending order based on the date
+  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+
+  //   // Create a Set to store unique dates
+  //   Set<DateTime> uniqueDates = {};
+
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       // Remove the time part from the date to consider only the unique day
+  //       DateTime dateOnly = DateTime(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+
+  //       // Check if the date is unique and the uniqueDates Set has less than 6 elements
+  //       if (!uniqueDates.contains(dateOnly) && uniqueDates.length < 6) {
+  //         lastSixDaysRemarks.add(attendance.remarks);
+  //         uniqueDates.add(dateOnly);
+  //       }
+  //     }
+  //   }
+  //   print(lastSixDaysRemarks);
+  //   print(uniqueDates);
+  //   return lastSixDaysRemarks;
+  // }
+
+  // List<Map<DateTime, Map<Remarks, int>>> getRemarksCountForLastSixDays() {
+  //   print('getRemarksCountForLastSixDays');
+  //   List<Map<DateTime, Map<Remarks, int>>> remarksCountList = [];
+
+  //   // Sort the allAttendanceList in descending order based on the date
+  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+
+  //   // Create a Set to store unique dates
+  //   Set<DateTime> uniqueDates = {};
+
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       // Remove the time part from the date to consider only the unique day
+  //       DateTime dateOnly = DateTime(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+
+  //       // Check if the date is unique and the uniqueDates Set has less than 6 elements
+  //       if (!uniqueDates.contains(dateOnly) && uniqueDates.length < 6) {
+  //         uniqueDates.add(dateOnly);
+  //       }
+  //     }
+  //   }
+
+  //   for (DateTime uniqueDate in uniqueDates) {
+  //     Map<Remarks, int> remarksCount = {
+  //       Remarks.onTime: 0,
+  //       Remarks.late: 0,
+  //       Remarks.cutting: 0,
+  //       Remarks.absent: 0
+  //     };
+
+  //     for (Attendance attendance in allAttendanceList) {
+  //       if (attendance.date != null) {
+  //         DateTime dateOnly = DateTime(attendance.date!.year,
+  //             attendance.date!.month, attendance.date!.day);
+
+  //         if (uniqueDate == dateOnly) {
+  //           remarksCount[attendance.remarks] =
+  //               remarksCount[attendance.remarks]! + 1;
+  //         }
+  //       }
+  //     }
+
+  //     remarksCountList.add({uniqueDate: remarksCount});
+  //   }
+  //   print(remarksCountList);
+  //   return remarksCountList;
+  // }
+
+  List<Map<String, Map<Remarks, int>>> remarksCountList = [];
+  void getRemarksCountForPercentiles() {
+    print('getRemarksCountForPercentiles');
+
+    allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+
+    Set<DateTime> uniqueDates = {};
+
+    for (Attendance attendance in allAttendanceList) {
+      if (attendance.date != null) {
+        DateTime dateOnly = DateTime(attendance.date!.year,
+            attendance.date!.month, attendance.date!.day);
+
+        uniqueDates.add(dateOnly);
+      }
+    }
+
+    int numOfPercentiles = (uniqueDates.length / 6).ceil();
+
+    for (int i = 0; i < numOfPercentiles; i++) {
+      List<DateTime> percentileDates = uniqueDates.skip(i * 6).take(6).toList();
+      String percentileLabel =
+          '${percentileDates.first} - ${percentileDates.last}';
+
+      Map<Remarks, int> remarksCount = {
+        Remarks.onTime: 0,
+        Remarks.late: 0,
+        Remarks.cutting: 0,
+        Remarks.absent: 0
+      };
+
+      for (Attendance attendance in allAttendanceList) {
+        if (attendance.date != null) {
+          DateTime dateOnly = DateTime(attendance.date!.year,
+              attendance.date!.month, attendance.date!.day);
+
+          if (percentileDates.contains(dateOnly)) {
+            remarksCount[attendance.remarks] =
+                remarksCount[attendance.remarks]! + 1;
+          }
+        }
+      }
+
+      remarksCountList.add({percentileLabel: remarksCount});
+    }
+    print(remarksCountList);
+
+    notifyListeners();
   }
 }
