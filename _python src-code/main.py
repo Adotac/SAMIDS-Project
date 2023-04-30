@@ -24,8 +24,8 @@ def train_model():
 def check_face():
     pass
 
-def start_process_videos(on_closing):
-    face_cropper = CVF.FrameExtractor()
+def start_process_videos(n:int, on_closing):
+    face_cropper = CVF.FrameExtractor(nframes = n)
     time.sleep(2)  # This will pause the execution for 2 seconds
 
     vidpath = dir1_entry.get()
@@ -63,6 +63,14 @@ def open_crop_videos_dialog():
     crop_videos_dialog.title("Crop Videos")
     global dir1_entry, dir2_entry
 
+    # Validation function for the integer Entry widget
+    def validate_integer_input(value_if_allowed):
+        if value_if_allowed == "":
+            return True
+        if value_if_allowed.isdigit():
+            return True
+        return False
+
     def on_closing():
         crop_videos_dialog.destroy()
 
@@ -80,14 +88,24 @@ def open_crop_videos_dialog():
     dir2_button = tk.Button(crop_videos_dialog, text="Browse", command=lambda: browse_directory(dir2_entry))
     dir2_button.grid(row=1, column=2, padx=5, pady=5)
 
-    process_videos_button = tk.Button(crop_videos_dialog, text="Crop Videos", command=lambda: start_process_videos(on_closing))
+    process_videos_button = tk.Button(crop_videos_dialog, text="Crop Videos", command=lambda: start_process_videos(int(int_var.get()), on_closing))
     process_videos_button.grid(row=2, column=1, padx=5, pady=5)
+
+    # Add a new label and Entry for the integer input
+    int_label = tk.Label(crop_videos_dialog, text="Integer Input:")
+    int_label.grid(row=4, column=0, sticky="e", padx=5, pady=5)
+    int_var = tk.StringVar()
+    int_var.set("100")  # Set the default value to 200
+    int_entry_validation = crop_videos_dialog.register(validate_integer_input)
+    int_entry = tk.Entry(crop_videos_dialog, width=40, textvariable=int_var, validate="key",
+                         validatecommand=(int_entry_validation, '%P'))
+    int_entry.grid(row=3, column=1, padx=5, pady=5)
 
     global progress_bar
     progress_label = tk.Label(crop_videos_dialog, text="Progress:")
     progress_label.grid(row=3, column=0, sticky="e")
     progress_bar = ttk.Progressbar(crop_videos_dialog, orient="horizontal", length=200, mode="determinate")
-    progress_bar.grid(row=3, column=1)
+    progress_bar.grid(row=4, column=1)
 
     crop_videos_dialog.protocol("WM_DELETE_WINDOW", on_closing)
 

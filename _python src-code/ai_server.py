@@ -24,7 +24,7 @@ async def root():
 async def connected():
     return {"message": "Connected to server"}
 
-@app.get("/test")
+@app.get("/attendance")
 async def test():
     response = requests.get(url + "/api/Student", headers=headers, verify=False)
     if response.status_code == 200:

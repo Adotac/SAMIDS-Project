@@ -5,7 +5,8 @@ import numpy as np
 from PIL import Image
 import cv2
 import pickle
-
+from CustomAugment import RandomBrightnessContrast
+from collections import OrderedDict
 # Define the path to the trained SVM model
 svm_path = 'svm_classifier.pkl'
 
@@ -14,35 +15,53 @@ with open("svm_classifier.pkl", "rb") as f:
     loaded_clf, loaded_le, loaded_name_list = pickle.load(f)
 
 # Define the transformations to apply to the input image
+# Define the transformations to apply to the input image
 data_transforms = transforms.Compose([
+    RandomBrightnessContrast(brightness_range=(0.7, 8), contrast_range=(0.6, 1)),
     transforms.Resize((160, 160)),
+    transforms.Grayscale(3),
     transforms.ToTensor(),
+
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
+import os
 
-# Load the input image
-image_path = './dataset/test/test1.jpg'
-img = cv2.imread(image_path)
+# Calculate the embedding of the face image using the pre-trained ResNet model
+weights_path = './models/facenet-vggface2.pt'  # Replace with the correct path to your downloaded weights file
+resnet = InceptionResnetV1()
 
-# Convert the image to RGB format
-img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+# Load the pre-trained weights, ignoring the extra keys
+state_dict = torch.load(weights_path)
+filtered_state_dict = OrderedDict(
+    (k, v) for k, v in state_dict.items() if k not in ['logits.weight', 'logits.bias'])
+resnet.load_state_dict(filtered_state_dict, strict=False)
+resnet.eval()
 
-# Convert the image to a PIL image
-img = Image.fromarray(img)
+# List of image paths
+image_folder = './dataset/test'
+image_paths = [os.path.join(image_folder, img) for img in os.listdir(image_folder)]
 
-# Apply the transformations to the image
-img = data_transforms(img)
+# Iterate over image paths and predict the labels
+for image_path in image_paths:
+    img = cv2.imread(image_path)
 
-# Add an extra dimension to the tensor to make it compatible with the model
-img = img.unsqueeze(0)
+    # Convert the image to RGB format
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-# Calculate the embedding of the image using the pre-trained ResNet model
-resnet = InceptionResnetV1(pretrained='vggface2').eval()
-with torch.no_grad():
-    embedding = resnet(img)
+    # Convert the image to a PIL image
+    img = Image.fromarray(img)
 
-# Use the SVM model to predict the label of the image
-label_index = loaded_clf.predict(embedding.numpy())[0]
-label_name = loaded_le.inverse_transform([label_index])[0]
+    # Apply the transformations to the image
+    img = data_transforms(img)
 
-print(f'The predicted label of the image is: {label_name}')
+    # Add an extra dimension to the tensor to make it compatible with the model
+    img = img.unsqueeze(0)
+
+    with torch.no_grad():
+        embedding = resnet(img)
+
+    # Use the SVM model to predict the label of the image
+    label_index = loaded_clf.predict(embedding.numpy())[0]
+    label_name = loaded_le.inverse_transform([label_index])[0]
+
+    print(f'The predicted label of the image {image_path} is: {label_name}')

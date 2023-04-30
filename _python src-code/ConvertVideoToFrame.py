@@ -6,9 +6,10 @@ import json
 
 
 class FrameExtractor:
-    def __init__(self, video_path: str = None, output_dir: str = None,
+    def __init__(self, nframes: int = 100, video_path: str = None, output_dir: str = None,
                  padding: int = 50, progress_callback=None):
 
+        self.max_frames = nframes
         self.video_path = video_path
         self.output_dir = output_dir
         self.padding = padding
@@ -23,7 +24,6 @@ class FrameExtractor:
         self.output_dir = output_dir
 
     def process_videos(self) -> str:
-        max_frames = 200
         # Create output directory if it doesn't exist
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -56,15 +56,14 @@ class FrameExtractor:
 
             max_frame_size = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-            print(f"Video duration: {max_frame_size} seconds")
+            print(f"Video duration: {max_frame_size} frames")
 
             # Initialize the frame count
             frame_count = 0
-            frame_interval = max_frame_size/max_frames
             # Loop through each frame in the video
             # 200 frames is the minimum input data per person as it roughly equates for a video clip under 10 seconds
             for i in range(max_frame_size):
-                if i < frame_interval and frame_count < max_frames and cap.isOpened():
+                if frame_count < self.max_frames and cap.isOpened():
                     # Read the next frame from the video
                     ret, frame = cap.read()
                     height, width, _ = frame.shape
@@ -98,7 +97,7 @@ class FrameExtractor:
                                 output_path = os.path.join(face_path, face_filename)
                                 # print(output_path)
 
-                                cv2.imwrite(output_path, face_image, [cv2.IMWRITE_JPEG_QUALITY, 100])
+                                cv2.imwrite(output_path, face_image, [cv2.IMWRITE_JPEG_QUALITY, 80])
 
                                 # Increment the frame count
                                 frame_count += 1
@@ -107,10 +106,6 @@ class FrameExtractor:
                     else:
                         print("Failed to read a frame in this file.")
                         break
-                elif i < (frame_interval + frame_interval):
-                    continue
-                else:
-                    frame_interval = i + frame_interval
 
             if (frame_count == 0):
                 return json.dumps({"success": False, "data": "Error in frame, no faces found"})
