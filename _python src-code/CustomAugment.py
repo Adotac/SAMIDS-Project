@@ -1,0 +1,48 @@
+import cv2
+import numpy as np
+from PIL import Image
+
+class RandomRotation:
+    def __init__(self, angles):
+        self.angles = angles
+
+    def __call__(self, img):
+        angle = np.random.choice(self.angles)
+        img = img.rotate(angle)
+        return img
+
+class RandomFlip:
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, img):
+        if np.random.random() < self.p:
+            img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        return img
+
+class RandomBrightnessContrast:
+    def __init__(self, brightness_range=(0.5, 1.5), contrast_range=(0.5, 1.5)):
+        self.brightness_range = brightness_range
+        self.contrast_range = contrast_range
+
+    def __call__(self, img):
+        brightness = np.random.uniform(self.brightness_range[0], self.brightness_range[1])
+        contrast = np.random.uniform(self.contrast_range[0], self.contrast_range[1])
+        img = Image.fromarray(cv2.convertScaleAbs(np.array(img), alpha=contrast, beta=brightness))
+        return img
+
+class Normalize:
+    def __init__(self, mean, std):
+        self.mean = np.array(mean)
+        self.std = np.array(std)
+
+    def __call__(self, img):
+        img = np.array(img).astype(np.float32) / 255.0
+        assert img.shape[-1] == len(self.mean) == len(self.std), "Number of channels in the image should match the length of mean and std"
+        normalized_image = (img - self.mean) / self.std
+        normalized_image = np.clip(normalized_image, 0, 1)  # Clip the values to the [0, 1] range
+        normalized_image = (normalized_image * 255).astype('uint8')  # Scale the values to the [0, 255] range and convert to integers
+        img = Image.fromarray(normalized_image.astype('uint8'), 'RGB')  # Convert the NumPy array to a PIL image
+        return img
+
+
