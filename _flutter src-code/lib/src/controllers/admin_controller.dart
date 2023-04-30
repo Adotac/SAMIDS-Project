@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
@@ -123,7 +124,9 @@ class AdminController with ChangeNotifier {
       }
       notifyListeners();
     } catch (e, stacktrace) {
-      print('handleEventJsonStudent $e $stacktrace');
+      if (kDebugMode) {
+        print('handleEventJsonStudent $e $stacktrace');
+      }
     }
   }
 
@@ -134,7 +137,9 @@ class AdminController with ChangeNotifier {
         _handleEventJsonStudent(response);
       }
     } catch (e, stacktrace) {
-      print('StudentController getStudents $e $stacktrace');
+      if (kDebugMode) {
+        print('StudentController getStudents $e $stacktrace');
+      }
     }
   }
 
@@ -387,10 +392,9 @@ class AdminController with ChangeNotifier {
   void handleEventJsonFaculty(CRUDReturn result) {
     try {
       if (result.data.isNotEmpty) {
-        filteredFaculties = List<Faculty>.from(
-          result.data.map((facultyJson) => Faculty.fromJson(facultyJson)),
-        );
-        filteredFaculties = filteredFaculties;
+        for (Map<String, dynamic> map in result.data) {
+          filteredFaculties.add(Faculty.fromJson(map));
+        }
       }
       notifyListeners();
     } catch (e, stacktrace) {
@@ -411,8 +415,14 @@ class AdminController with ChangeNotifier {
   }
 
   void searchFaculties(String query) {
+    if (query.isEmpty) {
+      filteredFaculties = filteredFaculties;
+      notifyListeners();
+      return;
+    }
     filteredFaculties = filteredFaculties
         .where((faculty) =>
+            faculty.facultyNo.toString().contains(query) ||
             faculty.firstName.toLowerCase().contains(query.toLowerCase()) ||
             faculty.lastName.toLowerCase().contains(query.toLowerCase()) ||
             faculty.facultyNo.toString().contains(query))

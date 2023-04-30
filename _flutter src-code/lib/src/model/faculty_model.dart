@@ -25,7 +25,9 @@ class Faculty {
         subjects: json['subjects'] != null
             ? List<Subject>.from(
                 json['subjects']
-                    .map((x) => x != null && x['faculties'] != null
+                    .map((x) => x != null &&
+                            x['faculties'] != null &&
+                            x['faculties'].first != null
                         ? Subject.fromJson(x)
                         : null)
                     .where((x) => x != null),

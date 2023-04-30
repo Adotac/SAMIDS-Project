@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/screen/page_not_found.dart';
 
+import '../auth/login.dart';
+import '../controllers/admin_controller.dart';
 import '../controllers/auth.controller.dart';
 import '../screen/admin/attendance.dart';
 import '../screen/admin/dashboard.dart';
@@ -21,6 +24,7 @@ class MobileView extends StatefulWidget {
   bool showAppBar;
   bool appBarOnly;
   bool implyLeading;
+  bool isAdmin = false;
   final int currentIndex;
   MobileView(
       {Key? key,
@@ -28,6 +32,7 @@ class MobileView extends StatefulWidget {
       required this.appBarTitle,
       required this.currentIndex,
       this.userName = '',
+      this.isAdmin = false,
       this.showBottomNavBar = true,
       this.showAppBar = true,
       this.appBarOnly = false,
@@ -40,6 +45,7 @@ class MobileView extends StatefulWidget {
 
 class _MobileViewState extends State<MobileView> {
   AuthController get _authController => widget.authController;
+
   Widget _buildBottomNavigationBar(context, int currentIndex) {
     // Get the current theme's brightness
     Brightness brightness = Theme.of(context).brightness;
@@ -65,17 +71,24 @@ class _MobileViewState extends State<MobileView> {
       Icons.school_outlined,
       Icons.settings_outlined,
     ];
-
+    List<String> labels;
     // Define labels
-    List<String> labels = [
-      'Dashboard',
-      'Attendance',
-      'Classes',
-      'Settings',
-    ];
+    if (widget.isAdmin) {
+      labels = [
+        'Dashboard',
+        'Attendance',
+      ];
+    } else {
+      labels = [
+        'Dashboard',
+        'Attendance',
+        'Classes',
+        'Settings',
+      ];
+    }
 
     List<BottomNavigationBarItem> items = List.generate(
-      4,
+      widget.isAdmin ? 2 : 4,
       (index) => BottomNavigationBarItem(
         icon: Icon(
           currentIndex == index ? selectedIcons[index] : unselectedIcons[index],
@@ -156,33 +169,33 @@ class _MobileViewState extends State<MobileView> {
     );
   }
 
-  Widget _buildNotificationsList(BuildContext context) {
-    // Dummy data for notifications
-    List<NotificationTile> notifications = const [
-      NotificationTile(
-        facultyName: 'John Doe',
-        content: 'Your attendance has been marked.',
-        time: '5 minutes ago',
-      ),
-      NotificationTile(
-        facultyName: 'John Doe',
-        content: 'Your attendance has been marked.',
-        time: '5 minutes ago',
-      ),
-      NotificationTile(
-        facultyName: 'John Doe',
-        content: 'Your attendance has been marked.',
-        time: '5 minutes ago',
-      ),
-    ];
+  // Widget _buildNotificationsList(BuildContext context) {
+  //   // Dummy data for notifications
+  //   List<NotificationTile> notifications = const [
+  //     NotificationTile(
+  //       facultyName: 'John Doe',
+  //       content: 'Your attendance has been marked.',
+  //       time: '5 minutes ago',
+  //     ),
+  //     NotificationTile(
+  //       facultyName: 'John Doe',
+  //       content: 'Your attendance has been marked.',
+  //       time: '5 minutes ago',
+  //     ),
+  //     NotificationTile(
+  //       facultyName: 'John Doe',
+  //       content: 'Your attendance has been marked.',
+  //       time: '5 minutes ago',
+  //     ),
+  //   ];
 
-    return ListView.builder(
-      itemCount: notifications.length,
-      itemBuilder: (BuildContext context, int index) {
-        return notifications[index];
-      },
-    );
-  }
+  //   return ListView.builder(
+  //     itemCount: notifications.length,
+  //     itemBuilder: (BuildContext context, int index) {
+  //       return notifications[index];
+  //     },
+  //   );
+  // }
 
   String _getGreeting() {
     var hour = DateTime.now().hour;
@@ -237,20 +250,20 @@ class _MobileViewState extends State<MobileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: Drawer(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 18.0),
-              child: Text(
-                'Notifications',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            Expanded(child: _buildNotificationsList(context)),
-          ],
-        ),
-      ),
+      // endDrawer: Drawer(
+      //   child: Column(
+      //     children: [
+      //       Padding(
+      //         padding: const EdgeInsets.symmetric(vertical: 18.0),
+      //         child: Text(
+      //           'Notifications',
+      //           style: Theme.of(context).textTheme.titleLarge,
+      //         ),
+      //       ),
+      //       Expanded(child: _buildNotificationsList(context)),
+      //     ],
+      //   ),
+      // ),
       bottomNavigationBar: Visibility(
         visible: widget.showBottomNavBar,
         child: _buildBottomNavigationBar(context, widget.currentIndex),
@@ -260,6 +273,19 @@ class _MobileViewState extends State<MobileView> {
               actions: [
                 Builder(
                   builder: (BuildContext context) {
+                    if (widget.isAdmin) {
+                      return IconButton(
+                        icon: const Icon(Icons.logout_outlined),
+                        onPressed: () {
+                          GetIt.instance.unregister<AdminController>();
+
+                          _authController.logout();
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              LoginScreen.routeName,
+                              (Route<dynamic> route) => false);
+                        },
+                      );
+                    }
                     return IconButton(
                       icon: const Icon(Icons.notifications_outlined),
                       onPressed: () {

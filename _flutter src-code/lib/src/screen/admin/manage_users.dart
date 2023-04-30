@@ -126,15 +126,16 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
 
   Widget _buildFacultyList() {
     return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(
-            color: Color(0xFFF2F2F2),
-            width: 2.0,
-          ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(
+          color: Color(0xFFF2F2F2),
+          width: 2.0,
         ),
-        padding: const EdgeInsets.all(18.0),
-        child: _dataTableFaculty(context));
+      ),
+      padding: const EdgeInsets.all(18.0),
+      child: _dataTableFaculty(context),
+    );
   }
 
   Widget _dataTableStudents(BuildContext context) {
@@ -209,7 +210,7 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
 
     return DataColumn(
       label: SizedBox(
-        width: 100,
+        width: 200,
         child: InkWell(
           onTap: () {
             _dataController.sortFaculties(title);
@@ -240,18 +241,20 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
   }
 
   Widget _dataTableFaculty(BuildContext context) {
-    return PaginatedDataTable(
-      columns: [
-        _dataColumnFaculty('Faculty No'),
-        _dataColumnFaculty('Last Name'),
-        _dataColumnFaculty('First Name'),
-      ],
-      showFirstLastButtons: true,
-      rowsPerPage: 20,
-      onPageChanged: (int value) {
-        print('Page changed to $value');
-      },
-      source: _createFacultyDataSource(),
+    return Container(
+      child: PaginatedDataTable(
+        columns: [
+          _dataColumnFaculty('Faculty No'),
+          _dataColumnFaculty('Last Name'),
+          _dataColumnFaculty('First Name'),
+        ],
+        showFirstLastButtons: true,
+        rowsPerPage: 20,
+        onPageChanged: (int value) {
+          print('Page changed to $value');
+        },
+        source: _createFacultyDataSource(),
+      ),
     );
   }
 

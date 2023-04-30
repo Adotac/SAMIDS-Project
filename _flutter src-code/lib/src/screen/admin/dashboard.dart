@@ -67,12 +67,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
       animation: adminController,
       builder: (context, child) {
         return MobileView(
+            isAdmin: true,
             appBarTitle: "Admin Dashboard",
             appBarOnly: true,
             currentIndex: 0,
             body: [
               SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                // padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Column(
                   children: [
                     _mBuildConfig(context),
@@ -684,8 +685,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
               _termInfo(),
               const SizedBox(height: 14.0),
               _timeOffset(),
-              const SizedBox(height: 12.0),
-              Expanded(child: _dataTableClasses(context))
+              // const SizedBox(height: 12.0),
+              // Expanded(child: _dataTableClasses(context))
             ],
           );
   }
@@ -694,7 +695,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return //add scroll view here
         adminController.config == null
             ? const SizedBox(
-                height: 500,
+                height: 50,
+                width: 50,
                 child: CircularProgressIndicator(),
               )
             : Container(

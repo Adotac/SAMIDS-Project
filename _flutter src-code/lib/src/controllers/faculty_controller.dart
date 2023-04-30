@@ -210,7 +210,9 @@ class FacultyController with ChangeNotifier {
       isStudentClassesCollected = true;
       notifyListeners();
     } catch (e, stacktrace) {
-      print('handleEventJsonStudentClasses $e $stacktrace');
+      if (kDebugMode) {
+        print('handleEventJsonStudentClasses $e $stacktrace');
+      }
     }
   }
 
@@ -223,7 +225,9 @@ class FacultyController with ChangeNotifier {
       isStudentsCollected = true;
       notifyListeners();
     } catch (e, stacktrace) {
-      print('handleEventJsonStudentList $e $stacktrace');
+      if (kDebugMode) {
+        print('handleEventJsonStudentList $e $stacktrace');
+      }
     }
   }
 

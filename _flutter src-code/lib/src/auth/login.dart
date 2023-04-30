@@ -32,15 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    // _usernameController.text = '0000';
-    _usernameController.text = '79417';
+    _usernameController.text = '0000';
+    // _usernameController.text = '79417';
 
-//28817 79417 faculty
+//   79417 faculty
 //35526 admin
 //91204 user
     _passwordController = TextEditingController();
-    // _passwordController.text = 'admin';
-    _passwordController.text = '79417';
+    _passwordController.text = 'admin';
+    // _passwordController.text = '79417';
     super.initState();
   }
 
@@ -472,84 +472,88 @@ class _LoginScreenState extends State<LoginScreen> {
         : Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  "Login",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  constraints: const BoxConstraints(
-                    maxWidth: 370,
-                  ),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _usernameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Username',
-                          hintText: 'Enter your username',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter your password',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: double.infinity,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              foregroundColor: Colors.white),
-                          onPressed: () async {
-                            await _onLogin(context);
-                          },
-                          child: const Text("Continue"),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      TextButton(
-                        onPressed: () => _showResetPasswordDialog(context),
-                        child: const Text("Forget password?"),
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      TextButton(
-                        onPressed: () => {_controller.setShowRegister(true)},
-                        child: const Text("Don't have an account? Register"),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-              ],
-            ),
+            child: mobileForum(context),
           );
+  }
+
+  Column mobileForum(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          "Login",
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        Container(
+          constraints: const BoxConstraints(
+            maxWidth: 370,
+          ),
+          child: Column(
+            children: [
+              TextField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  hintText: 'Enter your username',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white),
+                  onPressed: () async {
+                    await _onLogin(context);
+                  },
+                  child: const Text("Continue"),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextButton(
+                onPressed: () => _showResetPasswordDialog(context),
+                child: const Text("Forget password?"),
+              ),
+              const SizedBox(
+                height: 3,
+              ),
+              TextButton(
+                onPressed: () => {_controller.setShowRegister(true)},
+                child: const Text("Don't have an account? Register"),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 50,
+        ),
+      ],
+    );
   }
 }

@@ -52,21 +52,28 @@ class _AdminAttendanceState extends State<AdminAttendance> {
   }
 
   Widget _mobileView(BuildContext context) {
-    return MobileView(
-      appBarOnly: true,
-      appBarTitle: "Admin Attendance",
-      currentIndex: 1, // Set the appropriate index for the current screen
-      body: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: _searchBar(context),
-        ),
-        SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          scrollDirection: Axis.vertical,
-          child: _dataTableAttendance(context),
-        ),
-      ],
+    return AnimatedBuilder(
+      animation: _dataController,
+      builder: (context, child) {
+        return MobileView(
+          isAdmin: true,
+          appBarOnly: true,
+          appBarTitle: "Admin Attendance",
+          currentIndex: 1, // Set the appropriate index for the current screen
+          body: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _searchBarMobile(context),
+            ),
+            SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              scrollDirection: Axis.vertical,
+              child: _dataTableAttendance(context),
+            ),
+          ],
+        );
+        ;
+      },
     );
   }
 
@@ -173,6 +180,26 @@ class _AdminAttendanceState extends State<AdminAttendance> {
       //     shape: BoxShape.rectangle,
       //     borderRadius: BorderRadius.circular(5),
       //     border: Border.all(color: Colors.grey, width: 1)),
+      child: TextField(
+        autofocus: true,
+        onSubmitted: (query) {
+          // Call filterAttendance with the search query entered by the user
+          _dataController.filterAttendance(query);
+        },
+        controller: _textEditingController,
+        decoration: const InputDecoration(
+          suffixIcon: Icon(Icons.search_outlined),
+          suffixIconColor: Colors.grey,
+          border: InputBorder.none,
+          hintText: 'Search',
+        ),
+      ),
+    );
+  }
+
+  Widget _searchBarMobile(context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * .90,
       child: TextField(
         autofocus: true,
         onSubmitted: (query) {
