@@ -31,7 +31,7 @@ class StudentInfoCard extends StatelessWidget {
     return Container(
       constraints:
           const BoxConstraints(maxHeight: 148, minWidth: double.infinity),
-      padding: const EdgeInsets.only(left: 26),
+      padding: const EdgeInsets.only(left: 18),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -46,27 +46,35 @@ class StudentInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                RichText(
-                  text: TextSpan(
-                    text: '$firstName $lastName - $id',
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.titleLarge!.color,
-                    ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.39,
+                  child: Row(
                     children: [
-                      isFaculty
-                          ? TextSpan(
-                              text: ' Faculty',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            )
-                          : const TextSpan(
-                              text: '',
-                            ),
+                      Expanded(
+                        child: Text(
+                          '$firstName $lastName - $id',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
+                            color:
+                                Theme.of(context).textTheme.titleLarge!.color,
+                          ),
+                        ),
+                      ),
+                      // Expanded(
+                      //   child: Align(
+                      //     alignment: Alignment.centerRight,
+                      //     child: Text(
+                      //       'Stats Information',
+                      //       style: TextStyle(
+                      //         fontSize: 21,
+                      //         fontWeight: FontWeight.w300,
+                      //         color:
+                      //             Theme.of(context).textTheme.bodySmall!.color,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

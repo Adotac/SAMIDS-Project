@@ -105,34 +105,52 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           Column(
             children: [
               Card(
-                child: Column(
-                  children: [
-                    StudentInfoCard(
-                        course: "Faculty",
-                        id: _dataController.faculty.facultyNo,
-                        firstName: _dataController.faculty.firstName,
-                        lastName: _dataController.faculty.lastName,
-                        isFaculty: true),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildLegendContainer(Colors.red, 16, 'Absent'),
-                        SizedBox(width: 8),
-                        _buildLegendContainer(
-                            Colors.yellow.shade700, 16, 'Cutting'),
-                        SizedBox(width: 8),
-                        _buildLegendContainer(Colors.green, 16, 'On-Time'),
-                        SizedBox(width: 8),
-                        _buildLegendContainer(Colors.orange, 16, 'Late'),
-                      ],
-                    ),
-                    SizedBox(
-                        height: 232,
-                        child: TestLineChart(
-                          isShowingMainData: false,
-                          facultyController: _dataController,
-                        )),
-                  ],
+                child: SizedBox(
+                  height: 420,
+                  child: Column(
+                    children: [
+                      StudentInfoCard(
+                          course: "Faculty",
+                          id: _dataController.faculty.facultyNo,
+                          firstName: _dataController.faculty.firstName,
+                          lastName: _dataController.faculty.lastName,
+                          isFaculty: true),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Row(
+                            children: [
+                              _buildLegendContainer(Colors.red, 16, 'Absent'),
+                              SizedBox(width: 8),
+                              _buildLegendContainer(
+                                  Colors.yellow.shade700, 16, 'Cutting'),
+                              SizedBox(width: 8),
+                              _buildLegendContainer(
+                                  Colors.green, 16, 'On-Time'),
+                              SizedBox(width: 8),
+                              _buildLegendContainer(Colors.orange, 16, 'Late'),
+                            ],
+                          ),
+                          Text(
+                            _getCurrentYearTerm(),
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      if (_dataController.isRemarksCountListLoading)
+                        Center(child: CircularProgressIndicator())
+                      else
+                        SizedBox(
+                          height: 232,
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: DashboardLineChart(
+                            isShowingMainData: false,
+                            facultyController: _dataController,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -185,12 +203,16 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                       _buildLegendContainer(Colors.orange, 16, 'Late'),
                     ],
                   ),
-                  SizedBox(
+                  if (_dataController.isRemarksCountListLoading)
+                    Center(child: CircularProgressIndicator())
+                  else
+                    SizedBox(
                       height: 232,
-                      child: TestLineChart(
+                      child: DashboardLineChart(
                         isShowingMainData: false,
                         facultyController: _dataController,
-                      )),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -508,14 +530,14 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
               'Subject Schedule',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Text(
-              _getCurrentYearTerm(),
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
+            // SizedBox(height: 8),
+            // Text(
+            //   _getCurrentYearTerm(),
+            //   style: TextStyle(
+            //     fontSize: 14,
+            //     color: Colors.grey,
+            //   ),
+            // ),
             SizedBox(height: 16),
             SizedBox(width: double.infinity, child: _dataTableClasses(context)),
           ],

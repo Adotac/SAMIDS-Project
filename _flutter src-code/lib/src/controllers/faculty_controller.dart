@@ -28,6 +28,7 @@ class FacultyController with ChangeNotifier {
   final List<Student> students = [];
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
+  List<Attendance> graphAttendanceList = [];
   List<SubjectSchedule> facultyClasses = [];
   Map<int, List<Attendance>> attendanceBySchedId = {};
   Map<int, Map<Remarks, int>> remarksBySchedId = {};
@@ -47,6 +48,10 @@ class FacultyController with ChangeNotifier {
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
+  bool isRemarksCountListLoading = true;
+
+  List<Map<String, Map<Remarks, int>>> remarksCountList = [];
+  int maxRemarksCount = 0;
 
   FacultyController({required this.faculty});
 
@@ -272,6 +277,10 @@ class FacultyController with ChangeNotifier {
             );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
+
+        if (graphAttendanceList.isEmpty) {
+          graphAttendanceList = allAttendanceList;
+        }
         getRemarksCount();
         getRemarksCountForPercentiles();
         isAllAttendanceCollected = true;
@@ -855,84 +864,16 @@ class FacultyController with ChangeNotifier {
   //   print(remarksCountList);
   //   return remarksCountList;
   // }
-
-  List<Map<String, Map<Remarks, int>>> remarksCountList = [];
-
-  // void getRemarksCountForPercentiles() {
-  //   print('getRemarksCountForPercentiles');
-
-  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
-
-  //   Set<DateTime> uniqueDates = {};
-
-  //   for (Attendance attendance in allAttendanceList) {
-  //     if (attendance.date != null) {
-  //       DateTime dateOnly = DateTime(attendance.date!.year,
-  //           attendance.date!.month, attendance.date!.day);
-
-  //       uniqueDates.add(dateOnly);
-  //     }
-  //   }
-
-  //   int numOfPercentiles = (uniqueDates.length / 6).ceil();
-
-  //   for (int i = 0; i < numOfPercentiles; i++) {
-  //     List<DateTime> percentileDates = uniqueDates.skip(i * 6).take(6).toList();
-  //     String percentileLabel =
-  //         '${percentileDates.first} - ${percentileDates.last}';
-
-  //     Map<Remarks, int> remarksCount = {
-  //       Remarks.onTime: 0,
-  //       Remarks.late: 0,
-  //       Remarks.cutting: 0,
-  //       Remarks.absent: 0
-  //     };
-
-  //     for (Attendance attendance in allAttendanceList) {
-  //       if (attendance.date != null) {
-  //         DateTime dateOnly = DateTime(attendance.date!.year,
-  //             attendance.date!.month, attendance.date!.day);
-
-  //         if (percentileDates.contains(dateOnly)) {
-  //           remarksCount[attendance.remarks] =
-  //               remarksCount[attendance.remarks]! + 1;
-  //         }
-  //       }
-  //     }
-
-  //     remarksCountList.add({percentileLabel: remarksCount});
-  //   }
-
-  //   for (Map<String, Map<Remarks, int>> data in remarksCountList) {
-  //   String dateRange = data.keys.first;
-  //   Map<Remarks, int> remarksCount = data.values.first;
-
-  //   DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
-  //   DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
-
-  //   String formattedDateRange =
-  //       '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('MMMM d').format(endDate)}';
-
-  //   print(formattedDateRange);
-
-  //   for (Remarks remark in remarksCount.keys) {
-  //     int count = remarksCount[remark]!;
-  //     print('$remark: $count');
-  //   }
-  // }
-
-  //   // print(remarksCountList);
-  //   notifyListeners();
-  // }
-
+  List<String> formattedDateRangeList = [];
   void getRemarksCountForPercentiles() {
+    notifyListeners();
     print('getRemarksCountForPercentiles');
 
-    allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+    graphAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
 
     Set<DateTime> uniqueDates = {};
 
-    for (Attendance attendance in allAttendanceList) {
+    for (Attendance attendance in graphAttendanceList) {
       if (attendance.date != null) {
         DateTime dateOnly = DateTime(attendance.date!.year,
             attendance.date!.month, attendance.date!.day);
@@ -958,7 +899,7 @@ class FacultyController with ChangeNotifier {
         Remarks.absent: 0
       };
 
-      for (Attendance attendance in allAttendanceList) {
+      for (Attendance attendance in graphAttendanceList) {
         if (attendance.date != null) {
           DateTime dateOnly = DateTime(attendance.date!.year,
               attendance.date!.month, attendance.date!.day);
@@ -972,23 +913,64 @@ class FacultyController with ChangeNotifier {
 
       remarksCountList.add({percentileLabel: remarksCount});
     }
+
+    Remarks maxRemarks = Remarks.onTime;
+
     for (Map<String, Map<Remarks, int>> data in remarksCountList) {
       String dateRange = data.keys.first;
       Map<Remarks, int> remarksCount = data.values.first;
 
+      // Iterate through the remarks count and update the max count if needed
+      for (Remarks remark in remarksCount.keys) {
+        int count = remarksCount[remark]!;
+        if (count > maxRemarksCount) {
+          maxRemarksCount = count;
+          maxRemarks = remark;
+        }
+      }
+
       DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
       DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
 
-      String formattedDateRange =
-          '${DateFormat('MMMM d').format(startDate)} - ${DateFormat('MMMM d').format(endDate)}';
+      String formattedDateRange = DateFormat('MMMM').format(endDate);
 
-      print(formattedDateRange);
+      formattedDateRangeList.add(formattedDateRange);
 
       for (Remarks remark in remarksCount.keys) {
         int count = remarksCount[remark]!;
         print('$remark: $count');
       }
     }
+
+    print('Max remarks count: $maxRemarksCount');
+    print('Max remarks: $maxRemarks');
+
+    final count = getPercentileCounts();
+    print(count);
+    isRemarksCountListLoading = false;
     notifyListeners();
+  }
+
+  List<int> getPercentileCounts() {
+    List<int> percentileCounts = [];
+
+    int countPerPercentile = (maxRemarksCount / 5).ceil();
+
+    for (int i = 1; i <= 5; i++) {
+      int count = i * countPerPercentile;
+      percentileCounts.add(count);
+    }
+
+    return percentileCounts;
+  }
+
+  List<double> getCountOfRemark(Remarks desiredRemark) {
+    List<double> remarkCountList = [];
+    for (Map<String, Map<Remarks, int>> data in remarksCountList) {
+      Map<Remarks, int> remarksCount = data.values.first;
+      int count = remarksCount[desiredRemark] ?? 0;
+      remarkCountList.add(count.toDouble());
+    }
+    return remarkCountList;
   }
 }
