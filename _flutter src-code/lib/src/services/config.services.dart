@@ -77,64 +77,6 @@ class ConfigService {
     }
   }
 
-// ...
-
-//   static Future<CRUDReturn> addStudentFromCSV(html.File file) async {
-//     try {
-//       var url = Uri.parse('$_baseUrl/CSV/csvStudent');
-//       var request = http.MultipartRequest('POST', url);
-
-//       // Set headers
-//       request.headers.addAll({
-//         'accept': 'text/plain',
-//         'Content-Type': 'multipart/form-data',
-//       });
-// // Create a multipart file from the selected file
-//       var reader = html.FileReader();
-//       reader.readAsArrayBuffer(file);
-//       await reader.onLoad.first;
-//       var multipartFile = http.MultipartFile(
-//         'file',
-//         reader.result as Stream<List<int>>,
-//         file.size,
-//         filename: file.name,
-//         contentType: MediaType('text', 'csv'),
-//       );
-//       // Add the multipart file to the request
-//       request.files.add(multipartFile);
-
-//       // Send the request
-//       var response = await request.send();
-//       final http.Response httpResponse =
-//           await http.Response.fromStream(response);
-
-//       if (kDebugMode) {
-//         _logger.i(
-//             'addStudentFromCSV ${httpResponse.statusCode} ${httpResponse.body}');
-//       }
-
-//       if (httpResponse.statusCode == 200) {
-//         if (httpResponse.body.isNotEmpty) {
-//           final jsonResponse = jsonDecode(httpResponse.body);
-//           return CRUDReturn.fromJson(jsonResponse);
-//         } else {
-//           throw Exception("Empty response body");
-//         }
-//       } else {
-//         String errorMessage = "Something went wrong.";
-//         if (httpResponse.body.isNotEmpty) {
-//           final jsonResponse = jsonDecode(httpResponse.body);
-//           errorMessage = jsonResponse['message'] ?? "Something went wrong.";
-//         }
-//         throw Exception(
-//             "Request failed with status: ${httpResponse.statusCode}. Error message: $errorMessage");
-//       }
-//     } catch (e, stacktrace) {
-//       if (kDebugMode) print('ConfigService addStudentFromCSV $e $stacktrace');
-//       rethrow;
-//     }
-//   }
-
   static Future<CRUDReturn> addStudentFromCSV(html.File file) async {
     try {
       var url = Uri.parse('$_baseUrl/CSV/csvStudent');
@@ -284,6 +226,45 @@ class ConfigService {
       }
     } catch (e, stacktrace) {
       if (kDebugMode) print('ConfigService addSecurity $e $stacktrace');
+      rethrow;
+    }
+  }
+
+  static Future<CRUDReturn> forgotPassword(
+      String email, String securityQuestion, String securityAnswer) async {
+    try {
+      final response = await HttpService.post(
+        '$_baseUrl/Auth/forgot-password',
+        body: jsonEncode({
+          "email": email,
+          "securityQuestion": securityQuestion,
+          "securityAnswer": securityAnswer,
+        }),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (kDebugMode) {
+        _logger.i('forgotPassword ${response.statusCode} ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('ConfigService forgotPassword $e $stacktrace');
       rethrow;
     }
   }

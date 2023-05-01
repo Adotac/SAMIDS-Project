@@ -1,5 +1,4 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';

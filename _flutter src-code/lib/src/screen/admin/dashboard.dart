@@ -4,10 +4,13 @@ import 'dart:html' as html;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../controllers/admin_controller.dart';
+import '../../model/faculty_model.dart';
 import '../../services/DTO/crud_return.dart';
+import '../../services/attendance.services.dart';
 import '../../services/auth.services.dart';
 import '../../services/config.services.dart';
 import '../../widgets/Csv-upload/students.dart';
@@ -28,9 +31,6 @@ class AdminDashboard extends StatefulWidget {
 class _AdminDashboardState extends State<AdminDashboard> {
   AdminController get adminController => widget.adminController;
 
-  List<String> selectedFiles = [];
-  List<String> selectedFileTable = [];
-  List<String> uploadStatus = [];
   @override
   void initState() {
     adminController.getConfig();
@@ -225,11 +225,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     DataColumn(label: Text('Status')),
                   ],
                   rows: List.generate(
-                    selectedFiles.length,
+                    adminController.selectedFiles.length,
                     (index) => DataRow(
                       cells: [
-                        DataCell(Text(selectedFiles[index])),
-                        DataCell(Text(selectedFileTable[index])),
+                        DataCell(Text(adminController.selectedFiles[index])),
+                        DataCell(
+                            Text(adminController.selectedFileTable[index])),
                         // ignore: unrelated_type_equality_checks
                         DataCell(Text(adminController.uploadStatus[index],
                             style: TextStyle(
@@ -276,18 +277,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Download Attendance CSV',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16.0),
-          _mDownloadForm(),
-          const SizedBox(height: 18.0),
-          const Text(
-            'Reset Password',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16.0),
+          // const Text(
+          //   'Download Attendance CSV',
+          //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          // ),
+          // const SizedBox(height: 16.0),
+          // _mDownloadForm(),
+          // const SizedBox(height: 18.0),
+          // const Text(
+          //   'Reset Password',
+          //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          // ),
+          // const SizedBox(height: 16.0),
           _mResetPasswordForm(),
         ],
       ),
@@ -308,14 +309,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 "Reset faculty/student password",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 8.0),
               TextField(
                 controller: usernameController,
                 decoration: const InputDecoration(
                   labelText: 'Username',
                 ),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 8.0),
               TextField(
                 controller: passwordController,
                 decoration: const InputDecoration(
@@ -454,6 +455,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             _buildDropdownField(
+              onChanged: (String? newValue) {
+                // Do something with the new value
+              },
               label: "Current Year - Current Term",
               items: ["2022-2023 2nd Semester"],
               defaultValue: "2022-2023 2nd Semester",
@@ -471,6 +475,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               children: [
                 Expanded(
                   child: _buildDropdownField(
+                    onChanged: (String? newValue) {
+                      // Do something with the new value
+                    },
                     label: "Select Faculty",
                     items: ["All", "Faculty A", "Faculty B"],
                     defaultValue: "All",
@@ -478,6 +485,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 Expanded(
                   child: _buildDropdownField(
+                    onChanged: (String? newValue) {
+                      // Do something with the new value
+                    },
                     label: "Select Subject",
                     items: ["All", "Subject A", "Subject B"],
                     defaultValue: "All",
@@ -504,6 +514,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               children: [
                 Expanded(
                   child: _buildDropdownField(
+                    onChanged: (String? newValue) {
+                      // Do something with the new value
+                    },
                     label: "Select Student",
                     items: ["All", "Student A", "Student B"],
                     defaultValue: "All",
@@ -511,6 +524,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
                 Expanded(
                   child: _buildDropdownField(
+                    onChanged: (String? newValue) {
+                      // Do something with the new value
+                    },
                     label: "Select Subject",
                     items: ["All", "Subject A", "Subject B"],
                     defaultValue: "All",
@@ -532,6 +548,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Card _downloadForm() {
+    final facultyIdController = TextEditingController();
+    final subjectIdFacController = TextEditingController();
+    final studentIdController = TextEditingController();
+    final subjectIdStudController = TextEditingController();
+
+    final DateFormat displayDateFormat = DateFormat('MMMM d, y');
+    final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -539,91 +562,192 @@ class _AdminDashboardState extends State<AdminDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Select Year - Term",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            _buildDropdownField(
-              label: "Current Year - Current Term",
-              items: ["2022-2023 2nd Semester"],
-              defaultValue: "2022-2023 2nd Semester",
-            ),
-            const Divider(),
-            const SizedBox(
-              height: 18,
-            ),
-            const Text(
               "From Faculty",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(
+              height: 8.0,
+            ),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: "Faculty ID",
+              ),
+              controller: facultyIdController,
+
+              // Do something with the new value
+            ),
+            const SizedBox(height: 8.0),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: "Subject ID",
+              ),
+              controller: subjectIdFacController,
+            ),
+            // const SizedBox(height: 8.0),
+            // add date picker here
+            const SizedBox(height: 8.0),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Expanded(
-                  child: _buildDropdownField(
-                    label: "Select Faculty",
-                    items: ["All", "Faculty A", "Faculty B"],
-                    defaultValue: "All",
+                TextButton(
+                  onPressed: () async {
+                    if (!isNumber(facultyIdController.text)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Faculty ID must be a number"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    if (!isNumber(subjectIdFacController.text)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Subject ID must be a number"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    if (adminController.selectedDateFac == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please select a date"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    await adminController.getDataToDownload(
+                        0,
+                        int.parse(facultyIdController.text),
+                        dateFormat.format(adminController.selectedDateFac!),
+                        int.parse(subjectIdFacController.text),
+                        context);
+                    // Do something with the faculty data
+                  },
+                  child: const Text('Download'),
+                ),
+                const Spacer(),
+                Text(
+                  adminController.selectedDateFac == null
+                      ? "Select Date"
+                      : displayDateFormat
+                          .format(adminController.selectedDateFac!),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
-                Expanded(
-                  child: _buildDropdownField(
-                    label: "Select Subject",
-                    items: ["All", "Subject A", "Subject B"],
-                    defaultValue: "All",
-                  ),
+                IconButton(
+                  onPressed: () async {
+                    final DateTime? selectedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (selectedDate != null) {
+                      print(selectedDate);
+                      adminController.setSelectedDateFac(selectedDate);
+
+                      // Do something with the selected date
+                    }
+                  },
+                  icon: const Icon(Icons.calendar_today),
                 ),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.only(top: 12.0),
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Download'),
-              ),
-            ),
-            const SizedBox(
-              height: 18,
-            ),
-            const Divider(),
+            const SizedBox(height: 12.0),
             const Text(
               "From Attendance",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 8.0),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: "Student ID",
+              ),
+              controller: studentIdController,
+            ),
+            const SizedBox(height: 8.0),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: "Subject ID",
+              ),
+              controller: subjectIdStudController,
+            ),
+            const SizedBox(height: 8.0),
             Row(
               children: [
-                Expanded(
-                  child: _buildDropdownField(
-                    label: "Select Student",
-                    items: ["All", "Student A", "Student B"],
-                    defaultValue: "All",
+                TextButton(
+                  onPressed: () {
+                    if (!isNumber(studentIdController.text)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Student ID must be a number"),
+                        ),
+                      );
+                      return;
+                    }
+                    if (!isNumber(subjectIdStudController.text)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Subject ID must be a number"),
+                        ),
+                      );
+                      return;
+                    }
+                    // Do something with the attendance data
+                  },
+                  child: const Text('Download'),
+                ),
+                const Spacer(),
+                Text(
+                  adminController.selectedDateStud == null
+                      ? "Select Date"
+                      : displayDateFormat
+                          .format(adminController.selectedDateStud!),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge?.color,
                   ),
                 ),
-                Expanded(
-                  child: _buildDropdownField(
-                    label: "Select Subject",
-                    items: ["All", "Subject A", "Subject B"],
-                    defaultValue: "All",
-                  ),
+                IconButton(
+                  onPressed: () async {
+                    final DateTime? selectedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (selectedDate != null) {
+                      print(selectedDate);
+                      adminController.setSelectedDateStud(selectedDate);
+
+                      // Do something with the selected date
+                    }
+                  },
+                  icon: const Icon(Icons.calendar_today),
                 ),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.only(top: 12.0),
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Download'),
-              ),
-            )
           ],
         ),
       ),
     );
   }
 
+  bool isNumber(String? value) {
+    if (value == null) {
+      return false;
+    }
+    final number = int.tryParse(value);
+    return number != null;
+  }
+
   Widget _buildDropdownField({
     required String label,
     required List<String> items,
     required String defaultValue,
+    required void Function(String?) onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -638,7 +762,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               );
             },
           ).toList(),
-          onChanged: (String? newValue) {},
+          onChanged: (String? newValue) {
+            onChanged(newValue);
+          },
         ),
         Text(label),
       ],
@@ -1256,87 +1382,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  List<Map<String, dynamic>> sampleStudentClasses = [
-    {
-      'subject': 'Data Structures and Algorithms',
-      'room': 'BCL1',
-      'timeStart': DateTime(2023, 4, 1, 5, 30),
-      'timeEnd': DateTime(2023, 4, 1, 6, 30),
-      'day': 'Mon, Wed, Fri',
-    },
-    {
-      'subject': 'Operating Systems',
-      'room': 'BCL2',
-      'timeStart': DateTime(2023, 4, 1, 10, 0),
-      'timeEnd': DateTime(2023, 4, 1, 11, 30),
-      'day': 'Tue, Thu',
-    },
-    {
-      'subject': 'Design and Analysis of Algorithms',
-      'room': 'BCL3',
-      'timeStart': DateTime(2023, 4, 1, 2, 0),
-      'timeEnd': DateTime(2023, 4, 1, 3, 30),
-      'day': 'Mon, Wed, Fri',
-    },
-    {
-      'subject': 'Natural Language Processing',
-      'room': 'BCL4',
-      'timeStart': DateTime(2023, 4, 1, 13, 0),
-      'timeEnd': DateTime(2023, 4, 1, 14, 30),
-      'day': 'Tue, Thu',
-    },
-    {
-      'subject': 'Programming Languages',
-      'room': 'BCL5',
-      'timeStart': DateTime(2023, 4, 1, 16, 0),
-      'timeEnd': DateTime(2023, 4, 1, 17, 30),
-      'day': 'Mon, Wed, Fri',
-    },
-    // {
-    //   'subject': 'Calculus',
-    //   'room': 'BCL6',
-    //   'timeStart': DateTime(2023, 4, 1, 8, 0),
-    //   'timeEnd': DateTime(2023, 4, 1, 9, 30),
-    //   'day': 'Tue, Thu',
-    // },
-    {
-      'subject': 'Machine Learning',
-      'room': 'BCL7',
-      'timeStart': DateTime(2023, 4, 1, 14, 30),
-      'timeEnd': DateTime(2023, 4, 1, 16, 0),
-      'day': 'Mon, Wed, Fri',
-    },
-    // {
-    //   'subject': 'Apps Development 2',
-    //   'room': 'BCL8',
-    //   'timeStart': DateTime(2023, 4, 1, 9, 0),
-    //   'timeEnd': DateTime(2023, 4, 1, 10, 30),
-    //   'day': 'Tue, Thu',
-    // },
-    // {
-    //   'subject': 'Software Engineering 2',
-    //   'room': 'BCL9',
-    //   'timeStart': DateTime(2023, 4, 1, 11, 0),
-    //   'timeEnd': DateTime(2023, 4, 1, 12, 30),
-    //   'day': 'Mon, Wed, Fri',
-    // },
-  ];
-
-  Widget _dataTableClasses(context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.4,
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        child: SingleChildScrollView(
-          child: DataTable(columns: [
-            customDataColumn(label: const Text('Year'), flex: 3),
-            customDataColumn(label: const Text('Term  '), flex: 1),
-          ], rows: _buildSampleDataRows(context)),
-        ),
-      ),
-    );
-  }
-
   DataColumn customDataColumn({required Widget label, int flex = 1}) {
     return DataColumn(
       label: Expanded(
@@ -1344,28 +1389,5 @@ class _AdminDashboardState extends State<AdminDashboard> {
         child: label,
       ),
     );
-  }
-
-  List<DataRow> _buildSampleDataRows(BuildContext context) {
-    return sampleStudentClasses.map((schedule) {
-      return DataRow(
-        cells: [
-          DataCell(
-            Text(
-              schedule['subject'],
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-          DataCell(
-            Text(
-              '${schedule['timeStart'].hour == 0 ? 12 : (schedule['timeStart'].hour < 13 ? schedule['timeStart'].hour : schedule['timeStart'].hour - 12).toString().padLeft(2, '0')}:${schedule['timeStart'].minute.toString().padLeft(2, '0')} ${schedule['timeStart'].hour < 12 ? 'AM' : 'PM'} - ${(schedule['timeEnd'].hour == 0 ? 12 : (schedule['timeEnd'].hour < 13 ? schedule['timeEnd'].hour : schedule['timeEnd'].hour - 12)).toString().padLeft(2, '0')}:${schedule['timeEnd'].minute.toString().padLeft(2, '0')} ${schedule['timeEnd'].hour < 12 ? 'AM' : 'PM'}',
-              style: const TextStyle(
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      );
-    }).toList();
   }
 }

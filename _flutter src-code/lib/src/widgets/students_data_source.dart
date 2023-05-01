@@ -11,7 +11,6 @@ class StudentDataSource extends DataTableSource {
   final AdminController studentController;
 
   StudentDataSource(this.students, this.studentController);
-
   @override
   DataRow getRow(int index) {
     assert(index >= 0);

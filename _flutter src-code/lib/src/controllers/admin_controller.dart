@@ -3,12 +3,14 @@
 
 import 'dart:convert';
 import 'dart:html';
-
+import 'dart:io' as io;
+import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
 
@@ -32,6 +34,9 @@ class AdminController with ChangeNotifier {
   List<Faculty> filteredFaculties = [];
   List<String> uploadStatus = [];
 
+  DateTime? selectedDateStud;
+  DateTime? selectedDateFac;
+
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
   bool isAttendanceTodayCollected = false;
@@ -54,6 +59,16 @@ class AdminController with ChangeNotifier {
   static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
+  }
+
+  void setSelectedDateStud(DateTime date) {
+    selectedDateStud = date;
+    notifyListeners();
+  }
+
+  void setSelectedDateFac(DateTime date) {
+    selectedDateFac = date;
+    notifyListeners();
   }
 
   void setSelectedUserType(String userType) {
@@ -406,11 +421,14 @@ class AdminController with ChangeNotifier {
 
   void handleEventJsonFaculty(CRUDReturn result) {
     try {
+      if (filteredFaculties.isNotEmpty) filteredFaculties.clear();
+
       if (result.data.isNotEmpty) {
         for (Map<String, dynamic> map in result.data) {
           filteredFaculties.add(Faculty.fromJson(map));
         }
       }
+
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonFaculty $e $stacktrace');
@@ -472,5 +490,138 @@ class AdminController with ChangeNotifier {
     });
 
     notifyListeners();
+  }
+
+  List<Attendance> attendanceListToDownload = [];
+
+  handEventJsonAttendanceAllDownload(CRUDReturn result) {
+    if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
+
+    for (Map<String, dynamic> map in result.data) {
+      attendanceListToDownload.add(Attendance.fromJson(map));
+    }
+    filteredAttendanceList = allAttendanceList;
+    notifyListeners();
+  }
+
+  Future<void> getDataToDownload(
+      int type, int? userNo, String? date, int? schedId, context) async {
+    CRUDReturn response;
+    try {
+      if (type == 0) {
+        response = await AttendanceService.getAll(
+          studentNo: userNo,
+          schedId: schedId,
+          date: date,
+        );
+      } else {
+        response = await AttendanceService.getAll(
+          facultyNo: userNo,
+          schedId: schedId,
+          date: date,
+        );
+      }
+
+      if (response.success) {
+        handEventJsonAttendanceAllDownload(response);
+        downloadData(context);
+      }
+    } catch (e, stacktrace) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Error', style: TextStyle(color: Colors.red)),
+            content: Text(
+              '$e',
+              overflow: TextOverflow.ellipsis,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  Future<void> downloadData(context) async {
+    if (attendanceListToDownload.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('No attendance data found'),
+            content: Text('There is no attendance data to download.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    List<List<dynamic>> csvData = [
+      // Add headers to the CSV file
+      [
+        "Student ID",
+        "Name",
+        "Reference ID",
+        "Room",
+        "Subject",
+        "Date",
+        "Day",
+        "Time in",
+        "Time out",
+        "Remarks"
+      ],
+    ];
+
+    for (Attendance attendance in attendanceListToDownload) {
+      List<dynamic> row = [
+        attendance.student?.studentNo ?? '',
+        '${attendance.student?.firstName ?? ''} ${attendance.student?.lastName ?? ''}',
+        attendance.attendanceId,
+        attendance.subjectSchedule?.room ?? '',
+        attendance.subjectSchedule?.subject?.subjectName ?? '',
+        attendance.date?.toIso8601String() ?? '',
+        attendance.subjectSchedule?.day?.toString() ?? '',
+        attendance.actualTimeIn?.hour.toString() ?? '',
+        attendance.actualTimeOut?.hour.toString() ?? '',
+        attendance.remarks.index,
+      ];
+      csvData.add(row);
+    }
+
+    String csv = const ListToCsvConverter().convert(csvData);
+
+    if (kIsWeb) {
+      // Web implementation
+      AnchorElement(href: "data:text/csv;charset=utf-8,$csv")
+        ..setAttribute("download", "attendance_data.csv")
+        ..click();
+    } else {
+// Mobile implementation
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final file = io.File('$path/attendance_data.csv');
+      await file.writeAsString(csv);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('CSV file saved to: ${file.path}')),
+      );
+    }
   }
 }

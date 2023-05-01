@@ -12,6 +12,8 @@ import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import '../model/faculty_model.dart';
 import '../model/student_model.dart';
 import '../screen/admin/dashboard.dart';
+import '../services/DTO/crud_return.dart';
+import '../services/config.services.dart';
 import '../widgets/responsive_builder.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -32,15 +34,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    // _usernameController.text = '0000';
-    _usernameController.text = '12345';
+    _usernameController.text = '0000';
+    // _usernameController.text = '12345';
 
 //   79417 faculty
 //35526 admin
 //91204 user
     _passwordController = TextEditingController();
-    // _passwordController.text = 'admin';
-    _passwordController.text = '12345';
+    _passwordController.text = 'admin';
+    // _passwordController.text = '12345';
     super.initState();
   }
 
@@ -78,8 +80,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   //add on init
-  Future<void> _showResetPasswordDialog(BuildContext context) async {
+  Future<void> _showForgetPasswordDialog(BuildContext context) async {
     String email = '';
+    String? securityQuestion = securityQuestions.first;
+    final TextEditingController securityAnswerController =
+        TextEditingController();
 
     await showDialog(
       context: context,
@@ -93,19 +98,32 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Theme.of(context).colorScheme.error,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            TextField(
-              onChanged: (value) {
-                email = value;
-              },
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                hintText: 'Username',
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                onChanged: (value) {
+                  email = value;
+                },
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  hintText: 'Email',
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 15),
+              _dropDownSecurityQuestion(
+                securityQuestion,
+                (String? value) => securityQuestion = value,
+              ),
+              const SizedBox(height: 10),
+              _inputField(
+                securityAnswerController,
+                'Answer',
+                'Enter your answer',
+              ),
+            ],
+          ),
         ),
         actions: <Widget>[
           TextButton(
@@ -113,44 +131,31 @@ class _LoginScreenState extends State<LoginScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (isValidEmail(email)) {
-                // send email password reset
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    title: Text(
-                      'Password Reset',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
+                try {
+                  final CRUDReturn result = await ConfigService.forgotPassword(
+                    email,
+                    securityQuestion!,
+                    securityAnswerController.text,
+                  );
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result.data),
+                      backgroundColor:
+                          result.success ? Colors.green : Colors.red,
                     ),
-                    content: RichText(
-                      text: TextSpan(
-                        text: 'An email for password reset has been sent to ',
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.black),
-                        children: [
-                          TextSpan(
-                            text: email,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
+                  );
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error: $e'),
+                      backgroundColor: Colors.red,
                     ),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
+                  );
+                }
               } else {
                 showDialog(
                   context: context,
@@ -178,6 +183,49 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _inputField(
+      TextEditingController controller, String labelText, String hintText,
+      {bool obscureText = false}) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: labelText,
+        hintText: hintText,
+      ),
+      obscureText: obscureText,
+    );
+  }
+
+  List<String> securityQuestions = [
+    "What is your mother's maiden name?",
+    "What was the name of your first pet?",
+    "What was your favorite place to visit as a child?",
+    "What is the name of your favorite book?",
+    "What is the name of the street where you grew up?",
+  ];
+  Widget _dropDownSecurityQuestion(
+      String? currentValue, ValueChanged<String?>? onChanged) {
+    return DropdownButtonFormField<String>(
+      value: currentValue,
+      onChanged: onChanged,
+      items: securityQuestions.map<DropdownMenuItem<String>>(
+        (String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        },
+      ).toList(),
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Security Question',
+      ),
+
+      isExpanded: true, // This will help with fitting long text values
     );
   }
 
@@ -298,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _usernameController,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'Username',
+                          labelText: 'Email',
                           hintText: 'Username'),
                     ),
                   ),
@@ -310,7 +358,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Password',
-                          hintText: 'Enter your secure password'),
+                          hintText: 'Enter your password'),
                     ),
                   ),
                   const SizedBox(
@@ -342,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 10,
                   ),
                   TextButton(
-                    onPressed: () => _showResetPasswordDialog(context),
+                    onPressed: () => _showForgetPasswordDialog(context),
                     child: const Text("Forget password?"),
                   ),
                   const SizedBox(
@@ -538,7 +586,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 20,
               ),
               TextButton(
-                onPressed: () => _showResetPasswordDialog(context),
+                onPressed: () => _showForgetPasswordDialog(context),
                 child: const Text("Forget password?"),
               ),
               const SizedBox(

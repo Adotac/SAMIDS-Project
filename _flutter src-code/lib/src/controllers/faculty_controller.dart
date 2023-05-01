@@ -473,6 +473,7 @@ class FacultyController with ChangeNotifier {
       //   });
       //   print(output.substring(0, output.length - 1));
       // });
+
       isRemarksCountBySchedId = true;
       notifyListeners();
     } catch (e, stacktrace) {
@@ -651,7 +652,6 @@ class FacultyController with ChangeNotifier {
         ..setAttribute("download", fileName)
         ..click();
     } else {
-// Mobile implementation
       final directory = await getApplicationDocumentsDirectory();
       final path = directory.path;
       final file = io.File('$path/$fileName');
@@ -714,7 +714,6 @@ class FacultyController with ChangeNotifier {
         ..setAttribute("download", fileName)
         ..click();
     } else {
-// Mobile implementation
       final directory = await getApplicationDocumentsDirectory();
       final path = directory.path;
       final file = io.File('$path/fileName');
@@ -726,148 +725,6 @@ class FacultyController with ChangeNotifier {
     }
   }
 
-  // bool _isDateWithinPastSixDays(DateTime date) {
-  //   DateTime now = DateTime.now();
-  //   DateTime sixDaysAgo = now.subtract(Duration(days: 6));
-  //   return date.isAfter(sixDaysAgo) && date.isBefore(now);
-  // }
-
-  // Map<Remarks, int> countMap = {
-  //   Remarks.onTime: 0,
-  //   Remarks.late: 0,
-  //   Remarks.cutting: 0,
-  //   Remarks.absent: 0,
-  // };
-  // void getRemarksCountAllAtt() {
-  //   print('getRemarksCountAllAtt');
-  //   for (Attendance attendance in allAttendanceList) {
-  //     if (attendance.date != null &&
-  //         _isDateWithinPastSixDays(attendance.date!)) {
-  //       countMap[attendance.remarks] = countMap[attendance.remarks]! + 1;
-  //     }
-  //   }
-
-  //   print(countMap);
-  //   notifyListeners();
-  // }
-
-  // List<Remarks> getLastSixRecordedDaysRemarks() {
-  //   print('getLastSixRecordedDaysRemarks');
-  //   List<Remarks> lastSixDaysRemarks = [];
-
-  //   // Create a map to group attendance by date
-  //   Map<DateTime, List<Attendance>> attendanceByDate = {};
-  //   for (Attendance attendance in allAttendanceList) {
-  //     if (attendance.date != null) {
-  //       DateTime date = DateTime.utc(attendance.date!.year,
-  //           attendance.date!.month, attendance.date!.day);
-  //       attendanceByDate[date] = attendanceByDate[date] ?? [];
-  //       attendanceByDate[date]!.add(attendance);
-  //     }
-  //   }
-
-  //   // Iterate through the map to get the last 6 recorded days
-  //   List<DateTime> lastSixRecordedDays = [];
-  //   DateTime today = DateTime.now().toUtc();
-  //   for (int i = 0; i < 6; i++) {
-  //     DateTime day = today.subtract(Duration(days: i));
-  //     if (attendanceByDate.containsKey(day)) {
-  //       lastSixRecordedDays.add(day);
-  //     }
-  //   }
-
-  //   // Iterate through the attendance list and add the remarks for the last 6 recorded days
-  //   for (Attendance attendance in allAttendanceList) {
-  //     if (attendance.date != null) {
-  //       DateTime date = DateTime.utc(attendance.date!.year,
-  //           attendance.date!.month, attendance.date!.day);
-  //       if (lastSixRecordedDays.contains(date)) {
-  //         lastSixDaysRemarks.add(attendance.remarks);
-  //       }
-  //     }
-  //   }
-
-  //   print(lastSixDaysRemarks);
-  //   print('lastSixDaysRemarks');
-  //   return lastSixDaysRemarks;
-  // }
-
-  // List<Remarks> getLastSixDaysRemarks() {
-  //   print('lastSixDaysRemarks');
-  //   List<Remarks> lastSixDaysRemarks = [];
-
-  //   // Sort the allAttendanceList in descending order based on the date
-  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
-
-  //   // Create a Set to store unique dates
-  //   Set<DateTime> uniqueDates = {};
-
-  //   for (Attendance attendance in allAttendanceList) {
-  //     if (attendance.date != null) {
-  //       // Remove the time part from the date to consider only the unique day
-  //       DateTime dateOnly = DateTime(attendance.date!.year,
-  //           attendance.date!.month, attendance.date!.day);
-
-  //       // Check if the date is unique and the uniqueDates Set has less than 6 elements
-  //       if (!uniqueDates.contains(dateOnly) && uniqueDates.length < 6) {
-  //         lastSixDaysRemarks.add(attendance.remarks);
-  //         uniqueDates.add(dateOnly);
-  //       }
-  //     }
-  //   }
-  //   print(lastSixDaysRemarks);
-  //   print(uniqueDates);
-  //   return lastSixDaysRemarks;
-  // }
-
-  // List<Map<DateTime, Map<Remarks, int>>> getRemarksCountForLastSixDays() {
-  //   print('getRemarksCountForLastSixDays');
-  //   List<Map<DateTime, Map<Remarks, int>>> remarksCountList = [];
-
-  //   // Sort the allAttendanceList in descending order based on the date
-  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
-
-  //   // Create a Set to store unique dates
-  //   Set<DateTime> uniqueDates = {};
-
-  //   for (Attendance attendance in allAttendanceList) {
-  //     if (attendance.date != null) {
-  //       // Remove the time part from the date to consider only the unique day
-  //       DateTime dateOnly = DateTime(attendance.date!.year,
-  //           attendance.date!.month, attendance.date!.day);
-
-  //       // Check if the date is unique and the uniqueDates Set has less than 6 elements
-  //       if (!uniqueDates.contains(dateOnly) && uniqueDates.length < 6) {
-  //         uniqueDates.add(dateOnly);
-  //       }
-  //     }
-  //   }
-
-  //   for (DateTime uniqueDate in uniqueDates) {
-  //     Map<Remarks, int> remarksCount = {
-  //       Remarks.onTime: 0,
-  //       Remarks.late: 0,
-  //       Remarks.cutting: 0,
-  //       Remarks.absent: 0
-  //     };
-
-  //     for (Attendance attendance in allAttendanceList) {
-  //       if (attendance.date != null) {
-  //         DateTime dateOnly = DateTime(attendance.date!.year,
-  //             attendance.date!.month, attendance.date!.day);
-
-  //         if (uniqueDate == dateOnly) {
-  //           remarksCount[attendance.remarks] =
-  //               remarksCount[attendance.remarks]! + 1;
-  //         }
-  //       }
-  //     }
-
-  //     remarksCountList.add({uniqueDate: remarksCount});
-  //   }
-  //   print(remarksCountList);
-  //   return remarksCountList;
-  // }
   List<String> formattedDateRangeList = [];
   void getRemarksCountForPercentiles() {
     notifyListeners();
