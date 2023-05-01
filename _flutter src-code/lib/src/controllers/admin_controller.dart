@@ -25,6 +25,10 @@ import '../services/faculty.services.dart';
 import '../services/student.services.dart';
 
 class AdminController with ChangeNotifier {
+  List<String> selectedFiles = [];
+  List<String> selectedFileTable = [];
+  List<String> uploadStatus = [];
+
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
@@ -32,7 +36,6 @@ class AdminController with ChangeNotifier {
   List<Student> students = [];
   String selectedUserType = 'Student';
   List<Faculty> filteredFaculties = [];
-  List<String> uploadStatus = [];
 
   DateTime? selectedDateStud;
   DateTime? selectedDateFac;
@@ -59,6 +62,14 @@ class AdminController with ChangeNotifier {
   static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
+  }
+
+  void clearList() {
+    selectedFiles.clear();
+    selectedFileTable.clear();
+    uploadStatus.clear();
+
+    notifyListeners();
   }
 
   void setSelectedDateStud(DateTime date) {

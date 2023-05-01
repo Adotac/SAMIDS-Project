@@ -97,17 +97,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _webDashboardBody() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: Row(
         children: [
           Expanded(
             child: _buildConfig(context),
           ),
-          const VerticalDivider(width: 32.0),
+          const VerticalDivider(width: 8.0),
           Expanded(
             child: _buildUpload(),
           ),
-          const VerticalDivider(width: 32.0),
+          const VerticalDivider(width: 8.0),
           Expanded(
             child: _buildDownloadCSV(),
           )
@@ -116,87 +116,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  // Widget _mBuildUpload() {
-  //   return Container(
-  //     margin: const EdgeInsets.symmetric(horizontal: 12.0),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         const Text(
-  //           'Upload CSV',
-  //           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-  //         ),
-  //         const SizedBox(height: 16.0),
-  //         Column(
-  //           crossAxisAlignment: CrossAxisAlignment.center,
-  //           children: [
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 _buildTextButton('Student', () => _uploadCSV(0)),
-  //                 const SizedBox(width: 8.0),
-  //                 _buildTextButton('Subject', () => _uploadCSV(1)),
-  //                 const SizedBox(width: 8.0),
-  //                 _buildTextButton('Faculty', () => _uploadCSV(2)),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 8.0),
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 _buildTextButton('Faculty Subject', () => _uploadCSV(3)),
-  //                 const SizedBox(width: 8.0),
-  //                 _buildTextButton('Student Subject', () => _uploadCSV(4)),
-  //               ],
-  //             ),
-
-  //           ],
-  //         ),
-  //         const SizedBox(height: 16.0),
-  //         Card(
-  //           elevation: 0,
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(12.0),
-  //           ),
-  //           child: SingleChildScrollView(
-  //             scrollDirection: Axis.horizontal,
-  //             child: SizedBox(
-  //               width: MediaQuery.of(context).size.width * .95,
-  //               child: DataTable(
-  //                 columns: const [
-  //                   DataColumn(label: Text('File Name')),
-  //                   DataColumn(label: Text('Table Selected')),
-  //                   DataColumn(label: Text('Status')),
-  //                 ],
-  //                 rows: List.generate(
-  //                   selectedFiles.length,
-  //                   (index) => DataRow(
-  //                     cells: [
-  //                       DataCell(Text(selectedFiles[index])),
-  //                       DataCell(SingleChildScrollView(
-  //                           child: Text(selectedFileTable[index]))),
-  //                       const DataCell(Text('Uploading...')),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget _buildUpload() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Upload CSV',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Upload CSV',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+                onPressed: () {
+                  adminController.clearList();
+                },
+                child: const Text("Clear all"))
+          ],
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 8.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -207,7 +145,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             _buildTextButton('Student Subject', () => _uploadCSV(4)),
           ],
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 4.0),
         Expanded(
           child: Card(
             elevation: 0,
@@ -217,7 +155,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.25,
+                width: MediaQuery.of(context).size.width * 0.28,
                 child: DataTable(
                   columns: const [
                     DataColumn(label: Text('File Name')),
@@ -258,14 +196,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
           'Download Attendance CSV',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 8.0),
         _downloadForm(),
-        const SizedBox(height: 18.0),
+        const SizedBox(height: 6.0),
         const Text(
           'Reset Password',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 6.0),
         _resetPasswordForm(),
       ],
     );
@@ -437,110 +375,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
               },
               child: const Text('Submit'),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Card _mDownloadForm() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Select Year - Term",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            _buildDropdownField(
-              onChanged: (String? newValue) {
-                // Do something with the new value
-              },
-              label: "Current Year - Current Term",
-              items: ["2022-2023 2nd Semester"],
-              defaultValue: "2022-2023 2nd Semester",
-            ),
-            const Divider(),
-            const SizedBox(
-              height: 18,
-            ),
-            const Text(
-              "From Faculty",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _buildDropdownField(
-                    onChanged: (String? newValue) {
-                      // Do something with the new value
-                    },
-                    label: "Select Faculty",
-                    items: ["All", "Faculty A", "Faculty B"],
-                    defaultValue: "All",
-                  ),
-                ),
-                Expanded(
-                  child: _buildDropdownField(
-                    onChanged: (String? newValue) {
-                      // Do something with the new value
-                    },
-                    label: "Select Subject",
-                    items: ["All", "Subject A", "Subject B"],
-                    defaultValue: "All",
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 12.0),
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Download'),
-              ),
-            ),
-            const SizedBox(
-              height: 18,
-            ),
-            const Divider(),
-            const Text(
-              "From Attendance",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildDropdownField(
-                    onChanged: (String? newValue) {
-                      // Do something with the new value
-                    },
-                    label: "Select Student",
-                    items: ["All", "Student A", "Student B"],
-                    defaultValue: "All",
-                  ),
-                ),
-                Expanded(
-                  child: _buildDropdownField(
-                    onChanged: (String? newValue) {
-                      // Do something with the new value
-                    },
-                    label: "Select Subject",
-                    items: ["All", "Subject A", "Subject B"],
-                    defaultValue: "All",
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 12.0),
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Download'),
-              ),
-            )
           ],
         ),
       ),
@@ -771,50 +605,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  // Widget _buildDownload() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       const Text(
-  //         'Download CSV',
-  //         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-  //       ),
-  //       const SizedBox(height: 16.0),
-  //       Expanded(
-  //         child: Card(
-  //           elevation: 0,
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(12.0),
-  //           ),
-  //           child: SingleChildScrollView(
-  //             scrollDirection: Axis.horizontal,
-  //             child: SizedBox(
-  //               width: MediaQuery.of(context).size.width * 0.3,
-  //               child: DataTable(
-  //                 columns: const [
-  //                   DataColumn(label: Text('File Name')),
-  //                   DataColumn(label: Text('Table Selected')),
-  //                   DataColumn(label: Text('Status')),
-  //                 ],
-  //                 rows: List.generate(
-  //                   selectedFiles.length,
-  //                   (index) => DataRow(
-  //                     cells: [
-  //                       DataCell(Text(selectedFiles[index])),
-  //                       DataCell(Text(selectedFileTable[index])),
-  //                       DataCell(Text(adminController.uploadStatus[index])),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   void _uploadCSV(int table) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -823,8 +613,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
     if (result != null) {
       String fileName = result.files.single.name;
-      selectedFiles.add(fileName);
-      selectedFileTable.add(_getTableName(table));
+      adminController.selectedFiles.add(fileName);
+      adminController.selectedFileTable.add(_getTableName(table));
       int length = adminController.uploadStatus.length;
       adminController.setUploadStatus("Uploading");
 
@@ -948,9 +738,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 "Configurations",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 14.0),
+              const SizedBox(height: 4.0),
               _termInfo(),
-              const SizedBox(height: 14.0),
+              const SizedBox(height: 4.0),
               _timeOffset(),
               // const SizedBox(height: 12.0),
               // Expanded(child: _dataTableClasses(context))
