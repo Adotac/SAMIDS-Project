@@ -264,16 +264,16 @@ class _WebViewState extends State<WebView> {
           //     },
           //   ),
           // ),
-          Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(Icons.notifications_none_outlined),
-                onPressed: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-              );
-            },
-          ),
+          // Builder(
+          //   builder: (BuildContext context) {
+          //     return IconButton(
+          //       icon: const Icon(Icons.notifications_none_outlined),
+          //       onPressed: () {
+          //         Scaffold.of(context).openEndDrawer();
+          //       },
+          //     );
+          //   },
+          // ),
           const SizedBox(
             width: 24,
           )
@@ -289,20 +289,20 @@ class _WebViewState extends State<WebView> {
           Expanded(child: widget.body),
         ],
       ), //
-      endDrawer: Drawer(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0),
-              child: Text(
-                'Notifications',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-            Expanded(child: _buildNotificationsList(context)),
-          ],
-        ),
-      ),
+      // endDrawer: Drawer(
+      //   child: Column(
+      //     children: [
+      //       Padding(
+      //         padding: const EdgeInsets.only(top: 18.0),
+      //         child: Text(
+      //           'Notifications',
+      //           style: Theme.of(context).textTheme.titleLarge,
+      //         ),
+      //       ),
+      //       Expanded(child: _buildNotificationsList(context)),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

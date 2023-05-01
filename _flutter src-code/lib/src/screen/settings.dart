@@ -191,7 +191,7 @@ class _SettingsPageState extends State<SettingsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'New Password',
                   hintText: 'Enter new password',
                   border: OutlineInputBorder(),
@@ -201,9 +201,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   newPassword = value;
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Confirm Password',
                   hintText: 'Re-enter new password',
                   border: OutlineInputBorder(),
@@ -273,7 +273,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 if (userIndex == 0) {
                   userId = widget.controller!.student.studentNo;
                 } else {
-                  userId = widget.controller!.faculty.studentNo;
+                  userId = widget.controller!.faculty.facultyNo;
                 }
                 // Call the API to change the password
                 AuthService.changePassword(

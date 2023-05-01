@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:html' as html;
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -70,6 +73,56 @@ class ConfigService {
       }
     } catch (e, stacktrace) {
       if (kDebugMode) print('ConfigService updateConfig $e $stacktrace');
+      rethrow;
+    }
+  }
+
+  static Future<CRUDReturn> addStudentFromCSV(html.File file) async {
+    try {
+      var url = Uri.parse('$_baseUrl/CSV/csvStudent');
+      var request = http.MultipartRequest('POST', url);
+
+      var reader = html.FileReader();
+      var completer = Completer<List<int>>();
+      reader.onLoadEnd.listen((event) {
+        completer.complete(reader.result as List<int>);
+      });
+      reader.readAsArrayBuffer(file);
+
+      List<int> fileBytes = await completer.future;
+      var fileStream = http.ByteStream(Stream.fromIterable([fileBytes]));
+
+      var multipartFile = http.MultipartFile('filePath', fileStream, file.size,
+          filename: file.name);
+      request.files.add(multipartFile);
+
+      var response = await request.send();
+      final http.Response httpResponse =
+          await http.Response.fromStream(response);
+
+      if (kDebugMode) {
+        _logger.i(
+            'addStudentFromCSV ${httpResponse.statusCode} ${httpResponse.body}');
+      }
+
+      if (httpResponse.statusCode == 200) {
+        if (httpResponse.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(httpResponse.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (httpResponse.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(httpResponse.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${httpResponse.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('ConfigService addStudentFromCSV $e $stacktrace');
       rethrow;
     }
   }

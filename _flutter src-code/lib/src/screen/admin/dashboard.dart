@@ -1,14 +1,20 @@
 import 'dart:io';
+import 'dart:html' as html;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:samids_web_app/src/model/config_model.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../controllers/admin_controller.dart';
+import '../../services/DTO/crud_return.dart';
+import '../../services/auth.services.dart';
+import '../../services/config.services.dart';
 import '../../widgets/Csv-upload/students.dart';
 import '../../widgets/mobile_view.dart';
 import '../../widgets/web_view.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart' as syspaths;
 
 class AdminDashboard extends StatefulWidget {
   static const String routeName = '/admin-dashboard';
@@ -282,10 +288,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   Widget _resetPasswordForm() {
-    final TextEditingController usernameController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-
     return Expanded(
       child: Card(
         child: Padding(
@@ -313,17 +318,80 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 obscureText: true,
               ),
               const SizedBox(height: 24.0),
-              TextButton(
-                onPressed: () {
-                  // Implement your reset password logic here
-                },
-                child: const Text('Submit'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      _onForgetPasswordClick(context);
+                    },
+                    child: const Text('Submit'),
+                  ),
+                  DropdownButton<String>(
+                    value: adminController.selectedUserType,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        adminController.setSelectedUserType(newValue);
+                      }
+                    },
+                    items: <String>['Student', 'Faculty'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _onForgetPasswordClick(context) {
+    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter a username or password.'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+    if (int.tryParse(usernameController.text) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Username must be a number.'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+    AuthService.changePassword(
+      passwordController.text,
+      int.parse(usernameController.text),
+      adminController.selectedUserType == 'Student' ? 'studentNo' : 'facultyNo',
+    ).then((result) {
+      if (result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Password changed successfully.'),
+          backgroundColor: Colors.green,
+        ));
+
+        usernameController.text = '';
+        passwordController.text = '';
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.data),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    });
   }
 
   Widget _mResetPasswordForm() {
@@ -358,7 +426,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(height: 24.0),
             TextButton(
               onPressed: () {
-                // Implement your reset password logic here
+                _onForgetPasswordClick(context);
               },
               child: const Text('Submit'),
             ),
@@ -629,7 +697,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
       setState(() {});
 
       Uint8List fileBytes = result.files.single.bytes!;
-      await CSVFileUpload.uploadCsv(fileBytes, table);
+
+      if (table == 0) {
+        // Only call addStudentFromCSV for table 0 (Student)
+        final blob = html.Blob([fileBytes]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final file = html.File([blob], fileName);
+
+        try {
+          final CRUDReturn response =
+              await ConfigService.addStudentFromCSV(file);
+          print('File upload response: ${response.toJson()}');
+        } catch (e) {
+          print('Error uploading file: $e');
+        } finally {
+          html.Url.revokeObjectUrl(url);
+        }
+      } else {
+        await CSVFileUpload.uploadCsv(fileBytes, table);
+      }
     } else {
       print('No file selected.');
     }

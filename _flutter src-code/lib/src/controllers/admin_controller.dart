@@ -28,7 +28,7 @@ class AdminController with ChangeNotifier {
   List<SubjectSchedule> studentClasses = [];
   List<Attendance> filteredAttendanceList = [];
   List<Student> students = [];
-
+  String selectedUserType = 'Student';
   List<Faculty> filteredFaculties = [];
 
   bool isStudentClassesCollected = false;
@@ -53,6 +53,11 @@ class AdminController with ChangeNotifier {
   static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
+  }
+
+  void setSelectedUserType(String userType) {
+    selectedUserType = userType;
+    notifyListeners();
   }
 
   void filterAttendance(String query) {
