@@ -83,8 +83,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 child: Column(
                   children: [
                     _mBuildConfig(context),
-                    const Divider(),
-                    _mBuildUpload(),
+                    // const Divider(),
+                    // _mBuildUpload(),
                     const Divider(),
                     _mBuildDownloadCSV(),
                   ],
@@ -101,7 +101,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Row(
         children: [
           Expanded(
-            // child: _buildUpload(),
             child: _buildConfig(context),
           ),
           const VerticalDivider(width: 32.0),
@@ -117,76 +116,77 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _mBuildUpload() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Upload CSV',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildTextButton('Student', () => _uploadCSV(0)),
-                  const SizedBox(width: 8.0),
-                  _buildTextButton('Subject', () => _uploadCSV(1)),
-                  const SizedBox(width: 8.0),
-                  _buildTextButton('Faculty', () => _uploadCSV(2)),
-                ],
-              ),
-              const SizedBox(height: 8.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildTextButton('Faculty Subject', () => _uploadCSV(3)),
-                  const SizedBox(width: 8.0),
-                  _buildTextButton('Student Subject', () => _uploadCSV(4)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * .95,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('File Name')),
-                    DataColumn(label: Text('Table Selected')),
-                    DataColumn(label: Text('Status')),
-                  ],
-                  rows: List.generate(
-                    selectedFiles.length,
-                    (index) => DataRow(
-                      cells: [
-                        DataCell(Text(selectedFiles[index])),
-                        DataCell(SingleChildScrollView(
-                            child: Text(selectedFileTable[index]))),
-                        const DataCell(Text('Uploading...')),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _mBuildUpload() {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 12.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         const Text(
+  //           'Upload CSV',
+  //           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //         ),
+  //         const SizedBox(height: 16.0),
+  //         Column(
+  //           crossAxisAlignment: CrossAxisAlignment.center,
+  //           children: [
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 _buildTextButton('Student', () => _uploadCSV(0)),
+  //                 const SizedBox(width: 8.0),
+  //                 _buildTextButton('Subject', () => _uploadCSV(1)),
+  //                 const SizedBox(width: 8.0),
+  //                 _buildTextButton('Faculty', () => _uploadCSV(2)),
+  //               ],
+  //             ),
+  //             const SizedBox(height: 8.0),
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 _buildTextButton('Faculty Subject', () => _uploadCSV(3)),
+  //                 const SizedBox(width: 8.0),
+  //                 _buildTextButton('Student Subject', () => _uploadCSV(4)),
+  //               ],
+  //             ),
+
+  //           ],
+  //         ),
+  //         const SizedBox(height: 16.0),
+  //         Card(
+  //           elevation: 0,
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(12.0),
+  //           ),
+  //           child: SingleChildScrollView(
+  //             scrollDirection: Axis.horizontal,
+  //             child: SizedBox(
+  //               width: MediaQuery.of(context).size.width * .95,
+  //               child: DataTable(
+  //                 columns: const [
+  //                   DataColumn(label: Text('File Name')),
+  //                   DataColumn(label: Text('Table Selected')),
+  //                   DataColumn(label: Text('Status')),
+  //                 ],
+  //                 rows: List.generate(
+  //                   selectedFiles.length,
+  //                   (index) => DataRow(
+  //                     cells: [
+  //                       DataCell(Text(selectedFiles[index])),
+  //                       DataCell(SingleChildScrollView(
+  //                           child: Text(selectedFileTable[index]))),
+  //                       const DataCell(Text('Uploading...')),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildUpload() {
     return Column(
@@ -787,7 +787,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 3:
         return 'Faculty Subject';
       case 4:
-        return 'Faculty Subject';
+        return 'Student Subject';
       default:
         return 'Student';
     }

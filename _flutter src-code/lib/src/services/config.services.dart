@@ -248,4 +248,43 @@ class ConfigService {
       rethrow;
     }
   }
+
+  static Future<CRUDReturn> addSecurity(
+      String id, String securityQuestion, String securityAnswer) async {
+    try {
+      print([id, securityQuestion, securityAnswer]);
+      final response = await HttpService.post(
+        '$_baseUrl/Auth/add-security?id=$id',
+        body: {
+          "securityQuestion": securityQuestion,
+          "securityAnswer": securityAnswer,
+        },
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (kDebugMode) {
+        _logger.i('addSecurity ${response.statusCode} ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('ConfigService addSecurity $e $stacktrace');
+      rethrow;
+    }
+  }
 }

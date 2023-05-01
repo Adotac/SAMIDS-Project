@@ -139,7 +139,16 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                         ],
                       ),
                       if (_dataController.isRemarksCountListLoading)
-                        Center(child: CircularProgressIndicator())
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 150,
+                            ),
+                            Text("No data available"),
+                          ],
+                        )
                       else
                         SizedBox(
                           height: 232,
@@ -204,7 +213,16 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                     ],
                   ),
                   if (_dataController.isRemarksCountListLoading)
-                    Center(child: CircularProgressIndicator())
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 150,
+                        ),
+                        Text("No data available"),
+                      ],
+                    )
                   else
                     SizedBox(
                       height: 232,

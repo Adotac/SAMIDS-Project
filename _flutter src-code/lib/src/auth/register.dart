@@ -26,8 +26,8 @@ class _RegisterPageState extends State<RegisterPage> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
-  String? _securityQuestion1;
-  String? _securityQuestion2;
+  // String? _securityQuestion1;
+  // String? _securityQuestion2;
   int _userType = 0; // 0 for Student (default), 1 for Faculty
 
   Widget _userTypeDropDown(int currentValue, ValueChanged<int?>? onChanged) {
@@ -49,14 +49,6 @@ class _RegisterPageState extends State<RegisterPage> {
       isExpanded: true,
     );
   }
-
-  List<String> securityQuestions = [
-    "What is your mother's maiden name?",
-    "What was the name of your first pet?",
-    "What was your favorite place to visit as a child?",
-    "What is the name of your favorite book?",
-    "What is the name of the street where you grew up?",
-  ];
 
   @override
   void initState() {
@@ -98,6 +90,13 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  List<String> securityQuestions = [
+    "What is your mother's maiden name?",
+    "What was the name of your first pet?",
+    "What was your favorite place to visit as a child?",
+    "What is the name of your favorite book?",
+    "What is the name of the street where you grew up?",
+  ];
   Widget _inputField(
       TextEditingController controller, String labelText, String hintText,
       {bool obscureText = false}) {
@@ -270,7 +269,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         const SizedBox(height: 10),
         Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: _textFormField(
             controller: _userIdController,
             label: 'User ID',
@@ -287,7 +286,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: _textFormField(
             controller: _emailController,
             label: 'Email',
@@ -304,7 +303,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: _textFormField(
             controller: _passwordController,
             label: 'Password',
@@ -319,7 +318,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: _textFormField(
             controller: _confirmPasswordController,
             label: 'Confirm Password',
@@ -335,58 +334,58 @@ class _RegisterPageState extends State<RegisterPage> {
             },
           ),
         ),
-        Padding(
-          padding: EdgeInsets.all(10),
-          child: Container(
-            width: 400, // Adjust this value according to your layout
-            child: _dropDownSecurityQuestion(_securityQuestion1,
-                (String? newValue) {
-              setState(() {
-                _securityQuestion1 = newValue;
-              });
-            }),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(10),
-          child: _textFormField(
-            controller: TextEditingController(),
-            label: 'Answer 1',
-            hint: 'Enter your answer to the first security question',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter an answer';
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(10),
-          child: Container(
-            width: 400, // Adjust this value according to your layout
-            child: _dropDownSecurityQuestion(_securityQuestion2,
-                (String? newValue) {
-              setState(() {
-                _securityQuestion2 = newValue;
-              });
-            }),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(10),
-          child: _textFormField(
-            controller: TextEditingController(),
-            label: 'Answer 2',
-            hint: 'Enter your answer to the second security question',
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter an answer';
-              }
-              return null;
-            },
-          ),
-        ),
+        // Padding(
+        //   padding: EdgeInsets.all(10),
+        //   child: Container(
+        //     width: 400, // Adjust this value according to your layout
+        //     child: _dropDownSecurityQuestion(_securityQuestion1,
+        //         (String? newValue) {
+        //       setState(() {
+        //         _securityQuestion1 = newValue;
+        //       });
+        //     }),
+        //   ),
+        // ),
+        // Padding(
+        //   padding: EdgeInsets.all(10),
+        //   child: _textFormField(
+        //     controller: TextEditingController(),
+        //     label: 'Answer 1',
+        //     hint: 'Enter your answer to the first security question',
+        //     validator: (value) {
+        //       if (value == null || value.isEmpty) {
+        //         return 'Please enter an answer';
+        //       }
+        //       return null;
+        //     },
+        //   ),
+        // ),
+        // Padding(
+        //   padding: EdgeInsets.all(10),
+        //   child: Container(
+        //     width: 400, // Adjust this value according to your layout
+        //     child: _dropDownSecurityQuestion(_securityQuestion2,
+        //         (String? newValue) {
+        //       setState(() {
+        //         _securityQuestion2 = newValue;
+        //       });
+        //     }),
+        //   ),
+        // ),
+        // Padding(
+        //   padding: EdgeInsets.all(10),
+        //   child: _textFormField(
+        //     controller: TextEditingController(),
+        //     label: 'Answer 2',
+        //     hint: 'Enter your answer to the second security question',
+        //     validator: (value) {
+        //       if (value == null || value.isEmpty) {
+        //         return 'Please enter an answer';
+        //       }
+        //       return null;
+        //     },
+        //   ),
+        // ),
         Padding(
           padding: EdgeInsets.all(10),
           child: Container(

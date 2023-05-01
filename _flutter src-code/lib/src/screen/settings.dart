@@ -11,7 +11,9 @@ import '../auth/login.dart';
 import '../controllers/auth.controller.dart';
 import '../controllers/faculty_controller.dart';
 import '../model/student_model.dart';
+import '../services/DTO/crud_return.dart';
 import '../services/auth.services.dart';
+import '../services/config.services.dart';
 import '../settings/settings_controller.dart';
 import '../widgets/mobile_view.dart';
 import '../widgets/web_view.dart';
@@ -80,35 +82,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: Theme.of(context).textTheme.titleMedium),
             onTap: () async {
               _showChangePasswordDialog(context);
-
-              // showDialog(
-              //   context: context,
-              //   builder: (BuildContext context) {
-              //     return AlertDialog(
-              //       shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(12)),
-              //       title: Text('Change Password',
-              //           style:
-              //               TextStyle(color: Theme.of(context).primaryColor)),
-              //       content: Text(
-              //           'An email has been sent to your registered email address with instructions on how to change your password.',
-              //           style: TextStyle(
-              //               color:
-              //                   Theme.of(context).textTheme.bodyLarge!.color)),
-              //       actions: [
-              //         TextButton(
-              //           child: Text('Close',
-              //               style: TextStyle(
-              //                   color:
-              //                       Theme.of(context).colorScheme.secondary)),
-              //           onPressed: () {
-              //             Navigator.of(context).pop();
-              //           },
-              //         ),
-              //       ],
-              //     );
-              //   },
-              // );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.security_outlined,
+                color: Theme.of(context).iconTheme.color),
+            title: Text('Secure Account',
+                style: Theme.of(context).textTheme.titleMedium),
+            onTap: () async {
+              _showSecurityQuestionDialog(context);
             },
           ),
           Visibility(
@@ -138,35 +120,158 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-          // ListTile(
-          //   leading: Icon(Icons.brightness_6,
-          //       color: Theme.of(context).iconTheme.color),
-          //   title: Text('Theme', style: Theme.of(context).textTheme.subtitle1),
-          //   trailing: DropdownButton<ThemeMode>(
-          //     value: settingsController.themeMode,
-          //     onChanged: (ThemeMode? newValue) {
-          //       if (newValue != null) {
-          //         settingsController.updateThemeMode(newValue);
-          //       }
-          //     },
-          //     items: const [
-          //       DropdownMenuItem(
-          //         value: ThemeMode.system,
-          //         child: Text('System'),
-          //       ),
-          //       DropdownMenuItem(
-          //         value: ThemeMode.dark,
-          //         child: Text('Dark'),
-          //       ),
-          //       DropdownMenuItem(
-          //         value: ThemeMode.light,
-          //         child: Text('Light'),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ],
       ),
+    );
+  }
+
+  List<String> securityQuestions = [
+    "What is your mother's maiden name?",
+    "What was the name of your first pet?",
+    "What was your favorite place to visit as a child?",
+    "What is the name of your favorite book?",
+    "What is the name of the street where you grew up?",
+  ];
+  Widget _inputField(
+      TextEditingController controller, String labelText, String hintText,
+      {bool obscureText = false}) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        border: const OutlineInputBorder(),
+        labelText: labelText,
+        hintText: hintText,
+      ),
+      obscureText: obscureText,
+    );
+  }
+
+  Widget _dropDownSecurityQuestion(
+      String? currentValue, ValueChanged<String?>? onChanged) {
+    return DropdownButtonFormField<String>(
+      value: currentValue,
+      onChanged: onChanged,
+      items: securityQuestions.map<DropdownMenuItem<String>>(
+        (String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        },
+      ).toList(),
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        labelText: 'Security Question',
+      ),
+
+      isExpanded: true, // This will help with fitting long text values
+    );
+  }
+
+  Widget _submitButton(BuildContext context, VoidCallback onPressed) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14.0),
+      height: 48,
+      width: 420,
+      child: TextButton(
+        style: TextButton.styleFrom(
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+        ),
+        onPressed: onPressed,
+        child: const Text('Submit'),
+      ),
+    );
+  }
+
+  Future<void> _submitSecurityQuestion(BuildContext context,
+      String? questionValue, TextEditingController answerController) async {
+    try {
+      int userIndex = _authController.loggedInUser?.type.index ?? -1;
+      int userId = 0;
+
+      if (userIndex == 0) {
+        userId = widget.controller!.student.studentNo;
+      } else {
+        userId = widget.controller!.faculty.facultyNo;
+      }
+      print(['userId', userId]);
+      final CRUDReturn result = await ConfigService.addSecurity(
+        userId.toString(),
+        questionValue!,
+        answerController.text,
+      );
+
+      if (result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Security question and answer saved successfully.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${result.data}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showSecurityQuestionDialog(BuildContext context) async {
+    final TextEditingController answerController = TextEditingController();
+    String? questionValue = securityQuestions.first;
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Security Question'),
+          content: SizedBox(
+            height: 158,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const Text(
+                  'Please answer your security question',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 18.0),
+                _dropDownSecurityQuestion(
+                  questionValue,
+                  (String? value) => questionValue = value,
+                ),
+                const SizedBox(height: 8.0),
+                _inputField(
+                  answerController,
+                  'Answer',
+                  'Enter your answer',
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            _submitButton(
+              context,
+              () async {
+                await _submitSecurityQuestion(
+                    context, questionValue, answerController);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -225,19 +330,19 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ),
           actions: [
+            // TextButton(
+            //   child: Text(
+            //     'Cancel',
+            //     style: TextStyle(
+            //       color: Theme.of(context).colorScheme.secondary,
+            //     ),
+            //   ),
+            //   onPressed: () {
+            //     Navigator.of(context).pop();
+            //   },
+            // ),
             TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () {
                 if (newPassword == null || newPassword!.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(

@@ -32,15 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '0000';
-    // _usernameController.text = '79417';
+    // _usernameController.text = '0000';
+    _usernameController.text = '12345';
 
 //   79417 faculty
 //35526 admin
 //91204 user
     _passwordController = TextEditingController();
-    _passwordController.text = 'admin';
-    // _passwordController.text = '79417';
+    // _passwordController.text = 'admin';
+    _passwordController.text = '12345';
     super.initState();
   }
 
@@ -374,6 +374,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _setIsloading(true);
       if (_usernameController.text == '0000' &&
           _passwordController.text == 'admin') {
+        print('admin');
         AdminController.initialize();
         WidgetsBinding.instance!.addPostFrameCallback((_) {
           Navigator.pushNamed(context, AdminDashboard.routeName);
@@ -381,7 +382,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _setIsloading(false);
         return;
       }
-
+      print('not admin');
       var success = await AuthController.instance
           .login(_usernameController.text, _passwordController.text);
 
