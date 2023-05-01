@@ -30,7 +30,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   List<String> selectedFiles = [];
   List<String> selectedFileTable = [];
-
+  List<String> uploadStatus = [];
   @override
   void initState() {
     adminController.getConfig();
@@ -138,14 +138,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   const SizedBox(width: 8.0),
                   _buildTextButton('Subject', () => _uploadCSV(1)),
                   const SizedBox(width: 8.0),
-                  _buildTextButton('Teacher', () => _uploadCSV(2)),
+                  _buildTextButton('Faculty', () => _uploadCSV(2)),
                 ],
               ),
               const SizedBox(height: 8.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildTextButton('Teacher Subject', () => _uploadCSV(3)),
+                  _buildTextButton('Faculty Subject', () => _uploadCSV(3)),
                   const SizedBox(width: 8.0),
                   _buildTextButton('Student Subject', () => _uploadCSV(4)),
                 ],
@@ -202,8 +202,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
           children: [
             _buildTextButton('Student', () => _uploadCSV(0)),
             _buildTextButton('Subject', () => _uploadCSV(1)),
-            _buildTextButton('Teacher', () => _uploadCSV(2)),
-            _buildTextButton('Teacher Subject', () => _uploadCSV(3)),
+            _buildTextButton('Faculty', () => _uploadCSV(2)),
+            _buildTextButton('Faculty Subject', () => _uploadCSV(3)),
             _buildTextButton('Student Subject', () => _uploadCSV(4)),
           ],
         ),
@@ -217,7 +217,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
+                width: MediaQuery.of(context).size.width * 0.25,
                 child: DataTable(
                   columns: const [
                     DataColumn(label: Text('File Name')),
@@ -230,7 +230,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       cells: [
                         DataCell(Text(selectedFiles[index])),
                         DataCell(Text(selectedFileTable[index])),
-                        const DataCell(Text('Uploading...')),
+                        // ignore: unrelated_type_equality_checks
+                        DataCell(Text(adminController.uploadStatus[index],
+                            style: TextStyle(
+                                color: adminController.uploadStatus[index] ==
+                                        'Failed'
+                                    ? Theme.of(context).colorScheme.error
+                                    : Colors.green))),
                       ],
                     ),
                   ),
@@ -639,49 +645,49 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildDownload() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Download CSV',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16.0),
-        Expanded(
-          child: Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('File Name')),
-                    DataColumn(label: Text('Table Selected')),
-                    DataColumn(label: Text('Status')),
-                  ],
-                  rows: List.generate(
-                    selectedFiles.length,
-                    (index) => DataRow(
-                      cells: [
-                        DataCell(Text(selectedFiles[index])),
-                        DataCell(Text(selectedFileTable[index])),
-                        const DataCell(Text('Uploading...')),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildDownload() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text(
+  //         'Download CSV',
+  //         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //       ),
+  //       const SizedBox(height: 16.0),
+  //       Expanded(
+  //         child: Card(
+  //           elevation: 0,
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(12.0),
+  //           ),
+  //           child: SingleChildScrollView(
+  //             scrollDirection: Axis.horizontal,
+  //             child: SizedBox(
+  //               width: MediaQuery.of(context).size.width * 0.3,
+  //               child: DataTable(
+  //                 columns: const [
+  //                   DataColumn(label: Text('File Name')),
+  //                   DataColumn(label: Text('Table Selected')),
+  //                   DataColumn(label: Text('Status')),
+  //                 ],
+  //                 rows: List.generate(
+  //                   selectedFiles.length,
+  //                   (index) => DataRow(
+  //                     cells: [
+  //                       DataCell(Text(selectedFiles[index])),
+  //                       DataCell(Text(selectedFileTable[index])),
+  //                       DataCell(Text(adminController.uploadStatus[index])),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   void _uploadCSV(int table) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -693,28 +699,77 @@ class _AdminDashboardState extends State<AdminDashboard> {
       String fileName = result.files.single.name;
       selectedFiles.add(fileName);
       selectedFileTable.add(_getTableName(table));
+      int length = adminController.uploadStatus.length;
+      adminController.setUploadStatus("Uploading");
 
       setState(() {});
 
       Uint8List fileBytes = result.files.single.bytes!;
 
-      if (table == 0) {
-        // Only call addStudentFromCSV for table 0 (Student)
-        final blob = html.Blob([fileBytes]);
-        final url = html.Url.createObjectUrlFromBlob(blob);
-        final file = html.File([blob], fileName);
+      String endpoint = '';
+      switch (table) {
+        case 0:
+          endpoint = 'csvStudent';
+          break;
+        case 1:
+          endpoint = 'csvSubject';
+          break;
+        case 2:
+          endpoint = 'csvFaculty';
+          break;
+        case 3:
+          endpoint = 'csvSubFac';
+          break;
+        case 4:
+          endpoint = 'csvSubStud';
+          break;
+        default:
+      }
 
-        try {
-          final CRUDReturn response =
-              await ConfigService.addStudentFromCSV(file);
-          print('File upload response: ${response.toJson()}');
-        } catch (e) {
-          print('Error uploading file: $e');
-        } finally {
-          html.Url.revokeObjectUrl(url);
+      // Only call addStudentFromCSV for table 0 (Student)
+      final blob = html.Blob([fileBytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final file = html.File([blob], fileName);
+
+      try {
+        final CRUDReturn response =
+            await ConfigService.postCsvFile(endpoint, file);
+
+        if (response.success) {
+          int index = adminController.uploadStatus.length - 1;
+          adminController.setUploadStatus("Success", index);
         }
-      } else {
-        await CSVFileUpload.uploadCsv(fileBytes, table);
+
+        print('$endpoint File upload response: ${response.toJson()}');
+      } catch (e, st) {
+        int index = adminController.uploadStatus.length - 1;
+        adminController.setUploadStatus("Failed", index);
+
+        print('$endpoint Error uploading file: $e $st');
+        // ignore: use_build_context_synchronously
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error',
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.error)),
+                content: Text('Failed to upload file: $e'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } finally {
+        html.Url.revokeObjectUrl(url);
       }
     } else {
       print('No file selected.');
@@ -728,11 +783,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 1:
         return 'Subject';
       case 2:
-        return 'Teacher';
+        return 'Faculty';
       case 3:
-        return 'Teacher Subject';
+        return 'Faculty Subject';
       case 4:
-        return 'Student Subject';
+        return 'Faculty Subject';
       default:
         return 'Student';
     }

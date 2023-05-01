@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:html' as html;
-
+import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -77,25 +77,90 @@ class ConfigService {
     }
   }
 
+// ...
+
+//   static Future<CRUDReturn> addStudentFromCSV(html.File file) async {
+//     try {
+//       var url = Uri.parse('$_baseUrl/CSV/csvStudent');
+//       var request = http.MultipartRequest('POST', url);
+
+//       // Set headers
+//       request.headers.addAll({
+//         'accept': 'text/plain',
+//         'Content-Type': 'multipart/form-data',
+//       });
+// // Create a multipart file from the selected file
+//       var reader = html.FileReader();
+//       reader.readAsArrayBuffer(file);
+//       await reader.onLoad.first;
+//       var multipartFile = http.MultipartFile(
+//         'file',
+//         reader.result as Stream<List<int>>,
+//         file.size,
+//         filename: file.name,
+//         contentType: MediaType('text', 'csv'),
+//       );
+//       // Add the multipart file to the request
+//       request.files.add(multipartFile);
+
+//       // Send the request
+//       var response = await request.send();
+//       final http.Response httpResponse =
+//           await http.Response.fromStream(response);
+
+//       if (kDebugMode) {
+//         _logger.i(
+//             'addStudentFromCSV ${httpResponse.statusCode} ${httpResponse.body}');
+//       }
+
+//       if (httpResponse.statusCode == 200) {
+//         if (httpResponse.body.isNotEmpty) {
+//           final jsonResponse = jsonDecode(httpResponse.body);
+//           return CRUDReturn.fromJson(jsonResponse);
+//         } else {
+//           throw Exception("Empty response body");
+//         }
+//       } else {
+//         String errorMessage = "Something went wrong.";
+//         if (httpResponse.body.isNotEmpty) {
+//           final jsonResponse = jsonDecode(httpResponse.body);
+//           errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+//         }
+//         throw Exception(
+//             "Request failed with status: ${httpResponse.statusCode}. Error message: $errorMessage");
+//       }
+//     } catch (e, stacktrace) {
+//       if (kDebugMode) print('ConfigService addStudentFromCSV $e $stacktrace');
+//       rethrow;
+//     }
+//   }
+
   static Future<CRUDReturn> addStudentFromCSV(html.File file) async {
     try {
       var url = Uri.parse('$_baseUrl/CSV/csvStudent');
       var request = http.MultipartRequest('POST', url);
 
-      var reader = html.FileReader();
-      var completer = Completer<List<int>>();
-      reader.onLoadEnd.listen((event) {
-        completer.complete(reader.result as List<int>);
+      // Set headers
+      request.headers.addAll({
+        'accept': 'text/plain',
+        'Content-Type': 'multipart/form-data',
       });
+
+      // Create a multipart file from the selected file
+      var reader = html.FileReader();
       reader.readAsArrayBuffer(file);
+      await reader.onLoad.first;
+      var multipartFile = http.MultipartFile.fromBytes(
+        'file',
+        reader.result as List<int>,
+        filename: file.name,
+        contentType: MediaType('text', 'csv'),
+      );
 
-      List<int> fileBytes = await completer.future;
-      var fileStream = http.ByteStream(Stream.fromIterable([fileBytes]));
-
-      var multipartFile = http.MultipartFile('filePath', fileStream, file.size,
-          filename: file.name);
+      // Add the multipart file to the request
       request.files.add(multipartFile);
 
+      // Send the request
       var response = await request.send();
       final http.Response httpResponse =
           await http.Response.fromStream(response);
@@ -123,6 +188,63 @@ class ConfigService {
       }
     } catch (e, stacktrace) {
       if (kDebugMode) print('ConfigService addStudentFromCSV $e $stacktrace');
+      rethrow;
+    }
+  }
+
+  static Future<CRUDReturn> postCsvFile(String apiUrl, html.File file) async {
+    try {
+      var url = Uri.parse('$_baseUrl/CSV/$apiUrl');
+      var request = http.MultipartRequest('POST', url);
+
+      // Set headers
+      request.headers.addAll({
+        'accept': 'text/plain',
+        'Content-Type': 'multipart/form-data',
+      });
+
+      // Create a multipart file from the selected file
+      var reader = html.FileReader();
+      reader.readAsArrayBuffer(file);
+      await reader.onLoad.first;
+      var multipartFile = http.MultipartFile.fromBytes(
+        'file',
+        reader.result as List<int>,
+        filename: file.name,
+        contentType: MediaType('text', 'csv'),
+      );
+
+      // Add the multipart file to the request
+      request.files.add(multipartFile);
+
+      // Send the request
+      var response = await request.send();
+      final http.Response httpResponse =
+          await http.Response.fromStream(response);
+
+      if (kDebugMode) {
+        _logger
+            .i('postCsvFile ${httpResponse.statusCode} ${httpResponse.body}');
+      }
+
+      if (httpResponse.statusCode == 200) {
+        if (httpResponse.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(httpResponse.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (httpResponse.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(httpResponse.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${httpResponse.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('ConfigService postCsvFile $e $stacktrace');
       rethrow;
     }
   }

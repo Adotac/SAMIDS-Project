@@ -30,6 +30,7 @@ class AdminController with ChangeNotifier {
   List<Student> students = [];
   String selectedUserType = 'Student';
   List<Faculty> filteredFaculties = [];
+  List<String> uploadStatus = [];
 
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
@@ -57,6 +58,15 @@ class AdminController with ChangeNotifier {
 
   void setSelectedUserType(String userType) {
     selectedUserType = userType;
+    notifyListeners();
+  }
+
+  void setUploadStatus(String message, [int index = -1]) {
+    if (index != -1) {
+      uploadStatus[index] = message;
+    } else {
+      uploadStatus.add(message);
+    }
     notifyListeners();
   }
 
