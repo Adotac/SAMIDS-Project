@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
@@ -19,11 +20,13 @@ import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/config_model.dart';
 import '../model/faculty_model.dart';
+import '../model/subject_model.dart';
 import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
 
 class FacultyController with ChangeNotifier {
+  final Logger _logger = Logger();
   final Faculty faculty;
   final List<Student> students = [];
   List<Attendance> attendance = [];
@@ -176,14 +179,18 @@ class FacultyController with ChangeNotifier {
   }
 
   void handleEventJsonAttendanceBySchedId(CRUDReturn result, int schedId) {
-    print('handleEventJsonAttendanceBySchedId');
-    attendanceBySchedId.putIfAbsent(schedId, () => []);
+    try {
+      print('handleEventJsonAttendanceBySchedId');
+      attendanceBySchedId.putIfAbsent(schedId, () => []);
 
-    for (Map<String, dynamic> map in result.data) {
-      attendanceBySchedId[schedId]?.add(Attendance.fromJson(map));
+      for (Map<String, dynamic> map in result.data) {
+        attendanceBySchedId[schedId]?.add(Attendance.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonAttendanceBySchedId $e $stacktrace');
     }
-
-    notifyListeners();
   }
 
   // Future<void> getStudentClasses() async {
@@ -218,10 +225,21 @@ class FacultyController with ChangeNotifier {
 
   void handleEventJsonStudentList(CRUDReturn result) {
     try {
+      print('handleEventJsonStudentList');
+      print(result.data[0]);
+      print('result.data[]');
+
       if (students.isNotEmpty) students.clear();
-      for (Map<String, dynamic> map in result.data) {
-        students.add(Student.fromJson(map));
+      Subject subjectStudent = Subject.fromJson(result.data[0]);
+      if (subjectStudent.students == null) {
+        return;
       }
+
+      for (Student student in subjectStudent.students!) {
+        print(student);
+        students.add(student);
+      }
+
       isStudentsCollected = true;
       notifyListeners();
     } catch (e, stacktrace) {
@@ -235,8 +253,16 @@ class FacultyController with ChangeNotifier {
     try {
       isGetStudentListByLoading = true;
       notifyListeners();
+      print(schedId);
       CRUDReturn response = await StudentService.getStudentsBySchedId(schedId);
+      if (kDebugMode) {
+        _logger.i(' getStudentListbySchedId ${response.data}');
+      }
+
       if (response.success) {
+        if (kDebugMode) {
+          _logger.i(' response.success');
+        }
         handleEventJsonStudentList(response);
       }
       isGetStudentListByLoading = false;

@@ -36,14 +36,14 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     _usernameController = TextEditingController();
     // _usernameController.text = '0000';
-    _usernameController.text = '100004';
+    _usernameController.text = '200005';
 
-//   79417 faculty
+//   200005 faculty
 //35526 admin
 //91204 user
     _passwordController = TextEditingController();
     // _passwordController.text = 'admin';
-    _passwordController.text = '100004';
+    _passwordController.text = '200005';
     super.initState();
   }
 

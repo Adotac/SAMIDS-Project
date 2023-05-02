@@ -102,7 +102,7 @@ class _StudentClassesState extends State<StudentClasses> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
             subject?.subjectName ?? '',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: ListBody(

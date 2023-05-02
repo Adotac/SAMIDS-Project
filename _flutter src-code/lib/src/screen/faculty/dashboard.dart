@@ -115,7 +115,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             children: [
               Card(
                 child: SizedBox(
-                  height: 420,
+                  height: 427,
                   child: Column(
                     children: [
                       StudentInfoCard(
@@ -472,7 +472,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       cells: [
         DataCell(
           Text(
-            "${schedule.subject?.subjectID ?? 'No Code'} - ${schedule.subject?.subjectName ?? 'No subject name'}",
+            "${schedule.schedId} - ${schedule.subject?.subjectName ?? 'No subject name'}",
             style: TextStyle(fontSize: 14),
           ),
         ),
@@ -778,16 +778,18 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${subjectSchedule.subject?.subjectID ?? 'No Code'} - ${subjectSchedule.subject?.subjectName ?? 'No subject name'}",
+                      "${subjectSchedule.schedId} - ${subjectSchedule.subject?.subjectName ?? 'No subject name'}",
                       style: TextStyle(
                           fontSize: fontSize, fontWeight: FontWeight.bold),
                     ),
                     Spacer(),
                     TextButton(
                       onPressed: () {
+                        _dataController.getStudentListbySchedId(
+                            subjectSchedule.subject?.subjectID ?? 0);
                         _showMyClassesDialog(
                           context,
-                          subjectSchedule.subject?.subjectID ?? 'No Code',
+                          subjectSchedule.schedId,
                           subjectSchedule.subject?.subjectName ?? 'No Subject',
                           subjectSchedule.schedId,
                         );
@@ -798,7 +800,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                       onPressed: () {
                         _showAttendanceDialog(
                             context,
-                            subjectSchedule.subject?.subjectID ?? 0,
+                            subjectSchedule.schedId,
                             subjectSchedule.subject?.subjectName ??
                                 'No Subject',
                             subjectSchedule.schedId);
@@ -822,14 +824,21 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            _dataController.getStudentListbySchedId(
+                                subjectSchedule.subject?.subjectID ?? 0);
+                            // _dataController.downloadClassListSchedId(
+                            //     context,
+                            //     subjectSchedule.schedId,
+                            //     subjectSchedule.subject?.subjectName ??
+                            //         'No Subject',
+                            //     subjectSchedule.schedId);
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => FacultySubjectClassList(
-                                  subjectId: subjectSchedule.subject?.subjectID
-                                          .toString() ??
-                                      'No Code ',
+                                  subjectId: subjectSchedule.schedId.toString(),
                                   title: subjectSchedule.subject?.subjectName ??
                                       'No Subject',
                                   dataController: _dataController,
@@ -847,9 +856,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                               MaterialPageRoute(
                                 builder: (context) =>
                                     FacultySubjectAttendanceList(
-                                  subjectId: subjectSchedule.subject?.subjectID
-                                          .toString() ??
-                                      'No Code ',
+                                  subjectId: subjectSchedule.schedId.toString(),
                                   title: subjectSchedule.subject?.subjectName ??
                                       'No Subject',
                                   dataController: _dataController,
@@ -1136,7 +1143,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                 radius: radius,
                 textStyle: TextStyle(fontSize: 20),
                 color: Color(0xffEEEEEE),
-                sliderColor: color,
+                sliderColor: value == 0 ? Color(0xffEEEEEE) : color,
                 unSelectedColor: Color.fromARGB(255, 255, 255, 255),
               ),
               SizedBox(
@@ -1254,7 +1261,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   }
 
   Widget _dataTableClassList(context, int schedId) {
-    _dataController.getStudentListbySchedId(schedId);
     // if (_dataController.isGetStudentListByLoading) {
     //   return Center(child: CircularProgressIndicator());
     // }

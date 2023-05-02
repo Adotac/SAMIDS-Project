@@ -101,17 +101,18 @@ class _FacultyClassesState extends State<FacultyClasses> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
             subject?.subjectName ?? '',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: ListBody(
               children: [
-                Text('Code: ${subject?.subjectID}'),
+                Text('Code: ${subjectSchedule.schedId}'),
                 Text('Subject Description: ${subject?.subjectDescription}'),
                 Text('Schedule Time: ${getTimeStartEnd(subjectSchedule)}'),
-                Text('Schedule Day: ${subjectSchedule.day.name}'),
-                Text(
-                    'Subject Teacher: ${subject?.faculties?[0].firstName} ${subject?.faculties?[0].lastName}'),
+                // Text('Schedule Day: ${subjectSchedule.day.name}'),
+                // Text('Subject Teacher: ${getFaculty(subject!)}'),
+                // Text(
+                //     'Subject Teacher: ${subject?.faculties?[0].firstName} ${subject?.faculties?[0].lastName}'),
                 Text('Subject Room: ${subjectSchedule.room}'),
               ],
             ),

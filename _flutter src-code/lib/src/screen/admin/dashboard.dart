@@ -138,10 +138,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             TextButton(
-                onPressed: () {
-                  adminController.clearList();
-                },
-                child: const Text("Clear all"))
+              onPressed: () {
+                adminController.clearList();
+              },
+              child: const Text("Clear all"),
+            ),
           ],
         ),
         const SizedBox(height: 8.0),
@@ -179,13 +180,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         DataCell(Text(adminController.selectedFiles[index])),
                         DataCell(
                             Text(adminController.selectedFileTable[index])),
-                        // ignore: unrelated_type_equality_checks
-                        DataCell(Text(adminController.uploadStatus[index],
+                        DataCell(
+                          Text(
+                            adminController.uploadStatus[index],
                             style: TextStyle(
-                                color: adminController.uploadStatus[index] ==
-                                        'Failed'
-                                    ? Theme.of(context).colorScheme.error
-                                    : Colors.green))),
+                              color: adminController.uploadStatus[index] ==
+                                      'Failed'
+                                  ? Theme.of(context).colorScheme.error
+                                  : adminController.uploadStatus[index] ==
+                                          'Uploading'
+                                      ? Colors.black
+                                      : Colors.green,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -687,6 +695,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
         if (response.success) {
           int index = adminController.uploadStatus.length - 1;
           adminController.setUploadStatus("Success", index);
+          switch (table) {
+            case 0:
+              adminController.getStudents();
+              break;
+            case 1:
+              adminController.getSubjects();
+              break;
+            case 2:
+              adminController.getFaculties();
+              break;
+
+            default:
+          }
+        } else {
+          int index = adminController.uploadStatus.length - 1;
+          adminController.setUploadStatus("Failed", index);
+          throw Exception(response.data);
         }
 
         print('$endpoint File upload response: ${response.toJson()}');
