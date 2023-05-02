@@ -268,12 +268,12 @@ class AdminController with ChangeNotifier {
                     .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
                 0));
         break;
-      case "Day":
-        filteredAttendanceList.sort((a, b) =>
-            order *
-            (a.subjectSchedule?.day.index as num)
-                .compareTo(b.subjectSchedule?.day.index as num));
-        break;
+      // case "Day":
+      //   filteredAttendanceList.sort((a, b) =>
+      //       order *
+      //       (a.subjectSchedule?.day.index as num)
+      //           .compareTo(b.subjectSchedule?.day.index as num));
+      //   break;
       case "Date":
         filteredAttendanceList.sort((a, b) =>
             order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));

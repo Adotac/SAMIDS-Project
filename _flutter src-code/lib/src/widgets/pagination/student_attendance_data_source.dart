@@ -8,8 +8,7 @@ class AttendanceDataSourceSt extends DataTableSource {
   final StudentController sdController;
   final BuildContext context;
 
-  AttendanceDataSourceSt(
-      this.attendanceList, this.sdController, this.context);
+  AttendanceDataSourceSt(this.attendanceList, this.sdController, this.context);
   @override
   bool get isRowCountApproximate => false;
 
@@ -33,7 +32,7 @@ class AttendanceDataSourceSt extends DataTableSource {
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
         dataCell(sdController.formatDate(attendance.actualTimeIn!)),
-        dataCell(attendance.subjectSchedule?.day.name ?? 'No Date'),
+        dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
         dataCell(
           attendance.subjectSchedule?.room.toString() ?? 'No room code',
         ),
@@ -77,7 +76,7 @@ class AttendanceDataSourceSt extends DataTableSource {
                 const SizedBox(height: 10),
                 TextField(
                   controller: _textFieldController,
-                  decoration:const  InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Enter issue description',
                     border: OutlineInputBorder(),
                   ),

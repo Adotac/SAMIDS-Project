@@ -253,7 +253,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         ),
         DataCell(
           Text(
-            schedule.day.name,
+            schedule.day,
             style: TextStyle(
               fontSize: 14,
             ),

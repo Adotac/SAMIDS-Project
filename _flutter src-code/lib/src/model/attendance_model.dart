@@ -52,7 +52,7 @@ class Attendance {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['attendanceId'] = attendanceId;
     data['Student'] = student?.toJson();
-    data['SubjectSchedule'] = subjectSchedule?.toJson();
+    // data['SubjectSchedule'] = subjectSchedule?.toJson();
     data['Device'] = device?.toJson();
     data['Date'] = date?.toIso8601String();
     data['ActualTimeIn'] = actualTimeIn?.toIso8601String();

@@ -492,7 +492,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         ),
         DataCell(
           Text(
-            schedule.day.name,
+            schedule.day,
             style: TextStyle(
               fontSize: 14,
             ),
@@ -896,7 +896,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                               Text(subjectSchedule.room.toString()),
                               Text(
                                   '${DateFormat('hh:mm a').format(subjectSchedule.timeStart)} - ${DateFormat('hh:mm a').format(subjectSchedule.timeEnd)}'),
-                              Text(subjectSchedule.day.name),
+                              Text(subjectSchedule.day),
                             ],
                           ),
                         ],

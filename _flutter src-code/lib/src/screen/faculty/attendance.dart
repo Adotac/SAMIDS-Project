@@ -156,7 +156,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
               attendance.student?.studentNo.toString() ?? 'No student ID',
           name:
               '${attendance.student?.firstName} ${attendance.student?.lastName}',
-          day: attendance.subjectSchedule?.day.name ?? 'No Date',
+          day: attendance.subjectSchedule?.day ?? 'No Date',
           referenceNo: attendance.attendanceId.toString(),
           subject:
               attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject',

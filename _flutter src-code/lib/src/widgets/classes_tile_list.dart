@@ -67,7 +67,7 @@ class ClassesListTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    subjectSchedule?.day.name ?? 'No Class Day  ',
+                    subjectSchedule?.day ?? 'No Class Day  ',
                     style: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context).textTheme.bodySmall?.color,

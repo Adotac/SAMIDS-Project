@@ -150,12 +150,12 @@ class StudentController with ChangeNotifier {
                     .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
                 0));
         break;
-      case "Day":
-        filteredAttendanceList.sort((a, b) =>
-            order *
-            (a.subjectSchedule?.day.index as num)
-                .compareTo(b.subjectSchedule?.day.index as num));
-        break;
+      // case "Day":
+      //   filteredAttendanceList.sort((a, b) =>
+      //       order *
+      //       (a.subjectSchedule?.day.index as num)
+      //           .compareTo(b.subjectSchedule?.day.index as num));
+      //   break;
       case "Date":
         filteredAttendanceList.sort((a, b) =>
             order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));
@@ -189,7 +189,7 @@ class StudentController with ChangeNotifier {
     } else {
       filteredAttendanceList = allAttendanceList.where((attendance) {
         final referenceNo = attendance.attendanceId.toString();
-        final day = attendance.subjectSchedule?.day.index.toString() == query;
+        // final day = attendance.subjectSchedule?.day.index.toString() == query;
 
         final subjectName =
             attendance.subjectSchedule?.subject?.subjectName.toLowerCase() ??
@@ -200,7 +200,6 @@ class StudentController with ChangeNotifier {
         return referenceNo.toString() == query ||
             subjectName.contains(query.toLowerCase()) ||
             room.contains(query.toLowerCase()) ||
-            day ||
             remarks.contains(query.toLowerCase());
       }).toList();
     }
