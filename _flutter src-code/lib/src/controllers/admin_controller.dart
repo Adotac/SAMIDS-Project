@@ -311,6 +311,7 @@ class AdminController with ChangeNotifier {
       allAttendanceList.add(Attendance.fromJson(map));
     }
     filteredAttendanceList = allAttendanceList;
+    attendanceListToDownload = allAttendanceList;
     notifyListeners();
   }
 
@@ -523,8 +524,9 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
-  String userTypeName = '';
+  String userTypeName = 'Attendance';
   int userId = 0;
+
   Future<void> getDataToDownload(
       int type, int? userNo, String? date, int? schedId, context) async {
     CRUDReturn response;
@@ -650,6 +652,7 @@ class AdminController with ChangeNotifier {
 
   void attendanceReset() {
     filteredAttendanceList = allAttendanceList;
+    attendanceListToDownload = allAttendanceList;
     notifyListeners();
   }
 }
