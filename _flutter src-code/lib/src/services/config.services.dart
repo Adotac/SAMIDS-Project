@@ -268,4 +268,77 @@ class ConfigService {
       rethrow;
     }
   }
+
+  static Future<CRUDReturn> getSubjects() async {
+    try {
+      final response = await HttpService.get('$_baseUrl/Subject');
+      if (kDebugMode) {
+        _logger.i('getSubjects ${response.statusCode} ${response.body}');
+      }
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('ConfigService getSubjects $e $stacktrace');
+      rethrow;
+    }
+  }
+
+  static Future<CRUDReturn> updateStudent({
+    required int studentNo,
+    required String lastName,
+    required String firstName,
+    required String course,
+    required int year,
+  }) async {
+    try {
+      final response = await HttpService.patch(
+        '$_baseUrl/Student',
+        body: jsonEncode({
+          'studentNo': studentNo,
+          'lastName': lastName,
+          'firstName': firstName,
+          'course': course,
+          'year': year,
+        }),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (kDebugMode) {
+        _logger.i('StudentService ${response.statusCode} ${response.body}');
+      }
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('StudentService updateStudent $e $stacktrace');
+      rethrow;
+    }
+  }
 }

@@ -35,7 +35,7 @@ class SubjectSchedule {
           json['subject'] != null ? Subject.fromJson(json['subject']) : null,
       timeStart: DateTime.parse(json['timeStart']),
       timeEnd: DateTime.parse(json['timeEnd']),
-      day: dayOfWeekValues.map[json['day']]!,
+      day: dayOfWeekValues.map[json['daysOfWeek']] ?? DayOfWeek.M,
       room: json['room'],
     );
   }

@@ -5,6 +5,7 @@ import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
+import 'package:samids_web_app/src/widgets/pagination/subject_data_source.dart';
 
 import '../../controllers/admin_controller.dart';
 import '../../controllers/student_controller.dart';
@@ -30,7 +31,6 @@ class AdminSubjects extends StatefulWidget {
 
 class _AdminSubjectsState extends State<AdminSubjects> {
   final _textEditingController = TextEditingController();
-  final _textEditingControllerFaculty = TextEditingController();
 
   AdminController get _dataController => widget.adminController;
 
@@ -64,7 +64,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
   Widget _webView(BuildContext context) {
     return WebView(
       appBarTitle: "Admin Manage Subjects",
-      selectedWidgetMarker: 2,
+      selectedWidgetMarker: 3,
       body: AnimatedBuilder(
           animation: _dataController,
           builder: (context, child) {
@@ -78,8 +78,8 @@ class _AdminSubjectsState extends State<AdminSubjects> {
         padding: EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
           children: [
-            _buildCard(context, 'Subjects', _searchBarStudent(context),
-                _buildStudentList()),
+            _buildCard(context, 'Subjects', _searchBarSubject(context),
+                _buildSubjectList()),
           ],
         ));
   }
@@ -114,7 +114,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
     );
   }
 
-  Widget _buildStudentList() {
+  Widget _buildSubjectList() {
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
@@ -124,31 +124,17 @@ class _AdminSubjectsState extends State<AdminSubjects> {
           ),
         ),
         padding: const EdgeInsets.all(18.0),
-        child: _dataTableStudents(context));
+        child: _dataTableSubjects(context));
   }
 
-  Widget _buildFacultyList() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(
-          color: Color(0xFFF2F2F2),
-          width: 2.0,
-        ),
-      ),
-      padding: const EdgeInsets.all(18.0),
-      child: _dataTableFaculty(context),
-    );
-  }
-
-  Widget _dataTableStudents(BuildContext context) {
+  Widget _dataTableSubjects(BuildContext context) {
     return PaginatedDataTable(
       columns: [
-        _dataColumn('Student No'),
-        _dataColumn('RFID'),
-        _dataColumn('Last Name'),
-        _dataColumn('First Name'),
-        _dataColumn('Year'),
+        _dataColumn('Subject No'),
+        _dataColumn('Subject Name'),
+        _dataColumn('Subject Description', 500.0),
+        _dataColumn('Faculty Assigned', 200),
+        _dataColumn('Student Count'),
       ],
       showFirstLastButtons: true,
       rowsPerPage: 20,
@@ -159,11 +145,9 @@ class _AdminSubjectsState extends State<AdminSubjects> {
     );
   }
 
-  StudentDataSource _createStudentDataSource() {
-    return StudentDataSource(
-      _dataController.filteredStudents,
-      _dataController,
-    );
+  SubjectDataSource _createStudentDataSource() {
+    return SubjectDataSource(
+        _dataController.filteredSubjects, _dataController, context);
   }
 
   // AttendanceDataSource _createAttendanceDataSource() {
@@ -173,15 +157,15 @@ class _AdminSubjectsState extends State<AdminSubjects> {
   //   );
   // }
 
-  DataColumn _dataColumn(String title) {
+  DataColumn _dataColumn(String title, [double width = 100]) {
     bool isSortedColumn = _dataController.sortColumn == title;
 
     return DataColumn(
       label: SizedBox(
-        width: 100,
+        width: width,
         child: InkWell(
           onTap: () {
-            _dataController.sortStudents(title);
+            _dataController.sortSubjects(title);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -208,67 +192,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
     );
   }
 
-  DataColumn _dataColumnFaculty(String title) {
-    bool isSortedColumn = _dataController.sortColumnFaculties == title;
-
-    return DataColumn(
-      label: SizedBox(
-        width: 200,
-        child: InkWell(
-          onTap: () {
-            _dataController.sortFaculties(title);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  overflow: TextOverflow.ellipsis,
-                  title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              if (isSortedColumn)
-                Icon(
-                  _dataController.sortAscending
-                      ? Icons.arrow_drop_up_rounded
-                      : Icons.arrow_drop_down_rounded,
-                  color: Theme.of(context).primaryColor,
-                ),
-            ],
-          ),
-        ),
-      ),
-      numeric: false,
-    );
-  }
-
-  Widget _dataTableFaculty(BuildContext context) {
-    return Container(
-      child: PaginatedDataTable(
-        columns: [
-          _dataColumnFaculty('Faculty No'),
-          _dataColumnFaculty('Last Name'),
-          _dataColumnFaculty('First Name'),
-        ],
-        showFirstLastButtons: true,
-        rowsPerPage: 20,
-        onPageChanged: (int value) {
-          print('Page changed to $value');
-        },
-        source: _createFacultyDataSource(),
-      ),
-    );
-  }
-
-  FacultyDataSource _createFacultyDataSource() {
-    return FacultyDataSource(
-      _dataController.filteredFaculties,
-      _dataController,
-    );
-  }
-
-  Widget _searchBarStudent(context) {
+  Widget _searchBarSubject(context) {
     return SizedBox(
         child: TextField(
       onSubmitted: _onSearchSubmittedStudents,
@@ -277,7 +201,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
         suffixIcon: Icon(Icons.search_outlined),
         suffixIconColor: Color(0xFFF2F2F2),
         border: InputBorder.none,
-        hintText: 'Search Student',
+        hintText: 'Search Subject',
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: Color(0xFFF2F2F2),
@@ -290,32 +214,6 @@ class _AdminSubjectsState extends State<AdminSubjects> {
   }
 
   void _onSearchSubmittedStudents(String query) {
-    _dataController.searchStudents(query);
-  }
-
-  Widget _searchBarFaculty(context) {
-    return SizedBox(
-      child: TextField(
-        onSubmitted: _onSearchSubmittedFaculties,
-        controller: _textEditingControllerFaculty,
-        decoration: InputDecoration(
-          suffixIcon: Icon(Icons.search_outlined),
-          suffixIconColor: Color(0xFFF2F2F2),
-          border: InputBorder.none,
-          hintText: 'Search Faculty',
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFFF2F2F2),
-              width: 2.0,
-            ),
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _onSearchSubmittedFaculties(String query) {
-    _dataController.searchFaculties(query);
+    _dataController.filterSubjects(query);
   }
 }

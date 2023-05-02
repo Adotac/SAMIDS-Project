@@ -13,13 +13,14 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
+import 'package:samids_web_app/src/model/student_model.dart';
 
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
+import 'package:samids_web_app/src/model/subject_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/config_model.dart';
 import '../model/faculty_model.dart';
-import '../model/student_model.dart';
 import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
@@ -152,6 +153,42 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  Future<void> getAttendanceAll(String? date) async {
+    try {
+      if (isAllAttendanceCollected) return;
+
+      CRUDReturn response = date != null
+          ? await AttendanceService.getAll(
+              date: date,
+            )
+          : await AttendanceService.getAll();
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        isAllAttendanceCollected = true;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      _logger.i('adminController getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  bool isEditingFaculty = false;
+  Future<void> onUpdateFaculty(
+      int facultyNo, String firstName, String lastName) async {
+    try {
+      isEditingFaculty = true;
+      notifyListeners();
+
+      await FacultyService.updateFaculty(facultyNo, firstName, lastName);
+      await getFaculties();
+
+      isEditingFaculty = false;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      _logger.i('onUpdateFaculty onUpdateFaculty $e $stacktrace');
+    }
+  }
+
   Future<void> getConfig() async {
     try {
       CRUDReturn response = await ConfigService.getConfig();
@@ -159,7 +196,7 @@ class AdminController with ChangeNotifier {
         handleEventJsonConfig(response);
       }
     } catch (e, stacktrace) {
-      print('ConfigController getConfig $e $stacktrace');
+      print('adminController getConfig $e $stacktrace');
     }
   }
 
@@ -313,25 +350,6 @@ class AdminController with ChangeNotifier {
     filteredAttendanceList = allAttendanceList;
     attendanceListToDownload = allAttendanceList;
     notifyListeners();
-  }
-
-  Future<void> getAttendanceAll(String? date) async {
-    try {
-      if (isAllAttendanceCollected) return;
-
-      CRUDReturn response = date != null
-          ? await AttendanceService.getAll(
-              date: date,
-            )
-          : await AttendanceService.getAll();
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
-        isAllAttendanceCollected = true;
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      _logger.i('StudentDashboardController getAttendanceAll $e $stacktrace');
-    }
   }
 
   void handleEventJsonStudentClasses(CRUDReturn result) {
@@ -576,6 +594,39 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  bool sortAscendingSub = true;
+
+  String sortColumnSub = '';
+
+  void sortSubjects(String column) {
+    if (sortColumnSub == column) {
+      sortAscendingSub = !sortAscendingSub;
+    } else {
+      sortColumnSub = column;
+      sortAscendingSub = true;
+    }
+
+    filteredSubjects.sort((a, b) {
+      int compare;
+      switch (column) {
+        case 'Subject ID':
+          compare = a.subjectID.compareTo(b.subjectID);
+          break;
+        case 'Subject Name':
+          compare = a.subjectName.compareTo(b.subjectName);
+          break;
+        case 'Subject Description':
+          compare = a.subjectDescription.compareTo(b.subjectDescription);
+          break;
+        default:
+          compare = 0;
+      }
+      return sortAscendingSub ? compare : -compare;
+    });
+
+    notifyListeners();
+  }
+
   Future<void> downloadData(context) async {
     if (attendanceListToDownload.isEmpty) {
       showDialog(
@@ -653,6 +704,49 @@ class AdminController with ChangeNotifier {
   void attendanceReset() {
     filteredAttendanceList = allAttendanceList;
     attendanceListToDownload = allAttendanceList;
+    notifyListeners();
+  }
+
+  List<Subject> _allSubjects = [];
+  List<Subject> _filteredSubjects = [];
+
+  List<Subject> get allSubjects => _allSubjects;
+  List<Subject> get filteredSubjects => _filteredSubjects;
+
+  bool _isSubjectCollected = false;
+  bool get isSubjectCollected => _isSubjectCollected;
+
+  Future<void> getSubjects() async {
+    try {
+      if (_isSubjectCollected) return;
+
+      final response = await ConfigService.getSubjects();
+      if (response.success) {
+        _allSubjects = response.data
+            .map<Subject>((json) => Subject.fromJson(json))
+            .toList();
+        _filteredSubjects = _allSubjects;
+        _isSubjectCollected = true;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      debugPrint('SubjectController getSubjects $e $stacktrace');
+    }
+  }
+
+  void filterSubjects(String query) {
+    if (query.isNotEmpty) {
+      _filteredSubjects = _allSubjects
+          .where((subject) =>
+              subject.subjectName.toLowerCase().contains(query.toLowerCase()) ||
+              subject.subjectID.toString().contains(query.toLowerCase()) ||
+              subject.subjectDescription
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+    } else {
+      _filteredSubjects = _allSubjects;
+    }
     notifyListeners();
   }
 }

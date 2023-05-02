@@ -36,7 +36,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
             return MobileView(
                 appBarOnly: true,
                 currentIndex: 2,
-                appBarTitle: "Classes",
+                appBarTitle: "My Classes",
                 userName: "",
                 body: [
                   Padding(
@@ -127,6 +127,18 @@ class _FacultyClassesState extends State<FacultyClasses> {
         );
       },
     );
+  }
+
+  String getFaculty(Subject subject) {
+    try {
+      if (subject.faculties == null) {
+        return 'No Faculty';
+      }
+
+      return '${subject.faculties?[0].firstName} ${subject.faculties?[0].lastName}';
+    } catch (e) {
+      return 'No Faculty';
+    }
   }
 
   String getTimeStartEnd(SubjectSchedule subjectSchedule) {

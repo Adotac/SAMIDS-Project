@@ -24,6 +24,7 @@ class StudentDataSource extends DataTableSource {
         DataCell(Text(student.rfid.toString())),
         DataCell(Text(student.lastName)),
         DataCell(Text(student.firstName)),
+        DataCell(Text(student.course)),
         DataCell(Text(student.year.index.toString())),
       ],
     );

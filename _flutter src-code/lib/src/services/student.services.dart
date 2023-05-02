@@ -10,6 +10,8 @@ import 'package:samids_web_app/src/services/helper.services.dart';
 import 'package:samids_web_app/src/services/http.services.dart';
 import 'package:logger/logger.dart';
 
+import '../model/student_model.dart';
+
 class StudentService {
   static final Logger _logger = Logger();
 
@@ -141,7 +143,9 @@ class StudentService {
     try {
       final response = await HttpService.get(
           '$_baseUrl/Student/Classes?studentNo=$studentNo');
-      if (kDebugMode) _logger.i('${response.statusCode} ${response.body}');
+      if (kDebugMode) {
+        _logger.i('Student/Classes ${response.statusCode} ${response.body}');
+      }
       return CRUDReturn.fromJson(jsonDecode(response.body));
     } catch (e, stacktrace) {
       if (kDebugMode) _logger.i('$e $stacktrace');

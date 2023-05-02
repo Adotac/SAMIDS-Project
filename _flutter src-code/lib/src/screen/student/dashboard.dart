@@ -563,10 +563,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
   }
 
   Widget circularData(value, description, color, [radius = 40.0]) {
-    print(_sdController.lateCount);
-    print(_sdController.onTimeCount);
-    print(_sdController.cuttingCount);
-    print(_sdController.absentCount);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -577,7 +573,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
             radius: radius,
             textStyle: TextStyle(fontSize: 20),
             color: Color(0xffEEEEEE),
-            sliderColor: color,
+            sliderColor: value == 0 ? Color(0xffEEEEEE) : color,
             unSelectedColor: Color.fromARGB(255, 255, 255, 255),
           ),
           Text(description),

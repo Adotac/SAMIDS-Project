@@ -225,6 +225,7 @@ class StudentController with ChangeNotifier {
     }
   }
 
+  List<int> ex = [];
   Future<void> getStudentClasses() async {
     try {
       if (isStudentClassesCollected) return;
@@ -232,6 +233,7 @@ class StudentController with ChangeNotifier {
           await StudentService.getStudentClasses(student.studentNo);
       if (response.success) {
         handleEventJsonStudentClasses(response);
+        print(studentClasses);
       }
       notifyListeners();
     } catch (e, stacktrace) {
