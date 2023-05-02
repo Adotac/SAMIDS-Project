@@ -346,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _usernameController,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'Email',
+                          labelText: 'Username',
                           hintText: 'Username'),
                     ),
                   ),

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:samids_web_app/src/screen/page_size_constriant.dart';
 
 import '../../controllers/admin_controller.dart';
 import '../../model/faculty_model.dart';
@@ -47,8 +48,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+        return const ScreenSizeWarning();
+      }
+
       if (isMobile(constraints)) {
         return _mobileView();
+      }
+
+      if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+        return const ScreenSizeWarning();
       }
 
       return _webView();
@@ -199,12 +208,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
         const SizedBox(height: 8.0),
         _downloadForm(),
         const SizedBox(height: 6.0),
-        const Text(
-          'Reset Password',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 6.0),
-        _resetPasswordForm(),
       ],
     );
   }
@@ -247,7 +250,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 "Reset faculty/student password",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8.0),
+              const SizedBox(height: 12.0),
               TextField(
                 controller: usernameController,
                 decoration: const InputDecoration(
@@ -382,11 +385,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Card _downloadForm() {
-    final facultyIdController = TextEditingController();
-    final subjectIdFacController = TextEditingController();
-    final studentIdController = TextEditingController();
-    final subjectIdStudController = TextEditingController();
-
     final DateFormat displayDateFormat = DateFormat('MMMM d, y');
     final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
     return Card(
@@ -406,7 +404,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               decoration: const InputDecoration(
                 labelText: "Faculty ID",
               ),
-              controller: facultyIdController,
+              controller: adminController.facultyIdController,
 
               // Do something with the new value
             ),
@@ -415,7 +413,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               decoration: const InputDecoration(
                 labelText: "Subject ID",
               ),
-              controller: subjectIdFacController,
+              controller: adminController.subjectIdFacController,
             ),
             // const SizedBox(height: 8.0),
             // add date picker here
@@ -424,7 +422,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               children: [
                 TextButton(
                   onPressed: () async {
-                    if (!isNumber(facultyIdController.text)) {
+                    if (!isNumber(adminController.facultyIdController.text)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Faculty ID must be a number"),
@@ -433,7 +431,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       );
                       return;
                     }
-                    if (!isNumber(subjectIdFacController.text)) {
+                    if (adminController
+                            .subjectIdStudController.text.isNotEmpty &&
+                        !isNumber(
+                            adminController.subjectIdFacController.text)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Subject ID must be a number"),
@@ -442,20 +443,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       );
                       return;
                     }
-                    if (adminController.selectedDateFac == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please select a date"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
+                    // if (adminController.selectedDateFac == null) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text("Please select a date"),
+                    //       backgroundColor: Colors.red,
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
                     await adminController.getDataToDownload(
-                        0,
-                        int.parse(facultyIdController.text),
-                        dateFormat.format(adminController.selectedDateFac!),
-                        int.parse(subjectIdFacController.text),
+                        1,
+                        int.parse(adminController.facultyIdController.text),
+                        adminController.selectedDateFac == null
+                            ? null
+                            : dateFormat
+                                .format(adminController.selectedDateFac!),
+                        adminController.subjectIdStudController.text.isNotEmpty
+                            ? int.parse(
+                                adminController.subjectIdFacController.text)
+                            : null,
                         context);
                     // Do something with the faculty data
                   },
@@ -500,37 +507,62 @@ class _AdminDashboardState extends State<AdminDashboard> {
               decoration: const InputDecoration(
                 labelText: "Student ID",
               ),
-              controller: studentIdController,
+              controller: adminController.studentIdController,
             ),
             const SizedBox(height: 8.0),
             TextField(
               decoration: const InputDecoration(
                 labelText: "Subject ID",
               ),
-              controller: subjectIdStudController,
+              controller: adminController.subjectIdStudController,
             ),
             const SizedBox(height: 8.0),
             Row(
               children: [
                 TextButton(
-                  onPressed: () {
-                    if (!isNumber(studentIdController.text)) {
+                  onPressed: () async {
+                    if (!isNumber(adminController.studentIdController.text)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Student ID must be a number"),
+                          backgroundColor: Colors.red,
                         ),
                       );
                       return;
                     }
-                    if (!isNumber(subjectIdStudController.text)) {
+                    if (adminController
+                            .subjectIdStudController.text.isNotEmpty &&
+                        !isNumber(
+                            adminController.subjectIdStudController.text)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Subject ID must be a number"),
+                          backgroundColor: Colors.red,
                         ),
                       );
                       return;
                     }
-                    // Do something with the attendance data
+                    // if (adminController.selectedDateStud == null) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text("Please select a date"),
+                    //       backgroundColor: Colors.red,
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
+                    await adminController.getDataToDownload(
+                        0,
+                        int.parse(adminController.studentIdController.text),
+                        adminController.selectedDateStud == null
+                            ? null
+                            : dateFormat
+                                .format(adminController.selectedDateStud!),
+                        adminController.subjectIdStudController.text.isNotEmpty
+                            ? int.parse(
+                                adminController.subjectIdStudController.text)
+                            : null,
+                        context);
                   },
                   child: const Text('Download'),
                 ),
@@ -742,6 +774,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
               _termInfo(),
               const SizedBox(height: 4.0),
               _timeOffset(),
+              const SizedBox(height: 18.0),
+              const Text(
+                'Reset Password',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6.0),
+              _resetPasswordForm(),
               // const SizedBox(height: 12.0),
               // Expanded(child: _dataTableClasses(context))
             ],

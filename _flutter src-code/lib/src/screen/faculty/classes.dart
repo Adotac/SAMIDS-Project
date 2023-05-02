@@ -6,6 +6,7 @@ import '../../model/Subject_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/classes_tile_list.dart';
 import '../../widgets/mobile_view.dart';
+import '../page_size_constriant.dart';
 
 class FacultyClasses extends StatefulWidget {
   final FacultyController dataController;
@@ -45,35 +46,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
                   ),
                 ]);
           } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text("Classes"),
-              ),
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                    child: Text(
-                      '1st Semester 2023',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                    child: Text(
-                      'Total Units: 18',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    // _buildClasses(context),
-                  ),
-                ],
-              ),
-            );
+            return const ScreenSizeWarning();
           }
         });
       },

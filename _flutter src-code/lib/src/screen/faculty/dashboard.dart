@@ -22,6 +22,7 @@ import '../../widgets/mobile_view.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/web_view.dart';
+import '../page_size_constriant.dart';
 import 'attendance_list.dart';
 import 'class_list.dart';
 
@@ -56,8 +57,16 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+        return const ScreenSizeWarning();
+      }
+
       if (isMobile(constraints)) {
         return _mobileView();
+      }
+
+      if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+        return const ScreenSizeWarning();
       }
 
       return _webView();

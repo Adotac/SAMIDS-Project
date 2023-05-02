@@ -58,6 +58,11 @@ class AdminController with ChangeNotifier {
   bool sortAscendingFaculties = true;
   final Logger _logger = Logger();
 
+  final facultyIdController = TextEditingController();
+  final subjectIdFacController = TextEditingController();
+  final studentIdController = TextEditingController();
+  final subjectIdStudController = TextEditingController();
+
   static AdminController get I => GetIt.instance<AdminController>();
   static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
@@ -99,6 +104,7 @@ class AdminController with ChangeNotifier {
   void filterAttendance(String query) {
     if (query.isEmpty) {
       filteredAttendanceList = allAttendanceList;
+      attendanceListToDownload = filteredAttendanceList;
     } else {
       filteredAttendanceList = allAttendanceList.where((attendance) {
         final studentNo = attendance.student?.studentNo.toString() ?? '';
@@ -118,6 +124,7 @@ class AdminController with ChangeNotifier {
             remarks.contains(query.toLowerCase());
       }).toList();
     }
+    attendanceListToDownload = filteredAttendanceList;
     notifyListeners();
   }
 
@@ -249,6 +256,7 @@ class AdminController with ChangeNotifier {
             .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
         break;
     }
+
     notifyListeners();
   }
 
@@ -515,10 +523,14 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
+  String userTypeName = '';
+  int userId = 0;
   Future<void> getDataToDownload(
       int type, int? userNo, String? date, int? schedId, context) async {
     CRUDReturn response;
     try {
+      userTypeName = type == 0 ? 'Student' : 'Faculty';
+      userId = userNo ?? 0;
       if (type == 0) {
         response = await AttendanceService.getAll(
           studentNo: userNo,
@@ -617,11 +629,11 @@ class AdminController with ChangeNotifier {
     }
 
     String csv = const ListToCsvConverter().convert(csvData);
-
+    String fileName = "${userTypeName}_${userId}_${DateTime.now()}";
     if (kIsWeb) {
       // Web implementation
       AnchorElement(href: "data:text/csv;charset=utf-8,$csv")
-        ..setAttribute("download", "attendance_data.csv")
+        ..setAttribute("download", "$fileName.csv")
         ..click();
     } else {
 // Mobile implementation
@@ -634,5 +646,10 @@ class AdminController with ChangeNotifier {
         SnackBar(content: Text('CSV file saved to: ${file.path}')),
       );
     }
+  }
+
+  void attendanceReset() {
+    filteredAttendanceList = allAttendanceList;
+    notifyListeners();
   }
 }

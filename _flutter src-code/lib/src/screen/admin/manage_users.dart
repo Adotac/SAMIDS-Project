@@ -16,6 +16,7 @@ import '../../widgets/card_small.dart';
 import '../../widgets/pagination/faculties_data_source.dart';
 import '../../widgets/students_data_source.dart';
 import '../../widgets/web_view.dart';
+import '../page_size_constriant.dart';
 
 class AdminMngUsers extends StatefulWidget {
   static const routeName = '/admin-manange-users';
@@ -47,9 +48,13 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 768) {
-          return SizedBox();
-          // _mobileView(context);
+        // if (constraints.maxWidth < 768) {
+        //   return SizedBox();
+        //   // _mobileView(context);
+        // }
+
+        if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+          return const ScreenSizeWarning();
         }
         return _webView(context);
       },

@@ -286,12 +286,13 @@ class _MobileViewState extends State<MobileView> {
                         },
                       );
                     }
-                    return IconButton(
-                      icon: const Icon(Icons.notifications_outlined),
-                      onPressed: () {
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                    );
+                    return const SizedBox();
+                    // IconButton(
+                    //   icon: const Icon(Icons.notifications_outlined),
+                    //   onPressed: () {
+                    //     Scaffold.of(context).openEndDrawer();
+                    //   },
+                    // );
                   },
                 ),
               ],
@@ -323,12 +324,14 @@ class _MobileViewState extends State<MobileView> {
                   actions: [
                     Builder(
                       builder: (BuildContext context) {
-                        return IconButton(
-                          icon: const Icon(Icons.notifications_outlined),
-                          onPressed: () {
-                            Scaffold.of(context).openEndDrawer();
-                          },
-                        );
+                        return const SizedBox();
+
+                        // IconButton(
+                        //   icon: const Icon(Icons.notifications_outlined),
+                        //   onPressed: () {
+                        //     Scaffold.of(context).openEndDrawer();
+                        //   },
+                        // );
                       },
                     ),
                   ],

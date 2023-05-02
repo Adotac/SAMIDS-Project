@@ -8,6 +8,7 @@ import '../../model/student_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../widgets/classes_tile_list.dart';
 import '../../widgets/mobile_view.dart';
+import '../page_size_constriant.dart';
 
 class FacultySubjectClassList extends StatefulWidget {
   final FacultyController dataController;
@@ -47,7 +48,10 @@ class _FacultySubjectClassListState extends State<FacultySubjectClassList> {
       animation: _dataController,
       builder: (BuildContext context, Widget? child) {
         return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
-          if (constraints.maxWidth <= 450) {
+          if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+            return const ScreenSizeWarning();
+          }
+          if (constraints.maxWidth <= 450 && constraints.maxWidth < 1578) {
             return Scaffold(
               appBar: AppBar(
                 title: Text('$subjectId - $title'),
@@ -58,35 +62,7 @@ class _FacultySubjectClassListState extends State<FacultySubjectClassList> {
               ),
             );
           } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text("Classes"),
-              ),
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                    child: Text(
-                      '1st Semester 2023',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-                    child: Text(
-                      'Total Units: 18',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    // _buildClasses(context),
-                  ),
-                ],
-              ),
-            );
+            return const ScreenSizeWarning();
           }
         });
       },

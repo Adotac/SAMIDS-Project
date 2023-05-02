@@ -23,6 +23,7 @@ import '../../widgets/title_medium_text.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/web_view.dart';
+import '../page_size_constriant.dart';
 
 // ignore: must_be_immutable
 class StudentDashboard extends StatefulWidget {
@@ -54,8 +55,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+        return const ScreenSizeWarning();
+      }
       if (isMobile(constraints)) {
         return _mobileView();
+      }
+      if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+        return const ScreenSizeWarning();
       }
 
       return _webView();

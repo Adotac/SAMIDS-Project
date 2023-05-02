@@ -13,6 +13,7 @@ import '../../widgets/pagination/admin_attendance_data_source.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/mobile_view.dart';
 import '../../widgets/web_view.dart';
+import '../page_size_constriant.dart';
 
 class AdminAttendance extends StatefulWidget {
   static const routeName = '/admin-attendance';
@@ -43,8 +44,16 @@ class _AdminAttendanceState extends State<AdminAttendance> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 768) {
+        if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+          return const ScreenSizeWarning();
+        }
+
+        if (constraints.maxWidth < 450) {
           return _mobileView(context);
+        }
+
+        if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+          return const ScreenSizeWarning();
         }
         return _webView(context);
       },
@@ -99,25 +108,49 @@ class _AdminAttendanceState extends State<AdminAttendance> {
   }
 
   Widget _dataTableAttendance(context) {
-    return PaginatedDataTable(
-      columns: [
-        _dataColumn("Student ID"),
-        _dataColumn("Name"),
-        _dataColumn("Reference ID"),
-        _dataColumn("Room"),
-        _dataColumn("Subject"),
-        _dataColumn("Date"),
-        _dataColumn("Day"),
-        _dataColumn("Time In"),
-        _dataColumn("Time Out"),
-        _dataColumn("Remarks"),
-      ],
-      showFirstLastButtons: true,
-      rowsPerPage: 20,
-      onPageChanged: (int value) {
-        print('Page changed to $value');
-      },
-      source: _createAttendanceDataSource(),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () async {
+                      await _dataController.downloadData(context);
+                    },
+                    child: Text("Download Table")),
+                TextButton(
+                    onPressed: () {
+                      _dataController.attendanceReset();
+                    },
+                    child: Text("Reset"))
+              ],
+            ),
+            PaginatedDataTable(
+              columns: [
+                _dataColumn("Student ID"),
+                _dataColumn("Name"),
+                _dataColumn("Reference ID"),
+                _dataColumn("Room"),
+                _dataColumn("Subject"),
+                _dataColumn("Date"),
+                _dataColumn("Day"),
+                _dataColumn("Time In"),
+                _dataColumn("Time Out"),
+                _dataColumn("Remarks"),
+              ],
+              showFirstLastButtons: true,
+              rowsPerPage: 20,
+              onPageChanged: (int value) {
+                print('Page changed to $value');
+              },
+              source: _createAttendanceDataSource(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

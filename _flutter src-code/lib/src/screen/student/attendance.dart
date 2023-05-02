@@ -15,6 +15,7 @@ import '../../widgets/card_small.dart';
 import '../../widgets/pagination/student_attendance_data_source.dart';
 import '../../widgets/side_menu.dart';
 import '../../widgets/web_view.dart';
+import '../page_size_constriant.dart';
 
 class StudentAttendance extends StatefulWidget {
   final StudentController sdController;
@@ -35,6 +36,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
   StudentController get _dataController => widget.sdController;
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
   final DateFormat _displayDateFormat = DateFormat('MMMM d, y');
+
   bool isMobile(BoxConstraints constraints) {
     return (constraints.maxWidth <= 450);
   }
@@ -52,16 +54,22 @@ class _StudentAttendanceState extends State<StudentAttendance>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 768) {
+        if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+          return const ScreenSizeWarning();
+        }
+        if (constraints.maxWidth < 450) {
           return AnimatedBuilder(
             animation: _dataController,
             builder: (context, child) {
               return _mobileView(context);
             },
           );
-        } else {
-          return _webView(context);
         }
+
+        if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+          return const ScreenSizeWarning();
+        }
+        return _webView(context);
       },
     );
   }

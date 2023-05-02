@@ -16,6 +16,8 @@ import '../../widgets/mobile_view.dart';
 import '../../widgets/web_view.dart';
 import 'package:intl/intl.dart';
 
+import '../page_size_constriant.dart';
+
 class FacultyAttendance extends StatefulWidget {
   static const routeName = '/faculty-attendance';
   final FacultyController dataController;
@@ -46,13 +48,21 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 768) {
+        if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
+          return const ScreenSizeWarning();
+        }
+
+        if (constraints.maxWidth < 450) {
           return AnimatedBuilder(
             animation: _dataController,
             builder: (context, child) {
               return _mobileView(context);
             },
           );
+        }
+
+        if (constraints.maxWidth < 1578 || constraints.maxHeight < 854) {
+          return const ScreenSizeWarning();
         }
         return _webView(context);
       },
