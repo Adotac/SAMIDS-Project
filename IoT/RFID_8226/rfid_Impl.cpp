@@ -33,6 +33,30 @@ void espcamFromJson(const char* json, espcam_message& data) {
   doc.clear();
 }
 
+void serverFromJson(const char *jsonString, server_message& serverMsg) {
+  // Use DynamicJsonDocument instead of StaticJsonDocument
+  DynamicJsonDocument jsonDoc(1028);
+
+  // Deserialize the JSON string
+  DeserializationError error = deserializeJson(jsonDoc, jsonString);
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.c_str());
+    return;
+  }
+
+  JsonObject jsonObject = jsonDoc.as<JsonObject>();
+
+  // Copy the message from the JsonObject to the struct
+  strncpy(serverMsg.message, jsonObject["message"], MSG_SIZE - 1);
+  serverMsg.message[MSG_SIZE - 1] = '\0'; // Ensure the string is null-terminated
+
+  // Copy the displayFlag from the JsonObject to the struct
+  serverMsg.displayFlag = jsonObject["displayFlag"];
+
+  jsonDoc.clear();
+}
+
 void publishMessage(PicoMQTT::Client& mqttClient, String topic, const JsonVariant& jsonVariant) {
   printSeparationLine();
   // String messageBuffer;

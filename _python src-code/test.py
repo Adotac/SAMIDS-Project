@@ -17,7 +17,7 @@ with open("svm_classifier.pkl", "rb") as f:
 # Define the transformations to apply to the input image
 # Define the transformations to apply to the input image
 data_transforms = transforms.Compose([
-    RandomBrightnessContrast(brightness_range=(0.7, 8), contrast_range=(0.6, 1)),
+    RandomBrightnessContrast(brightness_range=(0.9, 1.3), contrast_range=(0.6, 1)),
     transforms.Resize((160, 160)),
     transforms.Grayscale(3),
     transforms.ToTensor(),
@@ -41,12 +41,17 @@ resnet.eval()
 image_folder = './dataset/test'
 image_paths = [os.path.join(image_folder, img) for img in os.listdir(image_folder)]
 
-# Iterate over image paths and predict the labels
-for image_path in image_paths:
-    img = cv2.imread(image_path)
-
+url = 'http://192.168.43.245/800x600.jpg'
+cap = cv2.VideoCapture(url)
+while True:
+    cap = cv2.VideoCapture(url)
+    ret, frame = cap.read()
+    # Iterate over image paths and predict the labels
+    # for image_path in image_paths:
+    # img = cv2.imread(image_path)
+    cv2.imshow("Captured Frame", frame)
     # Convert the image to RGB format
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     # Convert the image to a PIL image
     img = Image.fromarray(img)
@@ -64,4 +69,11 @@ for image_path in image_paths:
     label_index = loaded_clf.predict(embedding.numpy())[0]
     label_name = loaded_le.inverse_transform([label_index])[0]
 
-    print(f'The predicted label of the image {image_path} is: {label_name}')
+    print(f'The predicted label of the image is: {label_name}')
+    # Exit the program if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cv2.destroyAllWindows()
+
+cap.release()
