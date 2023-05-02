@@ -11,21 +11,34 @@ environment:
 
 dependencies:
   calendar_date_picker2: ^0.3.5
+  circular: ^0.0.5
   date_format: ^2.0.7
   dio: ^4.0.6
   flutter:
     sdk: flutter
+  flutter_layout_grid: ^2.0.1
   flutter_localizations:
     sdk: flutter
   flutter_svg: ^1.1.6
+  get_it: ^7.2.0
   google_fonts: ^3.0.1
-  sidebarx: ^0.14.0
+  http: ^0.13.5
+  logger: ^1.1.0
+  fl_chart: ^0.62.0
+  csv: ^5.0.0
+  file_picker: ^5.2.10
+  path_provider: ^2.0.8
+  intl: 0.17.0
+  path: ^1.8.3
+  http_parser: ^4.0.0
+
+dependency_overrides:
+  path: ^1.8.3
 
 dev_dependencies:
+  flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^2.0.0
 
 flutter:
   uses-material-design: true

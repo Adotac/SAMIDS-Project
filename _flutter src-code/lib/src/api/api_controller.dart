@@ -8,23 +8,25 @@ import 'dart:async';
 import 'api_exceptions.dart';
 
 class ApiController {
-  final String _baseUrl = "https://localhost:7170/api/Student";
-
+  final String _baseUrl = "https://localhost:7170/api/";
+  final dio = Dio();
+  
   Future<dynamic> get(String url) async {
-    Response response;
     try {
-      var dio = Dio();
-      Response response = await dio.get(
-        'https://localhost:7170/api/Student',
-      );
+      Response response = await dio.get(_baseUrl + url);
 
       print(response.data);
+      return response;
+    } catch (e) {
+      print(e);
+    }
+  }
 
-      // print(_baseUrl + url);
-      // print("as");
-      // response = await dio.get();
-      // print(response.data.toString());
-      // print(response.data.toString());
+  Future<dynamic> post(String url, dynamic data) async {
+    try {
+      Response response = await dio.post(_baseUrl + url, data: data);
+
+      print(response.data);
       return response;
     } catch (e) {
       print(e);
