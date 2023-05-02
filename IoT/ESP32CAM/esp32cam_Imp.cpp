@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "esp32cam_Impl.h"
 
-bool initCamera()
+void initCamera()
 {
   // Turn-off the 'brownout detector'
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
@@ -27,124 +27,24 @@ bool initCamera()
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
-  config.pixel_format = PIXFORMAT_JPEG;
-
+  config.frame_size = FRAMESIZE_UXGA;
+  config.pixel_format = PIXFORMAT_JPEG; // for streaming
+  //config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
   config.fb_location = CAMERA_FB_IN_PSRAM;
   config.jpeg_quality = 12;
   config.fb_count = 1;
 
-  if (psramFound())
-  {
-    Serial.println("paramFound | FRAMESIZE medium");
-    // config.frame_size = FRAMESIZE_UXGA; //largest resolution
-    config.frame_size = FRAMESIZE_VGA; //(640x480)
-    config.jpeg_quality = 10;
-    config.fb_count = 2;
-  }
-  else
-  {
-    Serial.println("paramFound failed | FRAMESIZE low");
-    // config.frame_size = FRAMESIZE_SVGA; //(800x600)
-    config.frame_size = FRAMESIZE_QVGA; //(320x240)
-    config.jpeg_quality = 12;
-    config.fb_count = 1;
-    config.fb_location = CAMERA_FB_IN_DRAM;
-  }
-  // Camera init
-  esp_err_t err = esp_camera_init(&config);
-  if (err != ESP_OK)
-  {
-    Serial.printf("Camera init failed with error 0x%x", err);
-    ESP.restart();
-    return false;
-  }
-  return true;
+  sensor_t * s = esp_camera_sensor_get();
+  // initial sensors are flipped vertically and colors are a bit saturated
+  
+  s->set_vflip(s, 1); // flip it back
+  s->set_hmirror(s, 1);
+  s->set_brightness(s, 1); // up the brightness just a bit
+  s->set_saturation(s, 1); // lower the saturation
+
+
 }
-
-// const size_t CAPACITY = 512;
-// // const int IMGSIZE = fb->width * fb->height * 3;
-// StaticJsonDocument<CAPACITY> doc;
-
-// String JsonData(camera_fb_t *fb, bool flag, long id ){  
-//   String temp = String("");
-//   JsonObject obj = doc.to<JsonObject>();
-
-//   obj["_Success"] = flag;
-//   obj["_Id"]=id;
-
-//   JsonObject cam  = obj.createNestedObject("_Img");
-
-//   // cam["Buffer"] = (char*)result;
-//   if(fb){
-//     cam["Length"] = fb->len;
-//     cam["Width"] = fb->width;
-//     cam["Height"] = fb->height;
-//     cam["Pixelformat"] = (int)fb->format;
-//   }
-//   else{
-//     Serial.println("Camera capture failed!!!!!!!"); 
-//   }
-
-//   serializeJson(obj, temp);
-//   doc.clear();
-//   return temp;
-// }
-
-// // Capture Photo
-// const char* capturePhoto(camera_fb_t*& imagedata)
-// {
-//   String temp = "";
-//   imagedata = esp_camera_fb_get();
-//   if(imagedata){
-//     Serial.println("Image captured now in process....");
-//   }
-//   else{
-//     Serial.println("Camera failed to initialize....");
-//     return temp.c_str();
-//   }
-
-//   // const char* myStrings = JsonData(imagedata, true, 187255239165).c_str();
-
-//   Serial.println("JSON Data generated");
-
-//   // char result[BASE64::encodeLength(imagedata->len)];
-//   // BASE64::encode(imagedata->buf, imagedata->len, result);
-//   // // Serial.println(result);
-//   // Serial.print("Image length: ");
-//   // Serial.println(strlen(result));
-
-//   // myStrings[1] = (char*) malloc(strlen(result) * sizeof(char));
-//   // strcpy(myStrings[1], result);
-
-  
-//   Serial.println("Image data buffer ready to send");
-//   esp_camera_fb_return(imagedata);
-//   imagedata = NULL;
-
-//   doc.clear();
-//   return temp.c_str();
-// }
-
-// // Capture Photo
-// uint8_t * captureBufferPhoto(camera_fb_t*& imagedata)
-// {
-  
-//   imagedata = esp_camera_fb_get();
-//   if(imagedata){
-//     Serial.println("Image captured now in process....");
-//   }
-//   else{
-//     Serial.println("Camera failed to initialize....");
-//     return NULL;
-//   }
-  
-//   Serial.println("Image data buffer ready to send");
-
-//   uint8_t * temp = imagedata->buf;
-//   esp_camera_fb_return(imagedata);
-//   return temp;
-// }
 
 void flash(bool on)
 {
@@ -157,8 +57,6 @@ void flash(bool on)
   else{
     digitalWrite(FLASH_GPIO_NUM, LOW);
   }
-
-
 }
 
 void printSeparationLine()
@@ -166,18 +64,14 @@ void printSeparationLine()
   Serial.println("************************************************");
 }
 
-void espcamToJson(const espcam_message& data, String& json) {
-  StaticJsonDocument<128> doc;
-
-  doc["message"] = data.message;
-  doc["attendanceFlag"] = data.attendanceFlag;
-  doc["displayFlag"] = data.displayFlag;
-  doc["deviceFlag"] = data.deviceFlag;
-
-  serializeJson(doc, json);
-
-  doc.clear();
+void createJsonDoc(DynamicJsonDocument& doc, const char* msg, bool af, bool df, bool device, const String& image_data) {
+  doc["message"] = msg;
+  doc["attendanceFlag"] = af;
+  doc["displayFlag"] = df;
+  doc["deviceFlag"] = device;
+  doc["encoded_image"] = image_data;
 }
+
 
 JsonVariant espcamToJson(espcam_message& data, const char* msg, bool af, bool df, bool device){
   DynamicJsonDocument* dynamicDoc = new DynamicJsonDocument(256);
@@ -242,5 +136,69 @@ void publishMessage(PicoMQTT::Client& mqttClient, String topic, const JsonVarian
   doc.clear();
   printSeparationLine();
   
+}
+
+
+String base64_image() {
+  camera_fb_t *fb = NULL;
+  flash(true);
+  fb = esp_camera_fb_get();
+  delay(300);
+  flash(false);
+  if (!fb) {
+    Serial.println("Camera capture failed");
+    return "";
+  }
+
+  String encoded = "";
+  unsigned char *input = (unsigned char *)fb->buf;
+  int inputLen = fb->len;
+
+  char b64_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  int i = 0;
+  int j = 0;
+  int enc_len = 0;
+  unsigned char array_3[3];
+  unsigned char array_4[4];
+
+  while (inputLen--) {
+    array_3[i++] = *(input++);
+    if (i == 3) {
+      array_4[0] = (array_3[0] & 0xfc) >> 2;
+      array_4[1] = ((array_3[0] & 0x03) << 4) + ((array_3[1] & 0xf0) >> 4);
+      array_4[2] = ((array_3[1] & 0x0f) << 2) + ((array_3[2] & 0xc0) >> 6);
+      array_4[3] = array_3[2] & 0x3f;
+
+      for (i = 0; i < 4; i++) {
+        encoded += b64_alphabet[array_4[i]];
+      }
+
+      i = 0;
+    }
+  }
+
+  if (i) {
+    for (j = i; j < 3; j++) {
+      array_3[j] = '\0';
+    }
+
+    array_4[0] = (array_3[0] & 0xfc) >> 2;
+    array_4[1] = ((array_3[0] & 0x03) << 4) + ((array_3[1] & 0xf0) >> 4);
+    array_4[2] = ((array_3[1] & 0x0f) << 2) + ((array_3[2] & 0xc0) >> 6);
+    array_4[3] = array_3[2] & 0x3f;
+
+    for (j = 0; j < i + 1; j++) {
+      encoded += b64_alphabet[array_4[j]];
+    }
+
+    while (i++ < 3) {
+      encoded += '=';
+    }
+  }
+
+  esp_camera_fb_return(fb);
+
+  return encoded;
 }
 

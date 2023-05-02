@@ -38,6 +38,8 @@ espcam_message myData;
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 
+esp32cam::Resolution initialResolution;
+WebServer server(80);
 PicoMQTT::Client client(
     MQTT_HOST,    // broker address (or IP)
     MQTT_PORT,                   // broker port (defaults to 1883)
@@ -45,17 +47,21 @@ PicoMQTT::Client client(
 );
 TimerHandle_t wifiReconnectTimer;
 
+String rfid = "";
+
 void connectToWifi(){
   Serial.print("Connecting to ");
 
+  WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   delay(1000);
   Serial.println(WIFI_SSID);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    Serial.println("WiFi failure");
     delay(500);
+    ESP.restart();
   }
 
   Serial.println("Wifi Connected!!");
@@ -74,8 +80,6 @@ void onWifiEvent(WiFiEvent_t event){
       deviceFlag = false;
       // Serial.println("Camera disconnected wifi");
 
-      
-      // uint16_t packetIdPubCam = mqttClient.publish(camtopic, 2, false, "test");
       publishMessage(client, camtopic, espcamToJson(myData, "Camera disconnected wifi", false, true, deviceFlag));
       // Serial.print("Publishing at QoS 2, packetId: ");
       // Serial.println(packetIdPubCam);
@@ -88,20 +92,6 @@ void onWifiEvent(WiFiEvent_t event){
   }
 }
 
-
-//-------------------------------------------------//
-void sendDataPayload(){
-  camera_fb_t *fb = NULL;
-
-
-  Serial.println("Publishing JSON DATA at QoS 0");
-  // captureBufferPhoto(fb);
-
-  Serial.println("Publishing Image data buffer at QoS 0");
-
-  // free(payloadArray);
-}
-
 //-------------------------------------------------//
 
 void setup() {
@@ -109,7 +99,8 @@ void setup() {
   pinMode(RED_LED, OUTPUT);
   Serial.begin(115200);
   WiFi.setSleep(false);
-
+  flash(true);
+  delay(10000); // wait for 10 to 15 seconds
   while (!Serial && millis() < 5000);
 
   Serial.print(F("\nStart WiFiMQTT "));
@@ -145,9 +136,9 @@ void setup() {
     if (isAllNumbers(rfidData.message, strlen(rfidData.message)) && rfidData.deviceFlag) {
       // code camera here to send on htttp
       Serial.println("Sending Photo...");
+      rfid = rfidData.message;
       sendRequest();
     } else {
-      
       
       publishMessage(client, camtopic, espcamToJson(myData, "RFID ERROR", false, true, deviceFlag));
 
@@ -157,27 +148,51 @@ void setup() {
 
   client.begin();
   client.loop();
-  
-  if(initCamera()){
+
+  {
+    using namespace esp32cam;
+
+    initialResolution = Resolution::find(1024, 768);
+
+    Config cfg;
+    cfg.setPins(pins::AiThinker);
+    cfg.setResolution(initialResolution);
+    cfg.setJpeg(80);
+
+    bool ok = Camera.begin(cfg);
+    if (!ok) {
+      Serial.println("camera initialize failure");
+      publishMessage(client, camtopic, espcamToJson(myData, "Camera Failed", false, true, deviceFlag));
+      Serial.println(myData.message);
+      flash(false);
+
+      delay(5000);
+      ESP.restart();
+    }
+    initCamera();
     Serial.println("Camera initialized");
     
     deviceFlag = true;
 
     publishMessage(client, camtopic, espcamToJson(myData, "Camera Ready", false, true, deviceFlag));
+    flash(false);
 
     Serial.println(myData.message);
   }
-  else{
-    publishMessage(client, camtopic, espcamToJson(myData, "Camera Failed", false, true, deviceFlag));
-    Serial.println(myData.message);
-    return;
-  }
+
+  Serial.println("camera starting");
+  Serial.print("http://");
+  Serial.println(WiFi.localIP());
+
+  addRequestHandlers();
+  server.begin();
 }
 
 
 void loop() {
   static uint32_t prev_ms = millis();
   // sendHttpRequest();
+
 
   client.loop(); // important
 
@@ -190,6 +205,8 @@ void loop() {
     sendRequest();
   }
 
+  server.handleClient();
+
   if (millis() > prev_ms + 30000)
   {
     prev_ms = millis();
@@ -198,14 +215,30 @@ void loop() {
   delay(2000);
 }
 
-void sendRequest(){
-    if (WiFi.status() == WL_CONNECTED) {
+void sendRequest() {
+  if (WiFi.status() == WL_CONNECTED) {
+    String ipAddress = WiFi.localIP().toString();
+    String rfidString = rfid;
+
+    DynamicJsonDocument jsonData(1024);
+    jsonData["ip_address"] = ipAddress;
+    jsonData["rfid_string"] = rfidString;
+    jsonData["device_id"] = deviceNumber;
+    String jsonString;
+    serializeJson(jsonData, jsonString);
+
+    String requestUrl = "http://" + String(SERVER_IP) + ":" + String(SERVER_PORT) + "/log/attendance";
+
     HTTPClient http;
     WiFiClient client;
+    http.begin(client, requestUrl);
+    http.addHeader("Accept", "application/json");
+    http.addHeader("Content-Type", "application/json");
+    // http.setTimeout(20000); // Sets the timeout to 20 seconds
+
+
     flash(true);
-    flash(false);
-    http.begin(client, "http://192.168.43.2:1412/connected");
-    int httpCode = http.GET();
+    int httpCode = http.POST(jsonString);
 
     if (httpCode > 0) {
       retrySend = false;
@@ -214,12 +247,15 @@ void sendRequest(){
       Serial.println("Payload: " + payload);
     } else {
       retrySend = true;
+      Serial.println("HTTP Response code: " + String(httpCode));
       Serial.println("Error on HTTP request");
     }
 
     http.end();
+    delay(300);
+    flash(false);
   }
-
-  delay(1000);
 }
+
+
 

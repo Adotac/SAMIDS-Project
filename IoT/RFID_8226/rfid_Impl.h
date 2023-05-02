@@ -32,10 +32,16 @@ typedef struct ESPRFID_MESSAGE {
   bool deviceFlag;
 } esprfid_message;
 
+typedef struct SERVER_MESSAGE {
+  char message[MSG_SIZE];
+  bool displayFlag;
+} server_message;
+
 void printSeparationLine();
 
 JsonVariant esprfidToJson(esprfid_message& data, const char* msg, bool device);
 void espcamFromJson(const char* json, espcam_message& data);
+void serverFromJson(const char *jsonString, server_message& serverMsg);
 void printBroadcastAddress();
 
 void publishMessage(PicoMQTT::Client& mqttClient, String topic, const JsonVariant& jsonVariant);

@@ -98,20 +98,16 @@ void setup() {
   client.subscribe(subtopic, [](const char * topic, const char * payload) {
     // payload might be binary, but PicoMQTT guarantees that it's zero-terminated
     Serial.printf("Received message in topic '%s': %s\n", topic, payload);
-    espcam_message camData;
+    server_message serverData;
 
-    espcamFromJson(payload, camData);
+    serverFromJson(payload, serverData);
+    Serial.println(serverData.message);
+    if(serverData.displayFlag){
 
-    deviceFlag = camData.deviceFlag;
-
-    if(camData.attendanceFlag){
-      Serial.println("Attendance Verified!");
       setLCD("Attendance", 0, 0, true);
       setLCD("Verified!", 0, 1, false);
-
     }
     else{
-      Serial.println("Attendance Failed!");
       setLCD("Attendance", 0, 0, true);
       setLCD("Failed!", 0, 1, false);
     }
