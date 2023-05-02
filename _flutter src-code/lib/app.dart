@@ -212,13 +212,19 @@ class MyApp extends StatelessWidget {
           themeMode: settingsController.themeMode,
           initialRoute: LoginScreen.routeName,
           home: LoginScreen(),
-
+          routes:{
+            '/reset-password': (ctx) => ChangePasswordPage()
+          },
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
 
           onGenerateRoute: (RouteSettings settings) {
             print(settings.name);
-
+            Uri uri = Uri.parse(settings.name!);
+          if (uri.path == '/reset-password') {
+              String? token = uri.queryParameters['token'];
+          return MaterialPageRoute(builder: (_) => ChangePasswordPage(token: token));
+          }
             switch (settings.name) {
               case ManageSubjects.routeName:
                 return MaterialPageRoute(
