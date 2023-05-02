@@ -24,7 +24,7 @@ class StudentDataSource extends DataTableSource {
         DataCell(Text(student.rfid.toString())),
         DataCell(Text(student.lastName)),
         DataCell(Text(student.firstName)),
-        DataCell(Text(yearValues.reverse[student.year].toString())),
+        DataCell(Text(student.year.index.toString())),
       ],
     );
   }

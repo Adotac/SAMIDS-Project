@@ -12,6 +12,7 @@ import 'package:samids_web_app/src/screen/student/dashboard.dart';
 import '../model/faculty_model.dart';
 import '../model/student_model.dart';
 import '../screen/admin/dashboard.dart';
+import '../screen/change_password.dart';
 import '../services/DTO/crud_return.dart';
 import '../services/config.services.dart';
 import '../widgets/responsive_builder.dart';
@@ -373,6 +374,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           backgroundColor: Theme.of(context).primaryColor,
                           foregroundColor: Colors.white),
                       onPressed: () async {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => ChangePasswordPage()),
+                        // );
                         await _onLogin(context);
                       },
                       child: _isloading
@@ -577,6 +583,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white),
                   onPressed: () async {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //       builder: (context) => ChangePasswordPage()),
+                    // );
+
                     await _onLogin(context);
                   },
                   child: const Text("Continue"),
