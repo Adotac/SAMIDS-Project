@@ -270,10 +270,11 @@ class StudentController with ChangeNotifier {
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
-        isAllAttendanceCollected = true;
         notifyListeners();
       }
+      isAllAttendanceCollected = true;
     } catch (e, stacktrace) {
+      isAllAttendanceCollected = true;
       print('StudentDashboardController getAttendanceAll $e $stacktrace');
     }
   }
@@ -286,11 +287,11 @@ class StudentController with ChangeNotifier {
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
-        isAllAttendanceCollected = true;
 
         dateSelected = null;
         notifyListeners();
       }
+      isAllAttendanceCollected = true;
     } catch (e, stacktrace) {
       print('StudentDashboardController getAttendanceAll $e $stacktrace');
     }
@@ -364,7 +365,9 @@ class StudentController with ChangeNotifier {
         isCountCalculated = true;
         notifyListeners();
       }
+      isCountCalculated = true;
     } catch (e, stacktrace) {
+      isCountCalculated = true;
       print('getRemarksCount $e $stacktrace');
     }
   }

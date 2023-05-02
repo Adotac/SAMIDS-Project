@@ -318,6 +318,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
+      isAllAttendanceCollected = true;
       print('StudentDashboardController getAttendanceAll $e $stacktrace');
     }
   }
@@ -459,6 +460,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
+      isCountCalculated = true;
       print('getRemarksCount $e $stacktrace');
     }
   }
