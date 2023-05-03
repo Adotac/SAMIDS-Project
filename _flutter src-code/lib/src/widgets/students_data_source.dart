@@ -21,11 +21,11 @@ class StudentDataSource extends DataTableSource {
       index: index,
       cells: [
         DataCell(Text(student.studentNo.toString())),
-        DataCell(Text(student.rfid.toString())),
+        // DataCell(Text(student.rfid.toString())),
         DataCell(Text(student.lastName)),
         DataCell(Text(student.firstName)),
         DataCell(Text(student.course)),
-        DataCell(Text(student.year.name.toString())),
+        DataCell(Text('${student.year.index + 1}')),
       ],
     );
   }

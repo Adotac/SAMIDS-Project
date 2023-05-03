@@ -58,8 +58,10 @@ class AuthService {
   static Future<CRUDReturn> changePassword(
       String newPassword, int userNo, String userType) async {
     try {
+      print('changePassword');
+      print('newPassword=$newPassword&$userType=$userNo');
       final response = await HttpService.patch(
-        '$_baseUrl/change-password?newPassword=$newPassword&$userType=$userNo',
+        '$_baseUrl/change-password?newPassword=$newPassword&id=$userNo',
         headers: {'accept': 'text/plain'},
       );
       if (kDebugMode) {

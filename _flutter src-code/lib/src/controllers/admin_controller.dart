@@ -73,6 +73,8 @@ class AdminController with ChangeNotifier {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
   }
 
+  Faculty? selectedFaculty;
+
   void clearList() {
     selectedFiles.clear();
     selectedFileTable.clear();
@@ -861,5 +863,34 @@ class AdminController with ChangeNotifier {
       _filteredSubjects = _allSubjects;
     }
     notifyListeners();
+  }
+
+  List<SubjectSchedule> tempFacultyClasses = [];
+  void handleEventJsonFacultyClassesInput(CRUDReturn result) {
+    try {
+      if (tempFacultyClasses.isNotEmpty) tempFacultyClasses.clear();
+      for (Map<String, dynamic> map in result.data) {
+        tempFacultyClasses.add(SubjectSchedule.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      if (kDebugMode) {
+        print('handleEventJsonFacultyClassesInput $e $stacktrace');
+      }
+    }
+  }
+
+  Future<void> getFacultyClassesTemp(int facultyNo) async {
+    try {
+      if (isStudentClassesCollected) return;
+      CRUDReturn response = await FacultyService.getFacultyClasses(facultyNo);
+      if (response.success) {
+        handleEventJsonFacultyClassesInput(response);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('getFacultyClassesTemp $e $stacktrace');
+    }
   }
 }

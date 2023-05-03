@@ -18,17 +18,17 @@ import '../../widgets/students_data_source.dart';
 import '../../widgets/web_view.dart';
 import '../page_size_constriant.dart';
 
-class AdminMngUsers extends StatefulWidget {
-  static const routeName = '/admin-manange-users';
+class ManageStudent extends StatefulWidget {
+  static const routeName = '/admin-manage-student';
   final AdminController adminController;
 
-  const AdminMngUsers({super.key, required this.adminController});
+  const ManageStudent({super.key, required this.adminController});
 
   @override
-  State<AdminMngUsers> createState() => _AdminMngUsersState();
+  State<ManageStudent> createState() => _ManageStudentState();
 }
 
-class _AdminMngUsersState extends State<AdminMngUsers> {
+class _ManageStudentState extends State<ManageStudent> {
   final _textEditingController = TextEditingController();
   final _textEditingControllerFaculty = TextEditingController();
 
@@ -63,7 +63,7 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
 
   Widget _webView(BuildContext context) {
     return WebView(
-      appBarTitle: "Admin Manage Users",
+      appBarTitle: "Manage Student",
       selectedWidgetMarker: 2,
       body: AnimatedBuilder(
           animation: _dataController,
@@ -152,7 +152,7 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
     return PaginatedDataTable(
       columns: [
         _dataColumn('Student No', 80),
-        _dataColumn('RFID'),
+        // _dataColumn('RFID'),
         _dataColumn('Last Name'),
         _dataColumn('First Name'),
         _dataColumn('Course'),

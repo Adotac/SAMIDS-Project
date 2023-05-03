@@ -386,51 +386,68 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('$title - Attendance List'),
-              TextButton(
-                  onPressed: () async {
-                    await _dataController.downloadAttendanceBySchedId(
-                        context, schedId, title, subjectId);
-                  },
-                  child: Text("Download Table")),
-            ],
-          ),
-          content: SizedBox(
-            child: SingleChildScrollView(
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                    label: Expanded(
-                      child: Text('Reference No.'),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text('First Name'),
-                  ),
-                  DataColumn(
-                    label: Text('Last Name'),
-                  ),
-                  DataColumn(
-                    label: Text('Time In'),
-                  ),
-                  DataColumn(
-                    label: Text('Time out'),
-                  ),
-                  DataColumn(
-                    label: Text('Remarks'),
+        return AnimatedBuilder(
+          animation: _dataController,
+          builder: (context, child) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('$title - Attendance List'),
+                  Row(
+                    children: [
+                      TextButton(
+                          onPressed: () async {
+                            _dataController.filterTodayAttendance(schedId);
+                          },
+                          child: Text(_dataController.btnName)),
+                      TextButton(
+                          onPressed: () async {
+                            await _dataController.downloadAttendanceBySchedId(
+                                context, schedId, title, subjectId);
+                          },
+                          child: Text("Download Table")),
+                    ],
                   ),
                 ],
-                rows: _dataController.attendanceBySchedId[schedId]!
-                    .map((attendance) =>
-                        _buildAttendanceList(context, attendance))
-                    .toList(),
               ),
-            ),
-          ),
+              content: SizedBox(
+                child: SingleChildScrollView(
+                  child: DataTable(
+                    columns: [
+                      DataColumn(
+                        label: Expanded(
+                          child: Text('Reference No.'),
+                        ),
+                      ),
+                      DataColumn(
+                        label: Text('First Name'),
+                      ),
+                      DataColumn(
+                        label: Text('Last Name'),
+                      ),
+                      DataColumn(
+                        label: Text('Date'),
+                      ),
+                      DataColumn(
+                        label: Text('Time In'),
+                      ),
+                      DataColumn(
+                        label: Text('Time out'),
+                      ),
+                      DataColumn(
+                        label: Text('Remarks'),
+                      ),
+                    ],
+                    rows: _dataController.attendanceBySchedId[schedId]!
+                        .map((attendance) =>
+                            _buildAttendanceList(context, attendance))
+                        .toList(),
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -530,6 +547,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         _tableDataCell(attendance.attendanceId.toString()),
         _tableDataCell(attendance.student?.firstName ?? 'No First Name'),
         _tableDataCell(attendance.student?.lastName ?? 'No Last Name'),
+        _tableDataCell(_formatDate(attendance.date!)),
         _tableDataCell(attendance.actualTimeIn != null
             ? _dataController.formatTime(attendance.actualTimeIn!)
             : 'No Time In'),
@@ -595,6 +613,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
 
   String _formatCurrentDate() {
     return DateFormat('MMMM d, y').format(DateTime.now());
+  }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('MMMM d, y').format(date);
   }
 
   // List<Map<String, dynamic>> sampleRecentLogsData = [

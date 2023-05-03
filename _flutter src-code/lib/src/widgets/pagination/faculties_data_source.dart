@@ -26,7 +26,10 @@ class FacultyDataSource extends DataTableSource {
             child: Text(faculty.lastName),
             onTap: () {
               // Handle cell tap here
-              _showEditDialog(context, faculty.lastName, faculty, 'Last Name');
+              adminController.selectedFaculty = faculty;
+              adminController.getFacultyClassesTemp(faculty.facultyNo);
+
+              // _showEditDialog(context, faculty.lastName, faculty, 'Last Name');
             },
           ),
         ),
@@ -34,9 +37,8 @@ class FacultyDataSource extends DataTableSource {
           GestureDetector(
             child: Text(faculty.firstName),
             onTap: () {
-              // Handle cell tap here
-              _showEditDialog(
-                  context, faculty.firstName, faculty, 'First Name');
+              adminController.selectedFaculty = faculty;
+              adminController.getFacultyClassesTemp(faculty.facultyNo);
             },
           ),
         ),

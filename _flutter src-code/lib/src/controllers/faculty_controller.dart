@@ -279,7 +279,7 @@ class FacultyController with ChangeNotifier {
       CRUDReturn response =
           await FacultyService.getFacultyClasses(faculty.facultyNo);
       if (response.success) {
-        handleEventJsonFacultyClasses(response);
+        handleEventJsonFacultyClassesInput(response);
         for (final element in facultyClasses) {
           await getAttendanceBySchedId(element.schedId);
         }
@@ -288,6 +288,35 @@ class FacultyController with ChangeNotifier {
       notifyListeners();
     } catch (e, stacktrace) {
       print('StudentDashboardController getStudentClasses $e $stacktrace');
+    }
+  }
+
+  List<SubjectSchedule> tempFacultyClasses = [];
+  void handleEventJsonFacultyClassesInput(CRUDReturn result) {
+    try {
+      if (tempFacultyClasses.isNotEmpty) tempFacultyClasses.clear();
+      for (Map<String, dynamic> map in result.data) {
+        tempFacultyClasses.add(SubjectSchedule.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      if (kDebugMode) {
+        print('handleEventJsonFacultyClassesInput $e $stacktrace');
+      }
+    }
+  }
+
+  Future<void> getFacultyClassesTemp(int facultyNo) async {
+    try {
+      if (isStudentClassesCollected) return;
+      CRUDReturn response = await FacultyService.getFacultyClasses(facultyNo);
+      if (response.success) {
+        handleEventJsonFacultyClassesInput(response);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('getFacultyClassesTemp $e $stacktrace');
     }
   }
 
@@ -625,6 +654,31 @@ class FacultyController with ChangeNotifier {
         SnackBar(content: Text('CSV file saved to: ${file.path}')),
       );
     }
+  }
+
+  List<Attendance> tempAttendance = [];
+  String btnName = 'Today';
+
+  void filterTodayAttendance(schedId) {
+    if (btnName == 'All') {
+      btnName = 'Today';
+    } else {
+      btnName = 'All';
+      attendanceBySchedId[schedId] = tempAttendance;
+      notifyListeners();
+      return;
+    }
+    notifyListeners();
+    List<Attendance> todayAttendance = [];
+    final now = DateTime.now();
+    tempAttendance = attendanceBySchedId[schedId]!;
+    final today = DateTime(now.year, now.month, now.day);
+    todayAttendance = attendanceBySchedId[schedId]!
+        .where((attendance) =>
+            attendance.date != null && attendance.date!.isAtSameMomentAs(today))
+        .toList();
+    attendanceBySchedId[schedId] = todayAttendance;
+    notifyListeners();
   }
 
   Future<void> downloadAttendanceBySchedId(

@@ -8,7 +8,8 @@ import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
-import 'package:samids_web_app/src/screen/admin/manage_users.dart';
+import 'package:samids_web_app/src/screen/admin/manage_faculty.dart';
+import 'package:samids_web_app/src/screen/admin/manage_student.dart';
 import 'package:samids_web_app/src/screen/admin/subjects.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
@@ -129,10 +130,21 @@ class _SideMenuState extends State<SideMenu> {
             visible: _authController.loggedInUser == null,
             child: _buildListTile(
               icon: Icons.group_outlined,
-              title: 'Users',
+              title: 'Students',
               index: 2,
               onTap: () {
-                Navigator.popAndPushNamed(context, AdminMngUsers.routeName);
+                Navigator.popAndPushNamed(context, ManageStudent.routeName);
+              },
+            ),
+          ),
+          Visibility(
+            visible: _authController.loggedInUser == null,
+            child: _buildListTile(
+              icon: Icons.book_outlined,
+              title: 'Faculty',
+              index: 3,
+              onTap: () {
+                Navigator.popAndPushNamed(context, ManageFaculty.routeName);
               },
             ),
           ),
@@ -141,7 +153,7 @@ class _SideMenuState extends State<SideMenu> {
             child: _buildListTile(
               icon: Icons.school_outlined,
               title: 'Subjects',
-              index: 3,
+              index: 4,
               onTap: () {
                 Navigator.popAndPushNamed(context, AdminSubjects.routeName);
               },
