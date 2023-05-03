@@ -104,16 +104,16 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
                 else:
                     raise ValueError("Rfid data doesn't match")
             else:
-                rfidData["message"] = "Server Error: " + str(response.status_code)
-                rfidData["displayFlag"] = False
+                rfidData["message"] = "Server Error:" + str(response.status_code)
+                rfidData["displayFlag"] = True
                 mqtt.publish(device_id=device_id, message=json.dumps(rfidData))
                 print("Error: " + str(response.status_code) + " | " + tag)
                 print(response.text)
 
             del results[ip_address]
         except Exception as e:
-            rfidData["message"] = "RFID not match!"
-            rfidData["displayFlag"] = False
+            rfidData["message"] = "RFID not-match!"
+            rfidData["displayFlag"] = True
             mqtt.publish(device_id=device_id, message=json.dumps(rfidData))
             print(f"An error occurred: {str(e)}")
 
@@ -132,14 +132,16 @@ async def add_attendance(std_id: int, room_id: str):
         json_str = json.dumps(data)
         print(json_str)
         response = requests.post(backend_url + f"/api/Attendance", json=data, headers=headers, verify=False)
-        print(response.text)
-        if response.status_code == 200:
+        data = response.json()
+
+        print(data)
+        if response.status_code == 200 and data["success"]:
             rfidData["message"] = "Attendance Verified!"
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
         else:
             rfidData["message"] = "Attendance Failed!"
-            rfidData["displayFlag"] = False
+            rfidData["displayFlag"] = True
             print(rfidData)
             print("Error: " + str(response.status_code) + " | Can't add attendance")
             print(response.text)
