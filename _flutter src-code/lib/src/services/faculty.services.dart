@@ -40,6 +40,35 @@ class FacultyService {
     }
   }
 
+  static Future<void> updateFaculty(
+      int facultyNo, String firstName, String lastName) async {
+    try {
+      final body = {
+        'facultyNo': facultyNo,
+        'firstName': firstName,
+        'lastName': lastName,
+      };
+
+      // Add a print statement to check the payload
+      print('Payload: $body');
+
+      final response = await HttpService.patch(
+        '$_baseUrl/Faculty',
+        headers: {
+          'accept': 'text/plain',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+      if (kDebugMode) {
+        _logger.i('updateFaculty ${response.statusCode} ${response.body}');
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' updateFaculty $e $stacktrace');
+      rethrow;
+    }
+  }
+
   static Future<CRUDReturn> getFacultyById(int id) async {
     final response = await HttpService.get('$_baseUrl/Faculty/$id');
     final jsonResponse = json.decode(response.body);
@@ -55,13 +84,6 @@ class FacultyService {
 
   static Future<CRUDReturn> deleteFaculty(int id) async {
     final response = await HttpService.delete('$_baseUrl/Faculty?id=$id');
-    final jsonResponse = json.decode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
-  }
-
-  static Future<CRUDReturn> updateFaculty(FacultyUpdateDto request) async {
-    final body = json.encode(request.toJson());
-    final response = await HttpService.patch('$_baseUrl/Faculty', body: body);
     final jsonResponse = json.decode(response.body);
     return CRUDReturn.fromJson(jsonResponse);
   }

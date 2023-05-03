@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:samids_web_app/src/controllers/admin_controller.dart';
 
 import '../../model/faculty_model.dart';
@@ -6,8 +7,8 @@ import '../../model/faculty_model.dart';
 class FacultyDataSource extends DataTableSource {
   final List<Faculty> _faculties;
   final AdminController adminController;
-
-  FacultyDataSource(this._faculties, this.adminController);
+  final context;
+  FacultyDataSource(this._faculties, this.adminController, this.context);
 
   @override
   DataRow getRow(int index) {
@@ -17,9 +18,28 @@ class FacultyDataSource extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text('${faculty.facultyNo}')),
-        DataCell(Text(faculty.lastName)),
-        DataCell(Text(faculty.firstName)),
+        DataCell(
+          Text('${faculty.facultyNo}'),
+        ),
+        DataCell(
+          GestureDetector(
+            child: Text(faculty.lastName),
+            onTap: () {
+              // Handle cell tap here
+              _showEditDialog(context, faculty.lastName, faculty, 'Last Name');
+            },
+          ),
+        ),
+        DataCell(
+          GestureDetector(
+            child: Text(faculty.firstName),
+            onTap: () {
+              // Handle cell tap here
+              _showEditDialog(
+                  context, faculty.firstName, faculty, 'First Name');
+            },
+          ),
+        ),
       ],
     );
   }
@@ -32,4 +52,43 @@ class FacultyDataSource extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
+
+  void _showEditDialog(BuildContext context, String initialValue,
+      Faculty faculty, String field) async {
+    TextEditingController controller =
+        TextEditingController(text: initialValue);
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit $field'),
+        content: TextField(controller: controller),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              // Update the faculty details
+              if (field == 'Last Name') {
+                await adminController.onUpdateFaculty(
+                  faculty.facultyNo,
+                  faculty.firstName,
+                  controller.text,
+                );
+              } else if (field == 'First Name') {
+                await adminController.onUpdateFaculty(
+                  faculty.facultyNo,
+                  controller.text,
+                  faculty.lastName,
+                );
+              }
+              Navigator.of(context).pop();
+            },
+            child: Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 }

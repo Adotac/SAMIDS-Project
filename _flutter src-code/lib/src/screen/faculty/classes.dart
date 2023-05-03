@@ -34,9 +34,10 @@ class _FacultyClassesState extends State<FacultyClasses> {
         return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
           if (constraints.maxWidth <= 450) {
             return MobileView(
+                routeName: FacultyClasses.routeName,
                 appBarOnly: true,
                 currentIndex: 2,
-                appBarTitle: "Classes",
+                appBarTitle: "My Classes",
                 userName: "",
                 body: [
                   Padding(
@@ -101,17 +102,18 @@ class _FacultyClassesState extends State<FacultyClasses> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
             subject?.subjectName ?? '',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: ListBody(
               children: [
-                Text('Code: ${subject?.subjectID}'),
+                Text('Code: ${subjectSchedule.schedId}'),
                 Text('Subject Description: ${subject?.subjectDescription}'),
                 Text('Schedule Time: ${getTimeStartEnd(subjectSchedule)}'),
-                Text('Schedule Day: ${subjectSchedule.day.name}'),
-                Text(
-                    'Subject Teacher: ${subject?.faculties?[0].firstName} ${subject?.faculties?[0].lastName}'),
+                // Text('Schedule Day: ${subjectSchedule.day.name}'),
+                // Text('Subject Teacher: ${getFaculty(subject!)}'),
+                // Text(
+                //     'Subject Teacher: ${subject?.faculties?[0].firstName} ${subject?.faculties?[0].lastName}'),
                 Text('Subject Room: ${subjectSchedule.room}'),
               ],
             ),
@@ -127,6 +129,18 @@ class _FacultyClassesState extends State<FacultyClasses> {
         );
       },
     );
+  }
+
+  String getFaculty(Subject subject) {
+    try {
+      if (subject.faculties == null) {
+        return 'No Faculty';
+      }
+
+      return '${subject.faculties?[0].firstName} ${subject.faculties?[0].lastName}';
+    } catch (e) {
+      return 'No Faculty';
+    }
   }
 
   String getTimeStartEnd(SubjectSchedule subjectSchedule) {

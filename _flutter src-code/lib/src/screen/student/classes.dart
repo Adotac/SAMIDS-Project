@@ -33,9 +33,10 @@ class _StudentClassesState extends State<StudentClasses> {
         return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
           if (constraints.maxWidth <= 450) {
             return MobileView(
+                routeName: StudentClasses.routeName,
                 appBarOnly: true,
                 currentIndex: 2,
-                appBarTitle: "Classes",
+                appBarTitle: "My Classes",
                 userName: "",
                 body: [
                   Padding(
@@ -80,6 +81,8 @@ class _StudentClassesState extends State<StudentClasses> {
       itemCount: _sdController.studentClasses.length,
       itemBuilder: (BuildContext context, int index) {
         SubjectSchedule schedule = _sdController.studentClasses[index];
+        print(index);
+        print(schedule.schedId);
         return ClassesListTile(
           subjectSchedule: schedule,
           subject: schedule.subject,
@@ -100,7 +103,7 @@ class _StudentClassesState extends State<StudentClasses> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
             subject?.subjectName ?? '',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           content: SingleChildScrollView(
             child: ListBody(
@@ -108,9 +111,8 @@ class _StudentClassesState extends State<StudentClasses> {
                 Text('Code: ${subject?.subjectID}'),
                 Text('Subject Description: ${subject?.subjectDescription}'),
                 Text('Schedule Time: ${getTimeStartEnd(subjectSchedule)}'),
-                Text('Schedule Day: ${subjectSchedule.day.name}'),
-                Text(
-                    'Subject Teacher: ${subject?.faculties?[0].firstName} ${subject?.faculties?[0].lastName}'),
+                // Text('Schedule Day: ${subjectSchedule.day.name}'),
+                Text('Subject Teacher: ${getFaculty(subject!)}'),
                 Text('Subject Room: ${subjectSchedule.room}'),
               ],
             ),
@@ -126,6 +128,18 @@ class _StudentClassesState extends State<StudentClasses> {
         );
       },
     );
+  }
+
+  String getFaculty(Subject subject) {
+    try {
+      if (subject.faculties == null) {
+        return 'No Faculty';
+      }
+
+      return '${subject.faculties?[0].firstName} ${subject.faculties?[0].lastName}';
+    } catch (e) {
+      return 'No Faculty';
+    }
   }
 
   String getTimeStartEnd(SubjectSchedule subjectSchedule) {

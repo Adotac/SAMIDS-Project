@@ -65,6 +65,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
       animation: _dataController,
       builder: (context, child) {
         return MobileView(
+          routeName: AdminAttendance.routeName,
           isAdmin: true,
           appBarOnly: true,
           appBarTitle: "Admin Attendance",

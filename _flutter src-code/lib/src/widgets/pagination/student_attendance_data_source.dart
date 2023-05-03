@@ -8,8 +8,7 @@ class AttendanceDataSourceSt extends DataTableSource {
   final StudentController sdController;
   final BuildContext context;
 
-  AttendanceDataSourceSt(
-      this.attendanceList, this.sdController, this.context);
+  AttendanceDataSourceSt(this.attendanceList, this.sdController, this.context);
   @override
   bool get isRowCountApproximate => false;
 
@@ -33,7 +32,7 @@ class AttendanceDataSourceSt extends DataTableSource {
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
         dataCell(sdController.formatDate(attendance.actualTimeIn!)),
-        dataCell(attendance.subjectSchedule?.day.name ?? 'No Date'),
+        dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
         dataCell(
           attendance.subjectSchedule?.room.toString() ?? 'No room code',
         ),
@@ -44,18 +43,18 @@ class AttendanceDataSourceSt extends DataTableSource {
             ? sdController.formatTime(attendance.actualTimeOut!)
             : 'No Time Out'),
         DataCell(sdController.getStatusText(attendance.remarks.name)),
-        DataCell(
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () => _showReportAttendanceDialog(context),
-                  icon: Icon(
-                    Icons.report_gmailerrorred_outlined,
-                    color: Theme.of(context).primaryColor,
-                  )),
-            ],
-          ),
-        ),
+        // DataCell(
+        //   Row(
+        //     children: [
+        //       IconButton(
+        //           onPressed: () => _showReportAttendanceDialog(context),
+        //           icon: Icon(
+        //             Icons.report_gmailerrorred_outlined,
+        //             color: Theme.of(context).primaryColor,
+        //           )),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }
@@ -77,7 +76,7 @@ class AttendanceDataSourceSt extends DataTableSource {
                 const SizedBox(height: 10),
                 TextField(
                   controller: _textFieldController,
-                  decoration:const  InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Enter issue description',
                     border: OutlineInputBorder(),
                   ),

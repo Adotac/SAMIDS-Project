@@ -38,7 +38,7 @@ class AttendanceDataSourceFac extends DataTableSource {
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
         dataCell(_dataController.formatDate(attendance.actualTimeIn!)),
-        dataCell(attendance.subjectSchedule?.day.name ?? 'No Date'),
+        dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
         dataCell(attendance.actualTimeIn != null
             ? _dataController.formatTime(attendance.actualTimeIn!)
             : 'No Time In'),

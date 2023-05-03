@@ -146,7 +146,6 @@ class _FacultySubjectClassListState extends State<FacultySubjectClassList> {
                     color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                 ),
-                const SizedBox(height: 4),
                 SizedBox(
                   width: 150,
                   child: Text(

@@ -74,42 +74,47 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
   }
 
   Widget _webMngUser(BuildContext context) {
-    return SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          children: [
-            _buildCard(context, 'Students', _searchBarStudent(context),
-                _buildStudentList()),
-            _buildCard(context, 'Faculty', _searchBarFaculty(context),
-                _buildFacultyList()),
-          ],
-        ));
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        children: [
+          _buildCard(context, 'Students', _searchBarStudent(context),
+              _buildStudentList(), 4),
+          _buildCard(context, 'Faculty', _searchBarFaculty(context),
+              _buildFacultyList(), 2),
+        ],
+      ),
+    );
   }
 
-  Expanded _buildCard(BuildContext context, title, searchBar, table) {
-    return Expanded(
-      child: Card(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12.0),
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                    decorationThickness: 5.0,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900),
-              ),
-              SizedBox(height: 4.0),
-              Container(
-                  margin: EdgeInsets.symmetric(vertical: 8.0),
-                  alignment: Alignment.center,
-                  child: searchBar),
-              table
-            ],
+  Flexible _buildCard(BuildContext context, title, searchBar, table,
+      [int flex = 1]) {
+    return Flexible(
+      flex: flex,
+      child: SingleChildScrollView(
+        child: Card(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12.0),
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                      decorationThickness: 5.0,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900),
+                ),
+                SizedBox(height: 4.0),
+                Container(
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    alignment: Alignment.center,
+                    child: searchBar),
+                table
+              ],
+            ),
           ),
         ),
       ),
@@ -146,10 +151,11 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
   Widget _dataTableStudents(BuildContext context) {
     return PaginatedDataTable(
       columns: [
-        _dataColumn('Student No'),
+        _dataColumn('Student No', 80),
         _dataColumn('RFID'),
         _dataColumn('Last Name'),
         _dataColumn('First Name'),
+        _dataColumn('Course'),
         _dataColumn('Year'),
       ],
       showFirstLastButtons: true,
@@ -175,12 +181,12 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
   //   );
   // }
 
-  DataColumn _dataColumn(String title) {
+  DataColumn _dataColumn(String title, [double width = 100]) {
     bool isSortedColumn = _dataController.sortColumn == title;
 
     return DataColumn(
       label: SizedBox(
-        width: 100,
+        width: width,
         child: InkWell(
           onTap: () {
             _dataController.sortStudents(title);
@@ -215,7 +221,7 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
 
     return DataColumn(
       label: SizedBox(
-        width: 200,
+        width: 100,
         child: InkWell(
           onTap: () {
             _dataController.sortFaculties(title);
@@ -265,9 +271,7 @@ class _AdminMngUsersState extends State<AdminMngUsers> {
 
   FacultyDataSource _createFacultyDataSource() {
     return FacultyDataSource(
-      _dataController.filteredFaculties,
-      _dataController,
-    );
+        _dataController.filteredFaculties, _dataController, context);
   }
 
   Widget _searchBarStudent(context) {

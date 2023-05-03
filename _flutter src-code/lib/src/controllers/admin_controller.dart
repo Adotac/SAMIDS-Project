@@ -13,13 +13,14 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
+import 'package:samids_web_app/src/model/student_model.dart';
 
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
+import 'package:samids_web_app/src/model/subject_model.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/config_model.dart';
 import '../model/faculty_model.dart';
-import '../model/student_model.dart';
 import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
@@ -32,6 +33,9 @@ class AdminController with ChangeNotifier {
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
+
+  List<SubjectSchedule> filteredSubjectSchedule = [];
+
   List<Attendance> filteredAttendanceList = [];
   List<Student> students = [];
   String selectedUserType = 'Student';
@@ -101,6 +105,116 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
+  void handleJsonSubjectSchedules(List<SubjectSchedule> subjectSchedulesList) {
+    try {
+      if (filteredSubjectSchedules.isNotEmpty) filteredSubjectSchedules.clear();
+
+      if (subjectSchedulesList.isNotEmpty) {
+        filteredSubjectSchedules.addAll(subjectSchedulesList);
+        subjectSchedules.addAll(subjectSchedulesList);
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleJsonSubjectSchedules $e $stacktrace');
+    }
+  }
+
+  void sortAscendingSubjectSchedules(String column) {
+    if (sortColumn == column) {
+      sortAscending = !sortAscending;
+    } else {
+      sortColumn = column;
+      sortAscending = true;
+    }
+
+    filteredSubjectSchedules.sort((a, b) {
+      int compare;
+      switch (column) {
+        case 'Subject Id':
+          compare =
+              a.subject?.subjectID.compareTo(b.subject?.subjectID ?? 0) ?? 0;
+          break;
+        case 'Code':
+          compare =
+              a.subject?.subjectName.compareTo(b.subject?.subjectName ?? '') ??
+                  0;
+          break;
+        case 'Description':
+          compare = a.subject?.subjectDescription
+                  .compareTo(b.subject?.subjectDescription ?? '') ??
+              0;
+          break;
+        case 'Room':
+          compare = a.room.compareTo(b.room);
+          break;
+        case 'Time Start':
+          compare = a.timeStart.compareTo(b.timeStart);
+          break;
+        case 'Time End':
+          compare = a.timeEnd.compareTo(b.timeEnd);
+          break;
+        case 'Day':
+          compare = a.day.compareTo(b.day);
+          break;
+        default:
+          compare = 0;
+      }
+      return sortAscending ? compare : -compare;
+    });
+
+    notifyListeners();
+  }
+
+  void filterSubjectSchedule(String query) {
+    if (query.isEmpty) {
+      filteredSubjectSchedules = subjectSchedules;
+      notifyListeners();
+      return;
+    }
+    filteredSubjectSchedules = subjectSchedules
+        .where((subject) =>
+            subject.subject!.subjectName
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            subject.subject!.subjectDescription
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            subject.room.toLowerCase().contains(query.toLowerCase()) ||
+            subject.day.toLowerCase().contains(query.toLowerCase()) ||
+            subject.schedId.toString().contains(query) ||
+            subject.timeStart.toString().contains(query) ||
+            subject.timeEnd.toString().contains(query))
+        .toList();
+    notifyListeners();
+  }
+
+  Future<void> getSubjectSchedules() async {
+    try {
+      List<SubjectSchedule> subjectSchedulesList =
+          await ConfigService.getSubjectSchedules();
+      handleJsonSubjectSchedules(subjectSchedulesList);
+    } catch (e, stacktrace) {
+      print('getSubjectSchedules $e $stacktrace');
+    }
+  }
+
+  List<SubjectSchedule> subjectSchedules = [];
+  List<SubjectSchedule> filteredSubjectSchedules = [];
+  String sortColumnSubjectSchedules = '';
+  // bool sortAscendingSubjectSchedules = true;
+
+  // void sortSubjectSchedules(String column) {
+  //   if (sortColumnSubjectSchedules == column) {
+  //     sortAscendingSubjectSchedules = !sortAscendingSubjectSchedules;
+  //   } else {
+  //     sortColumnSubjectSchedules = column;
+  //     sortAscendingSubjectSchedules = true;
+  //   }
+
+  //   notifyListeners();
+  // }
+
   void filterAttendance(String query) {
     if (query.isEmpty) {
       filteredAttendanceList = allAttendanceList;
@@ -152,6 +266,42 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  Future<void> getAttendanceAll(String? date) async {
+    try {
+      if (isAllAttendanceCollected) return;
+
+      CRUDReturn response = date != null
+          ? await AttendanceService.getAll(
+              date: date,
+            )
+          : await AttendanceService.getAll();
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        isAllAttendanceCollected = true;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      _logger.i('adminController getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  bool isEditingFaculty = false;
+  Future<void> onUpdateFaculty(
+      int facultyNo, String firstName, String lastName) async {
+    try {
+      isEditingFaculty = true;
+      notifyListeners();
+
+      await FacultyService.updateFaculty(facultyNo, firstName, lastName);
+      await getFaculties();
+
+      isEditingFaculty = false;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      _logger.i('onUpdateFaculty onUpdateFaculty $e $stacktrace');
+    }
+  }
+
   Future<void> getConfig() async {
     try {
       CRUDReturn response = await ConfigService.getConfig();
@@ -159,7 +309,7 @@ class AdminController with ChangeNotifier {
         handleEventJsonConfig(response);
       }
     } catch (e, stacktrace) {
-      print('ConfigController getConfig $e $stacktrace');
+      print('adminController getConfig $e $stacktrace');
     }
   }
 
@@ -231,12 +381,12 @@ class AdminController with ChangeNotifier {
                     .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
                 0));
         break;
-      case "Day":
-        filteredAttendanceList.sort((a, b) =>
-            order *
-            (a.subjectSchedule?.day.index as num)
-                .compareTo(b.subjectSchedule?.day.index as num));
-        break;
+      // case "Day":
+      //   filteredAttendanceList.sort((a, b) =>
+      //       order *
+      //       (a.subjectSchedule?.day.index as num)
+      //           .compareTo(b.subjectSchedule?.day.index as num));
+      //   break;
       case "Date":
         filteredAttendanceList.sort((a, b) =>
             order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));
@@ -315,26 +465,7 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getAttendanceAll(String? date) async {
-    try {
-      if (isAllAttendanceCollected) return;
-
-      CRUDReturn response = date != null
-          ? await AttendanceService.getAll(
-              date: date,
-            )
-          : await AttendanceService.getAll();
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
-        isAllAttendanceCollected = true;
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      _logger.i('StudentDashboardController getAttendanceAll $e $stacktrace');
-    }
-  }
-
-  void handleEventJsonStudentClasses(CRUDReturn result) {
+  void _handleEventJsonSchedule(CRUDReturn result) {
     try {
       if (studentClasses.isNotEmpty) studentClasses.clear();
       for (Map<String, dynamic> map in result.data) {
@@ -576,6 +707,39 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  bool sortAscendingSub = true;
+
+  String sortColumnSub = '';
+
+  void sortSubjects(String column) {
+    if (sortColumnSub == column) {
+      sortAscendingSub = !sortAscendingSub;
+    } else {
+      sortColumnSub = column;
+      sortAscendingSub = true;
+    }
+
+    filteredSubjects.sort((a, b) {
+      int compare;
+      switch (column) {
+        case 'Subject ID':
+          compare = a.subjectID.compareTo(b.subjectID);
+          break;
+        case 'Subject Name':
+          compare = a.subjectName.compareTo(b.subjectName);
+          break;
+        case 'Subject Description':
+          compare = a.subjectDescription.compareTo(b.subjectDescription);
+          break;
+        default:
+          compare = 0;
+      }
+      return sortAscendingSub ? compare : -compare;
+    });
+
+    notifyListeners();
+  }
+
   Future<void> downloadData(context) async {
     if (attendanceListToDownload.isEmpty) {
       showDialog(
@@ -653,6 +817,49 @@ class AdminController with ChangeNotifier {
   void attendanceReset() {
     filteredAttendanceList = allAttendanceList;
     attendanceListToDownload = allAttendanceList;
+    notifyListeners();
+  }
+
+  List<Subject> _allSubjects = [];
+  List<Subject> _filteredSubjects = [];
+
+  List<Subject> get allSubjects => _allSubjects;
+  List<Subject> get filteredSubjects => _filteredSubjects;
+
+  bool _isSubjectCollected = false;
+  bool get isSubjectCollected => _isSubjectCollected;
+
+  Future<void> getSubjects() async {
+    try {
+      if (_isSubjectCollected) return;
+
+      final response = await ConfigService.getSubjects();
+      if (response.success) {
+        _allSubjects = response.data
+            .map<Subject>((json) => Subject.fromJson(json))
+            .toList();
+        _filteredSubjects = _allSubjects;
+        _isSubjectCollected = true;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      debugPrint('SubjectController getSubjects $e $stacktrace');
+    }
+  }
+
+  void filterSubjects(String query) {
+    if (query.isNotEmpty) {
+      _filteredSubjects = _allSubjects
+          .where((subject) =>
+              subject.subjectName.toLowerCase().contains(query.toLowerCase()) ||
+              subject.subjectID.toString().contains(query.toLowerCase()) ||
+              subject.subjectDescription
+                  .toLowerCase()
+                  .contains(query.toLowerCase()))
+          .toList();
+    } else {
+      _filteredSubjects = _allSubjects;
+    }
     notifyListeners();
   }
 }

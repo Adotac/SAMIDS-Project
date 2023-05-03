@@ -90,6 +90,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
 
   Widget _mobileView(BuildContext context) {
     return MobileView(
+      routeName: StudentAttendance.routeName,
       appBarOnly: true,
       appBarTitle: 'Attendance',
       currentIndex: 1,
@@ -195,7 +196,6 @@ class _StudentAttendanceState extends State<StudentAttendance>
                 _dataColumn("Time in"),
                 _dataColumn('Time out'),
                 _dataColumn('Remarks'),
-                _dataColumn('Action'),
               ],
               showFirstLastButtons: true,
               rowsPerPage: 20,

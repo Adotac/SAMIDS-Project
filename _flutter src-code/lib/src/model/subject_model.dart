@@ -19,9 +19,9 @@ class Subject {
 
   static Subject fromJson(Map<String, dynamic> json) {
     return Subject(
-      subjectID: json['subjectID'],
-      subjectName: json['subjectName'],
-      subjectDescription: json['subjectDescription'],
+      subjectID: json['subjectID'] ?? 0,
+      subjectName: json['subjectName'] ?? '',
+      subjectDescription: json['subjectDescription'] ?? '',
       students: json['students'] != null
           ? List<Student>.from(
               json['students'].map((x) => Student.fromJson(x)),

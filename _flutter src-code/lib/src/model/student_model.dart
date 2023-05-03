@@ -25,11 +25,11 @@ class Student {
   static Student fromJson(Map<String, dynamic> json) {
     return Student(
       studentID: json['studentID'],
-      studentNo: json['studentNo'],
-      rfid: json['rfid'],
-      lastName: json['lastName'],
-      firstName: json['firstName'],
-      course: json['course'],
+      studentNo: json['studentNo'] ?? 0,
+      rfid: json['rfid'] ?? 0,
+      lastName: json['lastName'] ?? '',
+      firstName: json['firstName'] ?? '',
+      course: json['course'] ?? '',
       year: yearValues.map[json['year']] ?? Year.First,
       subjects: json['subjects'] != null
           ? List<Subject>.from(

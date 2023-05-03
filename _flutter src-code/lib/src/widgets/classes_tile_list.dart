@@ -22,8 +22,9 @@ class ClassesListTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Card(
+        elevation: 0,
         child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 8.0),
+          // margin: const EdgeInsets.symmetric(vertical: 3.0),
           padding: const EdgeInsets.all(16.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +34,7 @@ class ClassesListTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${subject?.subjectID.toString() ?? "No Subject Code"}  ${subject?.subjectName ?? "No Subject Name"}',
+                      '${subjectSchedule?.schedId.toString() ?? "No Subject Code"}  ${subject?.subjectName ?? "No Subject Name"}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -66,7 +67,7 @@ class ClassesListTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    subjectSchedule?.day.name ?? 'No Class Day  ',
+                    subjectSchedule?.day ?? 'No Class Day  ',
                     style: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context).textTheme.bodySmall?.color,

@@ -150,12 +150,12 @@ class StudentController with ChangeNotifier {
                     .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
                 0));
         break;
-      case "Day":
-        filteredAttendanceList.sort((a, b) =>
-            order *
-            (a.subjectSchedule?.day.index as num)
-                .compareTo(b.subjectSchedule?.day.index as num));
-        break;
+      // case "Day":
+      //   filteredAttendanceList.sort((a, b) =>
+      //       order *
+      //       (a.subjectSchedule?.day.index as num)
+      //           .compareTo(b.subjectSchedule?.day.index as num));
+      //   break;
       case "Date":
         filteredAttendanceList.sort((a, b) =>
             order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));
@@ -189,7 +189,7 @@ class StudentController with ChangeNotifier {
     } else {
       filteredAttendanceList = allAttendanceList.where((attendance) {
         final referenceNo = attendance.attendanceId.toString();
-        final day = attendance.subjectSchedule?.day.index.toString() == query;
+        // final day = attendance.subjectSchedule?.day.index.toString() == query;
 
         final subjectName =
             attendance.subjectSchedule?.subject?.subjectName.toLowerCase() ??
@@ -200,7 +200,6 @@ class StudentController with ChangeNotifier {
         return referenceNo.toString() == query ||
             subjectName.contains(query.toLowerCase()) ||
             room.contains(query.toLowerCase()) ||
-            day ||
             remarks.contains(query.toLowerCase());
       }).toList();
     }
@@ -225,6 +224,7 @@ class StudentController with ChangeNotifier {
     }
   }
 
+  List<int> ex = [];
   Future<void> getStudentClasses() async {
     try {
       if (isStudentClassesCollected) return;
@@ -232,6 +232,7 @@ class StudentController with ChangeNotifier {
           await StudentService.getStudentClasses(student.studentNo);
       if (response.success) {
         handleEventJsonStudentClasses(response);
+        print(studentClasses);
       }
       notifyListeners();
     } catch (e, stacktrace) {
@@ -269,11 +270,12 @@ class StudentController with ChangeNotifier {
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
-        isAllAttendanceCollected = true;
         notifyListeners();
       }
+      isAllAttendanceCollected = true;
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      isAllAttendanceCollected = true;
+      print('Admin getAttendanceAll getAll $e $stacktrace');
     }
   }
 
@@ -285,13 +287,13 @@ class StudentController with ChangeNotifier {
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
-        isAllAttendanceCollected = true;
 
         dateSelected = null;
         notifyListeners();
       }
+      isAllAttendanceCollected = true;
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('attendanceReset getAll $e $stacktrace');
     }
   }
 
@@ -363,7 +365,9 @@ class StudentController with ChangeNotifier {
         isCountCalculated = true;
         notifyListeners();
       }
+      isCountCalculated = true;
     } catch (e, stacktrace) {
+      isCountCalculated = true;
       print('getRemarksCount $e $stacktrace');
     }
   }

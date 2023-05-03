@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/services/attendance.services.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:samids_web_app/src/widgets/pagination/faculty_attendance_data_source.dart';
@@ -71,6 +72,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
 
   Widget _mobileView(BuildContext context) {
     return MobileView(
+      routeName: FacultyAttendance.routeName,
       appBarOnly: true,
       appBarTitle: 'Attendance',
       currentIndex: 1,
@@ -156,7 +158,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
               attendance.student?.studentNo.toString() ?? 'No student ID',
           name:
               '${attendance.student?.firstName} ${attendance.student?.lastName}',
-          day: attendance.subjectSchedule?.day.name ?? 'No Date',
+          day: attendance.subjectSchedule?.day ?? 'No Day',
           referenceNo: attendance.attendanceId.toString(),
           subject:
               attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject',

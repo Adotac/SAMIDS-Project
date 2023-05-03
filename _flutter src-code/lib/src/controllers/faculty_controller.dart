@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:samids_web_app/src/model/attendance_model.dart';
@@ -19,11 +20,13 @@ import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/config_model.dart';
 import '../model/faculty_model.dart';
+import '../model/subject_model.dart';
 import '../services/config.services.dart';
 import '../services/faculty.services.dart';
 import '../services/student.services.dart';
 
 class FacultyController with ChangeNotifier {
+  final Logger _logger = Logger();
   final Faculty faculty;
   final List<Student> students = [];
   List<Attendance> attendance = [];
@@ -106,7 +109,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('attendanceReset $e $stacktrace');
     }
   }
 
@@ -124,7 +127,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
     }
   }
 
@@ -176,14 +179,18 @@ class FacultyController with ChangeNotifier {
   }
 
   void handleEventJsonAttendanceBySchedId(CRUDReturn result, int schedId) {
-    print('handleEventJsonAttendanceBySchedId');
-    attendanceBySchedId.putIfAbsent(schedId, () => []);
+    try {
+      print('handleEventJsonAttendanceBySchedId');
+      attendanceBySchedId.putIfAbsent(schedId, () => []);
 
-    for (Map<String, dynamic> map in result.data) {
-      attendanceBySchedId[schedId]?.add(Attendance.fromJson(map));
+      for (Map<String, dynamic> map in result.data) {
+        attendanceBySchedId[schedId]?.add(Attendance.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonAttendanceBySchedId $e $stacktrace');
     }
-
-    notifyListeners();
   }
 
   // Future<void> getStudentClasses() async {
@@ -218,10 +225,21 @@ class FacultyController with ChangeNotifier {
 
   void handleEventJsonStudentList(CRUDReturn result) {
     try {
+      print('handleEventJsonStudentList');
+      print(result.data[0]);
+      print('result.data[]');
+
       if (students.isNotEmpty) students.clear();
-      for (Map<String, dynamic> map in result.data) {
-        students.add(Student.fromJson(map));
+      Subject subjectStudent = Subject.fromJson(result.data[0]);
+      if (subjectStudent.students == null) {
+        return;
       }
+
+      for (Student student in subjectStudent.students!) {
+        print(student);
+        students.add(student);
+      }
+
       isStudentsCollected = true;
       notifyListeners();
     } catch (e, stacktrace) {
@@ -235,8 +253,16 @@ class FacultyController with ChangeNotifier {
     try {
       isGetStudentListByLoading = true;
       notifyListeners();
+      print(schedId);
       CRUDReturn response = await StudentService.getStudentsBySchedId(schedId);
+      if (kDebugMode) {
+        _logger.i(' getStudentListbySchedId ${response.data}');
+      }
+
       if (response.success) {
+        if (kDebugMode) {
+          _logger.i(' response.success');
+        }
         handleEventJsonStudentList(response);
       }
       isGetStudentListByLoading = false;
@@ -292,7 +318,8 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      isAllAttendanceCollected = true;
+      print('getAttendanceAll getAll $e $stacktrace');
     }
   }
 
@@ -361,12 +388,12 @@ class FacultyController with ChangeNotifier {
                     .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
                 0));
         break;
-      case "Day":
-        filteredAttendanceList.sort((a, b) =>
-            order *
-            (a.subjectSchedule?.day.index as num)
-                .compareTo(b.subjectSchedule?.day.index as num));
-        break;
+      // case "Day":
+      //   filteredAttendanceList.sort((a, b) =>
+      //       order *
+      //       (a.subjectSchedule?.day.index as num)
+      //           .compareTo(b.subjectSchedule?.day.index as num));
+      //   break;
       case "Date":
         filteredAttendanceList.sort((a, b) =>
             order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));
@@ -433,6 +460,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
+      isCountCalculated = true;
       print('getRemarksCount $e $stacktrace');
     }
   }
@@ -473,7 +501,6 @@ class FacultyController with ChangeNotifier {
       //   });
       //   print(output.substring(0, output.length - 1));
       // });
-
       isRemarksCountBySchedId = true;
       notifyListeners();
     } catch (e, stacktrace) {
@@ -589,6 +616,7 @@ class FacultyController with ChangeNotifier {
     } else {
 // Mobile implementation
       final directory = await getApplicationDocumentsDirectory();
+
       final path = directory.path;
       final file = io.File('$path/attendance_data.csv');
       await file.writeAsString(csv);
@@ -652,6 +680,7 @@ class FacultyController with ChangeNotifier {
         ..setAttribute("download", fileName)
         ..click();
     } else {
+// Mobile implementation
       final directory = await getApplicationDocumentsDirectory();
       final path = directory.path;
       final file = io.File('$path/$fileName');
@@ -714,6 +743,7 @@ class FacultyController with ChangeNotifier {
         ..setAttribute("download", fileName)
         ..click();
     } else {
+// Mobile implementation
       final directory = await getApplicationDocumentsDirectory();
       final path = directory.path;
       final file = io.File('$path/fileName');
@@ -725,91 +755,247 @@ class FacultyController with ChangeNotifier {
     }
   }
 
+  // bool _isDateWithinPastSixDays(DateTime date) {
+  //   DateTime now = DateTime.now();
+  //   DateTime sixDaysAgo = now.subtract(Duration(days: 6));
+  //   return date.isAfter(sixDaysAgo) && date.isBefore(now);
+  // }
+
+  // Map<Remarks, int> countMap = {
+  //   Remarks.onTime: 0,
+  //   Remarks.late: 0,
+  //   Remarks.cutting: 0,
+  //   Remarks.absent: 0,
+  // };
+  // void getRemarksCountAllAtt() {
+  //   print('getRemarksCountAllAtt');
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null &&
+  //         _isDateWithinPastSixDays(attendance.date!)) {
+  //       countMap[attendance.remarks] = countMap[attendance.remarks]! + 1;
+  //     }
+  //   }
+
+  //   print(countMap);
+  //   notifyListeners();
+  // }
+
+  // List<Remarks> getLastSixRecordedDaysRemarks() {
+  //   print('getLastSixRecordedDaysRemarks');
+  //   List<Remarks> lastSixDaysRemarks = [];
+
+  //   // Create a map to group attendance by date
+  //   Map<DateTime, List<Attendance>> attendanceByDate = {};
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       DateTime date = DateTime.utc(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+  //       attendanceByDate[date] = attendanceByDate[date] ?? [];
+  //       attendanceByDate[date]!.add(attendance);
+  //     }
+  //   }
+
+  //   // Iterate through the map to get the last 6 recorded days
+  //   List<DateTime> lastSixRecordedDays = [];
+  //   DateTime today = DateTime.now().toUtc();
+  //   for (int i = 0; i < 6; i++) {
+  //     DateTime day = today.subtract(Duration(days: i));
+  //     if (attendanceByDate.containsKey(day)) {
+  //       lastSixRecordedDays.add(day);
+  //     }
+  //   }
+
+  //   // Iterate through the attendance list and add the remarks for the last 6 recorded days
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       DateTime date = DateTime.utc(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+  //       if (lastSixRecordedDays.contains(date)) {
+  //         lastSixDaysRemarks.add(attendance.remarks);
+  //       }
+  //     }
+  //   }
+
+  //   print(lastSixDaysRemarks);
+  //   print('lastSixDaysRemarks');
+  //   return lastSixDaysRemarks;
+  // }
+
+  // List<Remarks> getLastSixDaysRemarks() {
+  //   print('lastSixDaysRemarks');
+  //   List<Remarks> lastSixDaysRemarks = [];
+
+  //   // Sort the allAttendanceList in descending order based on the date
+  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+
+  //   // Create a Set to store unique dates
+  //   Set<DateTime> uniqueDates = {};
+
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       // Remove the time part from the date to consider only the unique day
+  //       DateTime dateOnly = DateTime(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+
+  //       // Check if the date is unique and the uniqueDates Set has less than 6 elements
+  //       if (!uniqueDates.contains(dateOnly) && uniqueDates.length < 6) {
+  //         lastSixDaysRemarks.add(attendance.remarks);
+  //         uniqueDates.add(dateOnly);
+  //       }
+  //     }
+  //   }
+  //   print(lastSixDaysRemarks);
+  //   print(uniqueDates);
+  //   return lastSixDaysRemarks;
+  // }
+
+  // List<Map<DateTime, Map<Remarks, int>>> getRemarksCountForLastSixDays() {
+  //   print('getRemarksCountForLastSixDays');
+  //   List<Map<DateTime, Map<Remarks, int>>> remarksCountList = [];
+
+  //   // Sort the allAttendanceList in descending order based on the date
+  //   allAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+
+  //   // Create a Set to store unique dates
+  //   Set<DateTime> uniqueDates = {};
+
+  //   for (Attendance attendance in allAttendanceList) {
+  //     if (attendance.date != null) {
+  //       // Remove the time part from the date to consider only the unique day
+  //       DateTime dateOnly = DateTime(attendance.date!.year,
+  //           attendance.date!.month, attendance.date!.day);
+
+  //       // Check if the date is unique and the uniqueDates Set has less than 6 elements
+  //       if (!uniqueDates.contains(dateOnly) && uniqueDates.length < 6) {
+  //         uniqueDates.add(dateOnly);
+  //       }
+  //     }
+  //   }
+
+  //   for (DateTime uniqueDate in uniqueDates) {
+  //     Map<Remarks, int> remarksCount = {
+  //       Remarks.onTime: 0,
+  //       Remarks.late: 0,
+  //       Remarks.cutting: 0,
+  //       Remarks.absent: 0
+  //     };
+
+  //     for (Attendance attendance in allAttendanceList) {
+  //       if (attendance.date != null) {
+  //         DateTime dateOnly = DateTime(attendance.date!.year,
+  //             attendance.date!.month, attendance.date!.day);
+
+  //         if (uniqueDate == dateOnly) {
+  //           remarksCount[attendance.remarks] =
+  //               remarksCount[attendance.remarks]! + 1;
+  //         }
+  //       }
+  //     }
+
+  //     remarksCountList.add({uniqueDate: remarksCount});
+  //   }
+  //   print(remarksCountList);
+  //   return remarksCountList;
+  // }
   List<String> formattedDateRangeList = [];
   void getRemarksCountForPercentiles() {
-    notifyListeners();
-    print('getRemarksCountForPercentiles');
+    try {
+      notifyListeners();
+      print('getRemarksCountForPercentiles');
 
-    graphAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+      graphAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
 
-    Set<DateTime> uniqueDates = {};
-
-    for (Attendance attendance in graphAttendanceList) {
-      if (attendance.date != null) {
-        DateTime dateOnly = DateTime(attendance.date!.year,
-            attendance.date!.month, attendance.date!.day);
-
-        uniqueDates.add(dateOnly);
-      }
-    }
-
-    int datesPerPercentile = (uniqueDates.length / 6).ceil();
-
-    for (int i = 0; i < 6; i++) {
-      List<DateTime> percentileDates = uniqueDates
-          .skip(i * datesPerPercentile)
-          .take(datesPerPercentile)
-          .toList();
-      String percentileLabel =
-          '${percentileDates.first} - ${percentileDates.last}';
-
-      Map<Remarks, int> remarksCount = {
-        Remarks.onTime: 0,
-        Remarks.late: 0,
-        Remarks.cutting: 0,
-        Remarks.absent: 0
-      };
+      Set<DateTime> uniqueDates = {};
 
       for (Attendance attendance in graphAttendanceList) {
         if (attendance.date != null) {
           DateTime dateOnly = DateTime(attendance.date!.year,
               attendance.date!.month, attendance.date!.day);
 
-          if (percentileDates.contains(dateOnly)) {
-            remarksCount[attendance.remarks] =
-                remarksCount[attendance.remarks]! + 1;
+          uniqueDates.add(dateOnly);
+        }
+      }
+
+      int divisor = 6;
+      if (uniqueDates.length < 6) {
+        divisor = uniqueDates.length;
+        print(uniqueDates.length);
+      }
+
+      int datesPerPercentile = (uniqueDates.length / divisor).ceil();
+
+      for (int i = 0; i < divisor; i++) {
+        List<DateTime> percentileDates = uniqueDates
+            .skip(i * datesPerPercentile)
+            .take(datesPerPercentile)
+            .toList();
+        String percentileLabel = percentileDates.isEmpty
+            ? 'Empty'
+            : '${percentileDates.first} - ${percentileDates.last}';
+
+        Map<Remarks, int> remarksCount = {
+          Remarks.onTime: 0,
+          Remarks.late: 0,
+          Remarks.cutting: 0,
+          Remarks.absent: 0
+        };
+
+        for (Attendance attendance in graphAttendanceList) {
+          if (attendance.date != null) {
+            DateTime dateOnly = DateTime(attendance.date!.year,
+                attendance.date!.month, attendance.date!.day);
+
+            if (percentileDates.contains(dateOnly)) {
+              remarksCount[attendance.remarks] =
+                  remarksCount[attendance.remarks]! + 1;
+            }
           }
         }
+
+        remarksCountList.add({percentileLabel: remarksCount});
       }
 
-      remarksCountList.add({percentileLabel: remarksCount});
-    }
+      Remarks maxRemarks = Remarks.onTime;
 
-    Remarks maxRemarks = Remarks.onTime;
+      for (Map<String, Map<Remarks, int>> data in remarksCountList) {
+        String dateRange = data.keys.first;
+        Map<Remarks, int> remarksCount = data.values.first;
 
-    for (Map<String, Map<Remarks, int>> data in remarksCountList) {
-      String dateRange = data.keys.first;
-      Map<Remarks, int> remarksCount = data.values.first;
+        // Iterate through the remarks count and update the max count if needed
+        for (Remarks remark in remarksCount.keys) {
+          int count = remarksCount[remark]!;
+          if (count > maxRemarksCount) {
+            maxRemarksCount = count;
+            maxRemarks = remark;
+          }
+        }
 
-      // Iterate through the remarks count and update the max count if needed
-      for (Remarks remark in remarksCount.keys) {
-        int count = remarksCount[remark]!;
-        if (count > maxRemarksCount) {
-          maxRemarksCount = count;
-          maxRemarks = remark;
+        DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
+        DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
+
+        String formattedDateRange = DateFormat('MMMM').format(endDate);
+
+        formattedDateRangeList.add(formattedDateRange);
+
+        for (Remarks remark in remarksCount.keys) {
+          int count = remarksCount[remark]!;
+          print('$remark: $count');
         }
       }
 
-      DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
-      DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
+      print('Max remarks count: $maxRemarksCount');
+      print('Max remarks: $maxRemarks');
 
-      String formattedDateRange = DateFormat('MMMM').format(endDate);
-
-      formattedDateRangeList.add(formattedDateRange);
-
-      for (Remarks remark in remarksCount.keys) {
-        int count = remarksCount[remark]!;
-        print('$remark: $count');
-      }
+      final count = getPercentileCounts();
+      print(count);
+      isRemarksCountListLoading = false;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print(stacktrace);
+      print(e);
+      isRemarksCountListLoading = false;
+      notifyListeners();
     }
-
-    print('Max remarks count: $maxRemarksCount');
-    print('Max remarks: $maxRemarks');
-
-    final count = getPercentileCounts();
-    print(count);
-    isRemarksCountListLoading = false;
-    notifyListeners();
   }
 
   List<int> getPercentileCounts() {
