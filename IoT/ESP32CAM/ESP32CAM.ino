@@ -188,7 +188,7 @@ void setup() {
   server.begin();
 }
 
-
+int retCtr = 0;
 void loop() {
   static uint32_t prev_ms = millis();
   // sendHttpRequest();
@@ -196,13 +196,19 @@ void loop() {
 
   client.loop(); // important
 
-  if(retrySend){
-    Serial.println("Retrying to send in transit...");
+  if(retrySend && retCtr < 3){ // retry for 3 times
+    Serial.printf("Retrying %d times to send in transit...", retCtr+1);
     digitalWrite(RED_LED, HIGH); // Turn on the red LED
     delay(1000);                // Wait for 1 second
     digitalWrite(RED_LED, LOW);  // Turn off the red LED
     delay(1000);   
     sendRequest();
+    publishMessage(client, camtopic, espcamToJson(myData, "Retrying...", false, true, false));
+    retCtr++;
+  }
+  else if (retCtr > 0){
+    publishMessage(client, camtopic, espcamToJson(myData, "Retrying...", false, false, true));
+    retCtr = 0;
   }
 
   server.handleClient();

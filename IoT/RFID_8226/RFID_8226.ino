@@ -26,6 +26,7 @@ unsigned long timerDelay = 2000;  // send readings timer
 
 bool deviceFlag = false;
 bool retrySend = false;
+bool scanFlag = false;
 
 esprfid_message myData;
 String tag = "";
@@ -102,17 +103,32 @@ void setup() {
 
     serverFromJson(payload, serverData);
     Serial.println(serverData.message);
+
+    char* token = strtok(serverData.message, " ");
+    char* tokens[2];
+
+    int tokctr = 0;
+    
+    while (token != NULL && tokctr < 2) {
+      // Print the current token (substring)
+      Serial.println(token);
+      tokens[tokctr] = token;
+      tokctr++;
+      // Get the next token
+      token = strtok(NULL, " ");
+    }
+
     if(serverData.displayFlag){
-
-      setLCD("Attendance", 0, 0, true);
-      setLCD("Verified!", 0, 1, false);
+      setLCD(tokens[0], 0, 0, true);
+      setLCD(tokens[1], 0, 1, false);
     }
-    else{
-      setLCD("Attendance", 0, 0, true);
-      setLCD("Failed!", 0, 1, false);
-    }
+    // else{
+    //   setLCD("Attendance", 0, 0, true);
+    //   setLCD("Failed!", 0, 1, false);
+    // }
 
-    delay(5000);
+    delay(3000);
+    scanFlag = false;
   });
 
   // Initialize RFID
@@ -134,20 +150,34 @@ void loop() {
 
   client.loop();
 
+  if(scanFlag && (millis() - lastTime) > timerDelay){ // 10 seconds
+    lastTime = millis();
+    scanFlag = false;
+  }
+
   if(deviceFlag){
     delay(350);
-    setLCD(" Face at Camera ", 0, 0, true);
-    setLCD(" and Scan RFID ", 1, 1, false);
+
+    if(!scanFlag){
+      setLCD(" Face at Camera ", 0, 0, true);
+      setLCD(" and Scan RFID ", 1, 1, false);
+    }
+    
     
     // Display card UID on LCD
     if(!RFID_Scanner()){
       if((millis() - lastTime) > timerDelay)
       {
+        lastTime = millis();
         Serial.println("No Message");
       }
     }
     else{
       publishMessage(client, pubtopic, esprfidToJson(myData, tag.c_str(), deviceFlag));
+      scanFlag = true;
+      setLCD(" Veryfying in ", 0, 0, true);
+      setLCD(" process... ", 1, 1, false);
+      // delay(3000);
     }
 
     tag.clear();
@@ -159,7 +189,7 @@ void loop() {
     setLCD("Synchronizing...", 0, 0, true);
     delay(1000);
   }
-
+  
 }
 
 bool RFID_Scanner(){
