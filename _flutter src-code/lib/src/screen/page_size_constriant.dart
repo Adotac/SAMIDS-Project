@@ -16,6 +16,7 @@ class ScreenSizeWarning extends StatelessWidget {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
+          routeName: ScreenSizeWarning.routeName,
           currentIndex: 0,
           showAppBar: false,
           showBottomNavBar: false,

@@ -275,7 +275,7 @@ class StudentController with ChangeNotifier {
       isAllAttendanceCollected = true;
     } catch (e, stacktrace) {
       isAllAttendanceCollected = true;
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('Admin getAttendanceAll getAll $e $stacktrace');
     }
   }
 
@@ -293,7 +293,7 @@ class StudentController with ChangeNotifier {
       }
       isAllAttendanceCollected = true;
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('attendanceReset getAll $e $stacktrace');
     }
   }
 

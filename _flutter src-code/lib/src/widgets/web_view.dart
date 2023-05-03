@@ -145,17 +145,38 @@ class _WebViewState extends State<WebView> {
     }
   }
 
+  _getController() {
+    int userType = authController.loggedInUser?.type.index ?? -1;
+
+    switch (userType) {
+      case 0:
+        return studentController;
+
+      case 1:
+        return facultyController;
+
+      default:
+        return adminController;
+    }
+  }
+
   _getAttendanceAll() async {
     int userType = authController.loggedInUser?.type.index ?? -1;
 
     switch (userType) {
       case 0:
+        studentController!.isAllAttendanceCollected = false;
+        studentController!.isAttendanceTodayCollected = false;
         await studentController!.getAttendanceAll(null);
+        await studentController!.getAttendanceToday();
+
         break;
       case 1:
+        facultyController!.isAllAttendanceCollected = false;
         await facultyController!.getAttendanceAll(null);
         break;
       default:
+        adminController!.isAllAttendanceCollected = false;
         await adminController!.getAttendanceAll(null);
     }
   }
@@ -274,6 +295,21 @@ class _WebViewState extends State<WebView> {
           //     );
           //   },
           // ),
+          Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: Icon(
+                  Icons.refresh,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _getAttendanceAll();
+                  });
+                },
+              );
+            },
+          ),
           const SizedBox(
             width: 24,
           )

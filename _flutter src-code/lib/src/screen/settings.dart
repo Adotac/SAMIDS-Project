@@ -169,9 +169,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _submitButton(BuildContext context, VoidCallback onPressed) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14.0),
+      margin: const EdgeInsets.only(bottom: 16.0, left: 14.0, right: 14.0),
       height: 48,
-      width: 420,
+      width: double.infinity,
       child: TextButton(
         style: TextButton.styleFrom(
           backgroundColor: Theme.of(context).primaryColor,
@@ -236,7 +236,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return AlertDialog(
           title: const Text('Security Question'),
           content: SizedBox(
-            height: 158,
+            height: 178,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,6 +448,7 @@ class _SettingsPageState extends State<SettingsPage> {
         builder: (BuildContext context, BoxConstraints constraints) {
       if (constraints.maxWidth <= 450) {
         return MobileView(
+            routeName: SettingsPage.routeName,
             showBottomNavBar: true,
             appBarOnly: true,
             currentIndex: 3, // Assuming settings page has index 1

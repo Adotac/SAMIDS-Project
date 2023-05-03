@@ -34,6 +34,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   void initState() {
+    adminController.getSubjectSchedules();
     adminController.getSubjects();
     adminController.getConfig();
     adminController.getStudents();
@@ -83,6 +84,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       animation: adminController,
       builder: (context, child) {
         return MobileView(
+            routeName: AdminDashboard.routeName,
             isAdmin: true,
             appBarTitle: "Admin Dashboard",
             appBarOnly: true,
@@ -705,7 +707,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             case 2:
               adminController.getFaculties();
               break;
-
+            case 4:
+              adminController.getSubjectSchedules();
+              break;
             default:
           }
         } else {

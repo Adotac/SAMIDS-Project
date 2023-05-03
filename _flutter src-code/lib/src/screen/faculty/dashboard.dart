@@ -80,6 +80,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return WebView(
+              facultyController: _dataController,
               appBarTitle: 'Dashboard',
               selectedWidgetMarker: 0,
               body: Container(
@@ -156,6 +157,17 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                               height: 150,
                             ),
                             Text("No data available"),
+                          ],
+                        )
+                      else if (_dataController.remarksCountList.length <= 1)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 150,
+                            ),
+                            Text("Insufficient data for chart"),
                           ],
                         )
                       else
@@ -344,6 +356,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
       animation: _dataController,
       builder: (context, child) {
         return MobileView(
+            routeName: FacultyDashboard.routeName,
             currentIndex: 0,
             appBarTitle: 'Dashboard',
             userName:
@@ -1138,6 +1151,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           child: Column(
             children: [
               CircularViewer(
+                controller: _dataController,
                 value: value,
                 maxValue: maxValue,
                 radius: radius,

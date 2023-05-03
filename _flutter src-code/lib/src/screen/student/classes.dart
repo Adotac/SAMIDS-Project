@@ -33,6 +33,7 @@ class _StudentClassesState extends State<StudentClasses> {
         return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
           if (constraints.maxWidth <= 450) {
             return MobileView(
+                routeName: StudentClasses.routeName,
                 appBarOnly: true,
                 currentIndex: 2,
                 appBarTitle: "My Classes",

@@ -83,6 +83,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 ),
               )
             : WebView(
+                studentController: _sdController,
                 appBarTitle: "Dashboard",
                 selectedWidgetMarker: 0,
                 body: Container(
@@ -157,6 +158,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
       animation: _sdController,
       builder: (context, child) {
         return MobileView(
+            routeName: StudentDashboard.routeName,
             currentIndex: 0,
             appBarTitle: 'Dashboard',
             userName:
@@ -233,7 +235,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
       cells: [
         DataCell(
           Text(
-            schedule.subject?.subjectName ?? 'No subject name',
+            "${schedule.schedId} - ${schedule.subject?.subjectName ?? 'No subject name'}",
             style: TextStyle(fontSize: 14),
           ),
         ),
@@ -360,7 +362,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     label: Text('Remarks'),
                   ),
                 ],
-                rows: _sdController.allAttendanceList
+                rows: _sdController.attendance
                     .map((attendance) =>
                         _buildDataRowRecentLogs(context, attendance))
                     .toList(),
@@ -383,9 +385,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
       title: "Recent Activity",
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: _sdController.allAttendanceList.length,
+        itemCount: _sdController.attendance.length,
         itemBuilder: (BuildContext context, int index) {
-          Attendance attendance = _sdController.allAttendanceList[index];
+          Attendance attendance = _sdController.attendance[index];
           return CustomListTile(
             title: attendance.subjectSchedule?.subject?.subjectName ??
                 'No subject name',
@@ -568,6 +570,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
       child: Column(
         children: [
           CircularViewer(
+            controller: _sdController,
             value: value,
             maxValue: _sdController.allAttendanceList.length.toDouble(),
             radius: radius,

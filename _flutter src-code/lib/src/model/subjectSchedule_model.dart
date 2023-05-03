@@ -35,7 +35,7 @@ class SubjectSchedule {
           json['subject'] != null ? Subject.fromJson(json['subject']) : null,
       timeStart: DateTime.parse(json['timeStart']),
       timeEnd: DateTime.parse(json['timeEnd']),
-      day: displayDay(json['daysOfWeek']),
+      day: displayDay(json['daysOfWeek'] ?? []),
       room: json['room'],
     );
   }
@@ -51,11 +51,11 @@ class SubjectSchedule {
 enum DayOfWeek { Mon, Tue, Wed, Thu, Fri, Sat, Sun }
 
 final dayOfWeekValues = EnumValues({
-  0: DayOfWeek.Mon,
-  1: DayOfWeek.Tue,
-  2: DayOfWeek.Wed,
-  3: DayOfWeek.Thu,
-  4: DayOfWeek.Fri,
-  5: DayOfWeek.Sat,
-  6: DayOfWeek.Sun
+  0: DayOfWeek.Sun,
+  1: DayOfWeek.Mon,
+  2: DayOfWeek.Tue,
+  3: DayOfWeek.Wed,
+  4: DayOfWeek.Thu,
+  5: DayOfWeek.Fri,
+  6: DayOfWeek.Sat,
 });

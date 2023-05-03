@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/widgets/magic_circle.dart';
 
 class CircularViewer extends StatefulWidget {
+  final controller;
   final Color color;
   final Color sliderColor;
   final Color unSelectedColor;
@@ -16,6 +17,7 @@ class CircularViewer extends StatefulWidget {
       this.textStyle = const TextStyle(fontSize: 20),
       this.decoration,
       required this.radius,
+      required this.controller,
       required this.color,
       required this.value,
       required this.sliderColor,
@@ -61,26 +63,30 @@ class _CircularViewerState extends State<CircularViewer>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          decoration: widget.decoration,
-          width: widget.radius * 2,
-          height: widget.radius * 2,
-          child: CustomPaint(
-            painter: Circle(
-                angle: animation.value.toDouble() * 360 / widget.maxValue,
-                color: widget.color,
-                unSelectedColor: widget.unSelectedColor,
-                sliderColor: widget.sliderColor),
-          ),
-        ),
-        Text(
-          animation.value.toString(),
-          style: widget.textStyle,
-        )
-      ],
-    );
+    return AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                decoration: widget.decoration,
+                width: widget.radius * 2,
+                height: widget.radius * 2,
+                child: CustomPaint(
+                  painter: Circle(
+                      angle: animation.value.toDouble() * 360 / widget.maxValue,
+                      color: widget.color,
+                      unSelectedColor: widget.unSelectedColor,
+                      sliderColor: widget.sliderColor),
+                ),
+              ),
+              Text(
+                animation.value.toString(),
+                style: widget.textStyle,
+              )
+            ],
+          );
+        });
   }
 }

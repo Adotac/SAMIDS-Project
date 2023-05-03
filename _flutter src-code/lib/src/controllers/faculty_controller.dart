@@ -109,7 +109,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('attendanceReset $e $stacktrace');
     }
   }
 
@@ -127,7 +127,7 @@ class FacultyController with ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stacktrace) {
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
     }
   }
 
@@ -319,7 +319,7 @@ class FacultyController with ChangeNotifier {
       }
     } catch (e, stacktrace) {
       isAllAttendanceCollected = true;
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
+      print('getAttendanceAll getAll $e $stacktrace');
     }
   }
 
@@ -899,89 +899,103 @@ class FacultyController with ChangeNotifier {
   // }
   List<String> formattedDateRangeList = [];
   void getRemarksCountForPercentiles() {
-    notifyListeners();
-    print('getRemarksCountForPercentiles');
+    try {
+      notifyListeners();
+      print('getRemarksCountForPercentiles');
 
-    graphAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
+      graphAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
 
-    Set<DateTime> uniqueDates = {};
-
-    for (Attendance attendance in graphAttendanceList) {
-      if (attendance.date != null) {
-        DateTime dateOnly = DateTime(attendance.date!.year,
-            attendance.date!.month, attendance.date!.day);
-
-        uniqueDates.add(dateOnly);
-      }
-    }
-
-    int datesPerPercentile = (uniqueDates.length / 6).ceil();
-
-    for (int i = 0; i < 6; i++) {
-      List<DateTime> percentileDates = uniqueDates
-          .skip(i * datesPerPercentile)
-          .take(datesPerPercentile)
-          .toList();
-      String percentileLabel =
-          '${percentileDates.first} - ${percentileDates.last}';
-
-      Map<Remarks, int> remarksCount = {
-        Remarks.onTime: 0,
-        Remarks.late: 0,
-        Remarks.cutting: 0,
-        Remarks.absent: 0
-      };
+      Set<DateTime> uniqueDates = {};
 
       for (Attendance attendance in graphAttendanceList) {
         if (attendance.date != null) {
           DateTime dateOnly = DateTime(attendance.date!.year,
               attendance.date!.month, attendance.date!.day);
 
-          if (percentileDates.contains(dateOnly)) {
-            remarksCount[attendance.remarks] =
-                remarksCount[attendance.remarks]! + 1;
+          uniqueDates.add(dateOnly);
+        }
+      }
+
+      int divisor = 6;
+      if (uniqueDates.length < 6) {
+        divisor = uniqueDates.length;
+        print(uniqueDates.length);
+      }
+
+      int datesPerPercentile = (uniqueDates.length / divisor).ceil();
+
+      for (int i = 0; i < divisor; i++) {
+        List<DateTime> percentileDates = uniqueDates
+            .skip(i * datesPerPercentile)
+            .take(datesPerPercentile)
+            .toList();
+        String percentileLabel = percentileDates.isEmpty
+            ? 'Empty'
+            : '${percentileDates.first} - ${percentileDates.last}';
+
+        Map<Remarks, int> remarksCount = {
+          Remarks.onTime: 0,
+          Remarks.late: 0,
+          Remarks.cutting: 0,
+          Remarks.absent: 0
+        };
+
+        for (Attendance attendance in graphAttendanceList) {
+          if (attendance.date != null) {
+            DateTime dateOnly = DateTime(attendance.date!.year,
+                attendance.date!.month, attendance.date!.day);
+
+            if (percentileDates.contains(dateOnly)) {
+              remarksCount[attendance.remarks] =
+                  remarksCount[attendance.remarks]! + 1;
+            }
           }
         }
+
+        remarksCountList.add({percentileLabel: remarksCount});
       }
 
-      remarksCountList.add({percentileLabel: remarksCount});
-    }
+      Remarks maxRemarks = Remarks.onTime;
 
-    Remarks maxRemarks = Remarks.onTime;
+      for (Map<String, Map<Remarks, int>> data in remarksCountList) {
+        String dateRange = data.keys.first;
+        Map<Remarks, int> remarksCount = data.values.first;
 
-    for (Map<String, Map<Remarks, int>> data in remarksCountList) {
-      String dateRange = data.keys.first;
-      Map<Remarks, int> remarksCount = data.values.first;
+        // Iterate through the remarks count and update the max count if needed
+        for (Remarks remark in remarksCount.keys) {
+          int count = remarksCount[remark]!;
+          if (count > maxRemarksCount) {
+            maxRemarksCount = count;
+            maxRemarks = remark;
+          }
+        }
 
-      // Iterate through the remarks count and update the max count if needed
-      for (Remarks remark in remarksCount.keys) {
-        int count = remarksCount[remark]!;
-        if (count > maxRemarksCount) {
-          maxRemarksCount = count;
-          maxRemarks = remark;
+        DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
+        DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
+
+        String formattedDateRange = DateFormat('MMMM').format(endDate);
+
+        formattedDateRangeList.add(formattedDateRange);
+
+        for (Remarks remark in remarksCount.keys) {
+          int count = remarksCount[remark]!;
+          print('$remark: $count');
         }
       }
 
-      DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
-      DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
+      print('Max remarks count: $maxRemarksCount');
+      print('Max remarks: $maxRemarks');
 
-      String formattedDateRange = DateFormat('MMMM').format(endDate);
-
-      formattedDateRangeList.add(formattedDateRange);
-
-      for (Remarks remark in remarksCount.keys) {
-        int count = remarksCount[remark]!;
-        print('$remark: $count');
-      }
+      final count = getPercentileCounts();
+      print(count);
+      isRemarksCountListLoading = false;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print(stacktrace);
+      print(e);
+      isRemarksCountListLoading = false;
+      notifyListeners();
     }
-
-    print('Max remarks count: $maxRemarksCount');
-    print('Max remarks: $maxRemarks');
-
-    final count = getPercentileCounts();
-    print(count);
-    isRemarksCountListLoading = false;
-    notifyListeners();
   }
 
   List<int> getPercentileCounts() {

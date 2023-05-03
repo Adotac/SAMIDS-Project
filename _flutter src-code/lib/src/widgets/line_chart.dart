@@ -30,7 +30,7 @@ class DashboardLineChart extends StatelessWidget {
         minX: 1,
         maxX: 6,
         maxY: 10,
-        minY: 1,
+        minY: 0,
       );
 
   LineTouchData get lineTouchData2 => LineTouchData(
@@ -58,7 +58,6 @@ class DashboardLineChart extends StatelessWidget {
         getLineChartBarLate(),
         getLineChartBarCutting(),
       ];
-
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     List<int> countPercentile = _dataController.getPercentileCounts();
     const style = TextStyle(
@@ -76,34 +75,9 @@ class DashboardLineChart extends StatelessWidget {
       text = countPercentile[3].toString();
     } else if (countPercentile[4] == value.toInt()) {
       text = countPercentile[4].toString();
-      // } else if (countPercentile[5] == value.toInt()) {
-      //   text = countPercentile[5].toString();
     } else {
-      text = '';
+      return Container();
     }
-
-    // switch (value.toInt()) {
-    //   case 1:
-    //     text = countPercentile[0].toString();
-    //     break;
-    //   case 2:
-    //     text = countPercentile[1].toString();
-    //     break;
-    //   case 3:
-    //     text = countPercentile[2].toString();
-    //     break;
-    //   case 4:
-    //     text = countPercentile[3].toString();
-    //     break;
-    //   case 5:
-    //     text = countPercentile[4].toString();
-    //     break;
-    //   case 10:
-    //     text = countPercentile[4].toString();
-    //     break;
-    //   default:
-    //     return Container();
-    // }
 
     return Text(text, style: style, textAlign: TextAlign.center);
   }
@@ -185,9 +159,14 @@ class DashboardLineChart extends StatelessWidget {
   LineChartBarData getLineChartBarAbsent() {
     List<double> absentListCount =
         _dataController.getCountOfRemark(Remarks.absent);
-    print('getLineChartBarData2_1');
+    print('absentListCount getLineChartBarData2_1');
     print(absentListCount);
     print(absentListCount.length);
+
+    List<FlSpot> flSpots = [];
+    for (int i = 0; i < absentListCount.length; i++) {
+      flSpots.add(FlSpot(i + 1, absentListCount[i]));
+    }
     return LineChartBarData(
       isCurved: true,
       curveSmoothness: 0,
@@ -196,23 +175,17 @@ class DashboardLineChart extends StatelessWidget {
       isStrokeCapRound: true,
       dotData: FlDotData(show: false),
       belowBarData: BarAreaData(show: false),
-      spots: [
-        FlSpot(1, absentListCount[0]),
-        FlSpot(2, absentListCount[1]),
-        FlSpot(3, absentListCount[2]),
-        FlSpot(4, absentListCount[3]),
-        FlSpot(5, absentListCount[4]),
-        FlSpot(6, absentListCount[5]),
-      ],
+      spots: [...flSpots],
     );
   }
 
   LineChartBarData getLineChartBarOnTime() {
     List<double> onTimeListCount =
         _dataController.getCountOfRemark(Remarks.onTime);
-    print('getLineChartBarData2_1');
-    print(onTimeListCount);
-    print(onTimeListCount.length);
+
+    List<FlSpot> onTimeSpots = List.generate(onTimeListCount.length, (index) {
+      return FlSpot(index + 1, onTimeListCount[index]);
+    });
     return LineChartBarData(
       isCurved: true,
       color: Colors.green.withOpacity(0.5),
@@ -223,22 +196,17 @@ class DashboardLineChart extends StatelessWidget {
         show: true,
         color: Colors.green.withOpacity(0.2),
       ),
-      spots: [
-        FlSpot(1, onTimeListCount[0]),
-        FlSpot(2, onTimeListCount[1]),
-        FlSpot(3, onTimeListCount[2]),
-        FlSpot(4, onTimeListCount[3]),
-        FlSpot(5, onTimeListCount[4]),
-        FlSpot(6, onTimeListCount[5]),
-      ],
+      spots: [...onTimeSpots],
     );
   }
 
   LineChartBarData getLineChartBarLate() {
     List<double> lateListCount = _dataController.getCountOfRemark(Remarks.late);
 
-    print(lateListCount);
-    print(lateListCount.length);
+    List<FlSpot> lateSpots = List.generate(lateListCount.length, (index) {
+      return FlSpot(index + 1, lateListCount[index]);
+    });
+
     return LineChartBarData(
       isCurved: true,
       curveSmoothness: 0,
@@ -247,14 +215,7 @@ class DashboardLineChart extends StatelessWidget {
       isStrokeCapRound: true,
       dotData: FlDotData(show: false),
       belowBarData: BarAreaData(show: false),
-      spots: [
-        FlSpot(1, lateListCount[0]),
-        FlSpot(2, lateListCount[1]),
-        FlSpot(3, lateListCount[2]),
-        FlSpot(4, lateListCount[3]),
-        FlSpot(5, lateListCount[4]),
-        FlSpot(6, lateListCount[5]),
-      ],
+      spots: [...lateSpots],
     );
   }
 
@@ -262,8 +223,10 @@ class DashboardLineChart extends StatelessWidget {
     List<double> cuttingListCount =
         _dataController.getCountOfRemark(Remarks.cutting);
 
-    print(cuttingListCount);
-    print(cuttingListCount.length);
+    List<FlSpot> cuttingSpots = List.generate(cuttingListCount.length, (index) {
+      return FlSpot(index + 1, cuttingListCount[index]);
+    });
+
     return LineChartBarData(
       isCurved: true,
       curveSmoothness: 0,
@@ -272,14 +235,7 @@ class DashboardLineChart extends StatelessWidget {
       isStrokeCapRound: true,
       dotData: FlDotData(show: false),
       belowBarData: BarAreaData(show: false),
-      spots: [
-        FlSpot(1, cuttingListCount[0]),
-        FlSpot(2, cuttingListCount[1]),
-        FlSpot(3, cuttingListCount[2]),
-        FlSpot(4, cuttingListCount[3]),
-        FlSpot(5, cuttingListCount[4]),
-        FlSpot(6, cuttingListCount[5]),
-      ],
+      spots: [...cuttingSpots],
     );
   }
 }

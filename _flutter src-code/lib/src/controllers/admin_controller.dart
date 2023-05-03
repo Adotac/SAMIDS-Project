@@ -33,6 +33,9 @@ class AdminController with ChangeNotifier {
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
+
+  List<SubjectSchedule> filteredSubjectSchedule = [];
+
   List<Attendance> filteredAttendanceList = [];
   List<Student> students = [];
   String selectedUserType = 'Student';
@@ -101,6 +104,116 @@ class AdminController with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void handleJsonSubjectSchedules(List<SubjectSchedule> subjectSchedulesList) {
+    try {
+      if (filteredSubjectSchedules.isNotEmpty) filteredSubjectSchedules.clear();
+
+      if (subjectSchedulesList.isNotEmpty) {
+        filteredSubjectSchedules.addAll(subjectSchedulesList);
+        subjectSchedules.addAll(subjectSchedulesList);
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleJsonSubjectSchedules $e $stacktrace');
+    }
+  }
+
+  void sortAscendingSubjectSchedules(String column) {
+    if (sortColumn == column) {
+      sortAscending = !sortAscending;
+    } else {
+      sortColumn = column;
+      sortAscending = true;
+    }
+
+    filteredSubjectSchedules.sort((a, b) {
+      int compare;
+      switch (column) {
+        case 'Subject Id':
+          compare =
+              a.subject?.subjectID.compareTo(b.subject?.subjectID ?? 0) ?? 0;
+          break;
+        case 'Code':
+          compare =
+              a.subject?.subjectName.compareTo(b.subject?.subjectName ?? '') ??
+                  0;
+          break;
+        case 'Description':
+          compare = a.subject?.subjectDescription
+                  .compareTo(b.subject?.subjectDescription ?? '') ??
+              0;
+          break;
+        case 'Room':
+          compare = a.room.compareTo(b.room);
+          break;
+        case 'Time Start':
+          compare = a.timeStart.compareTo(b.timeStart);
+          break;
+        case 'Time End':
+          compare = a.timeEnd.compareTo(b.timeEnd);
+          break;
+        case 'Day':
+          compare = a.day.compareTo(b.day);
+          break;
+        default:
+          compare = 0;
+      }
+      return sortAscending ? compare : -compare;
+    });
+
+    notifyListeners();
+  }
+
+  void filterSubjectSchedule(String query) {
+    if (query.isEmpty) {
+      filteredSubjectSchedules = subjectSchedules;
+      notifyListeners();
+      return;
+    }
+    filteredSubjectSchedules = subjectSchedules
+        .where((subject) =>
+            subject.subject!.subjectName
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            subject.subject!.subjectDescription
+                .toLowerCase()
+                .contains(query.toLowerCase()) ||
+            subject.room.toLowerCase().contains(query.toLowerCase()) ||
+            subject.day.toLowerCase().contains(query.toLowerCase()) ||
+            subject.schedId.toString().contains(query) ||
+            subject.timeStart.toString().contains(query) ||
+            subject.timeEnd.toString().contains(query))
+        .toList();
+    notifyListeners();
+  }
+
+  Future<void> getSubjectSchedules() async {
+    try {
+      List<SubjectSchedule> subjectSchedulesList =
+          await ConfigService.getSubjectSchedules();
+      handleJsonSubjectSchedules(subjectSchedulesList);
+    } catch (e, stacktrace) {
+      print('getSubjectSchedules $e $stacktrace');
+    }
+  }
+
+  List<SubjectSchedule> subjectSchedules = [];
+  List<SubjectSchedule> filteredSubjectSchedules = [];
+  String sortColumnSubjectSchedules = '';
+  // bool sortAscendingSubjectSchedules = true;
+
+  // void sortSubjectSchedules(String column) {
+  //   if (sortColumnSubjectSchedules == column) {
+  //     sortAscendingSubjectSchedules = !sortAscendingSubjectSchedules;
+  //   } else {
+  //     sortColumnSubjectSchedules = column;
+  //     sortAscendingSubjectSchedules = true;
+  //   }
+
+  //   notifyListeners();
+  // }
 
   void filterAttendance(String query) {
     if (query.isEmpty) {
@@ -352,7 +465,7 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
-  void handleEventJsonStudentClasses(CRUDReturn result) {
+  void _handleEventJsonSchedule(CRUDReturn result) {
     try {
       if (studentClasses.isNotEmpty) studentClasses.clear();
       for (Map<String, dynamic> map in result.data) {

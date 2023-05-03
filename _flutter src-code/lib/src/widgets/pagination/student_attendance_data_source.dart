@@ -43,18 +43,18 @@ class AttendanceDataSourceSt extends DataTableSource {
             ? sdController.formatTime(attendance.actualTimeOut!)
             : 'No Time Out'),
         DataCell(sdController.getStatusText(attendance.remarks.name)),
-        DataCell(
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () => _showReportAttendanceDialog(context),
-                  icon: Icon(
-                    Icons.report_gmailerrorred_outlined,
-                    color: Theme.of(context).primaryColor,
-                  )),
-            ],
-          ),
-        ),
+        // DataCell(
+        //   Row(
+        //     children: [
+        //       IconButton(
+        //           onPressed: () => _showReportAttendanceDialog(context),
+        //           icon: Icon(
+        //             Icons.report_gmailerrorred_outlined,
+        //             color: Theme.of(context).primaryColor,
+        //           )),
+        //     ],
+        //   ),
+        // ),
       ],
     );
   }

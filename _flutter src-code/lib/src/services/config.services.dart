@@ -11,6 +11,8 @@ import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/http.services.dart';
 import 'package:http/http.dart' as http;
 
+import '../model/subjectSchedule_model.dart';
+
 class ConfigService {
   static const String _baseUrl = "https://localhost:7170/api";
   static final Logger _logger = Logger();
@@ -40,6 +42,71 @@ class ConfigService {
       }
     } catch (e, stacktrace) {
       if (kDebugMode) print('ConfigService getConfig $e $stacktrace');
+      rethrow;
+    }
+  }
+
+  // static Future<List<SubjectSchedule>> getSubjectSchedules() async {
+  //   try {
+  //     final response = await HttpService.get('$_baseUrl/Subject/Schedules');
+  //     if (kDebugMode) {
+  //       _logger
+  //           .i('getSubjectSchedules ${response.statusCode} ${response.body}');
+  //     }
+  //     if (response.statusCode == 200) {
+  //       if (response.body.isNotEmpty) {
+  //         final jsonResponse = jsonDecode(response.body);
+  //         List<SubjectSchedule> subjectSchedules = jsonResponse
+  //             .map<SubjectSchedule>((e) => SubjectSchedule.fromJson(e))
+  //             .toList();
+  //         return subjectSchedules;
+  //       } else {
+  //         throw Exception("Empty response body");
+  //       }
+  //     } else {
+  //       String errorMessage = "Something went wrong.";
+  //       if (response.body.isNotEmpty) {
+  //         final jsonResponse = jsonDecode(response.body);
+  //         errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+  //       }
+  //       throw Exception(
+  //           "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+  //     }
+  //   } catch (e, stacktrace) {
+  //     if (kDebugMode) print('ConfigService getSubjectSchedules $e $stacktrace');
+  //     rethrow;
+  //   }
+  // }
+  static Future<List<SubjectSchedule>> getSubjectSchedules() async {
+    try {
+      final response = await HttpService.get('$_baseUrl/Subject/Schedules');
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          _logger
+              .i('getSubjectSchedules ${response.statusCode} ${response.body}');
+        }
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          List<dynamic> jsonData = jsonResponse[
+              'data']; // Assuming the list of schedules is under 'data' key
+          return jsonData
+              .map<SubjectSchedule>((json) => SubjectSchedule.fromJson(json))
+              .toList();
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('ConfigService getSubjectSchedules $e $stacktrace');
       rethrow;
     }
   }

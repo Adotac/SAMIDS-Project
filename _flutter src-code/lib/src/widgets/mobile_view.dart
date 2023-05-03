@@ -25,6 +25,8 @@ class MobileView extends StatefulWidget {
   bool appBarOnly;
   bool implyLeading;
   bool isAdmin = false;
+
+  final String routeName;
   final int currentIndex;
   MobileView(
       {Key? key,
@@ -36,7 +38,8 @@ class MobileView extends StatefulWidget {
       this.showBottomNavBar = true,
       this.showAppBar = true,
       this.appBarOnly = false,
-      this.implyLeading = false})
+      this.implyLeading = false,
+      required this.routeName})
       : super(key: key);
   final AuthController authController = AuthController.instance;
   @override
@@ -250,20 +253,6 @@ class _MobileViewState extends State<MobileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // endDrawer: Drawer(
-      //   child: Column(
-      //     children: [
-      //       Padding(
-      //         padding: const EdgeInsets.symmetric(vertical: 18.0),
-      //         child: Text(
-      //           'Notifications',
-      //           style: Theme.of(context).textTheme.titleLarge,
-      //         ),
-      //       ),
-      //       Expanded(child: _buildNotificationsList(context)),
-      //     ],
-      //   ),
-      // ),
       bottomNavigationBar: Visibility(
         visible: widget.showBottomNavBar,
         child: _buildBottomNavigationBar(context, widget.currentIndex),
@@ -313,65 +302,79 @@ class _MobileViewState extends State<MobileView> {
             )
           : null,
       body: (!widget.showAppBar || widget.appBarOnly)
-          ? SingleChildScrollView(
-              child: Column(
-                children: [...widget.body],
+          ? RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  Navigator.popAndPushNamed(context, widget.routeName);
+                });
+              },
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [...widget.body],
+                ),
               ),
             )
-          : CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  actions: [
-                    Builder(
-                      builder: (BuildContext context) {
-                        return const SizedBox();
+          : RefreshIndicator(
+              onRefresh: () async {
+                setState(() {});
+              },
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    actions: [
+                      Builder(
+                        builder: (BuildContext context) {
+                          return const SizedBox();
 
-                        // IconButton(
-                        //   icon: const Icon(Icons.notifications_outlined),
-                        //   onPressed: () {
-                        //     Scaffold.of(context).openEndDrawer();
-                        //   },
-                        // );
-                      },
-                    ),
-                  ],
-                  leading: Visibility(
-                    visible: !widget.implyLeading,
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 16),
-                      child: Image.asset(
-                        'assets/images/BiSAM.png',
-                        height: 24,
-                        width: 24,
+                          // IconButton(
+                          //   icon: const Icon(Icons.notifications_outlined),
+                          //   onPressed: () {
+                          //     Scaffold.of(context).openEndDrawer();
+                          //   },
+                          // );
+                        },
+                      ),
+                    ],
+                    leading: Visibility(
+                      visible: !widget.implyLeading,
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 16),
+                        child: Image.asset(
+                          'assets/images/BiSAM.png',
+                          height: 24,
+                          width: 24,
+                        ),
                       ),
                     ),
+                    leadingWidth: 48,
+                    automaticallyImplyLeading: widget.implyLeading,
+                    pinned: true,
+                    floating: true,
+                    expandedHeight: 100.0,
+                    flexibleSpace: LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        return FlexibleSpaceBar(
+                          title: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 0),
+                            opacity:
+                                constraints.biggest.height > 80 ? 0.0 : 1.0,
+                            child: Text(widget.appBarTitle,
+                                style: Theme.of(context).textTheme.titleLarge),
+                          ),
+                          background:
+                              _buildAppBar(widget.currentIndex, context),
+                        );
+                      },
+                    ),
                   ),
-                  leadingWidth: 48,
-                  automaticallyImplyLeading: widget.implyLeading,
-                  pinned: true,
-                  floating: true,
-                  expandedHeight: 100.0,
-                  flexibleSpace: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return FlexibleSpaceBar(
-                        title: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 0),
-                          opacity: constraints.biggest.height > 80 ? 0.0 : 1.0,
-                          child: Text(widget.appBarTitle,
-                              style: Theme.of(context).textTheme.titleLarge),
-                        ),
-                        background: _buildAppBar(widget.currentIndex, context),
-                      );
-                    },
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      ...widget.body,
+                    ]),
                   ),
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    ...widget.body,
-                  ]),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }

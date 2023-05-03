@@ -130,11 +130,14 @@ class _AdminSubjectsState extends State<AdminSubjects> {
   Widget _dataTableSubjects(BuildContext context) {
     return PaginatedDataTable(
       columns: [
-        _dataColumn('Subject No'),
-        _dataColumn('Subject Name'),
-        _dataColumn('Subject Description', 500.0),
-        _dataColumn('Faculty Assigned', 200),
-        _dataColumn('Student Count'),
+        _dataColumn('Subject Id'),
+        _dataColumn('Code'),
+        _dataColumn('Description', 400.0),
+        _dataColumn('Room'),
+        _dataColumn('Time Start'),
+        _dataColumn('Time End'),
+        _dataColumn('Day'),
+        // _dataColumn('Student Count'),
       ],
       showFirstLastButtons: true,
       rowsPerPage: 20,
@@ -147,7 +150,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
 
   SubjectDataSource _createStudentDataSource() {
     return SubjectDataSource(
-        _dataController.filteredSubjects, _dataController, context);
+        _dataController.filteredSubjectSchedules, _dataController, context);
   }
 
   // AttendanceDataSource _createAttendanceDataSource() {
@@ -165,7 +168,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
         width: width,
         child: InkWell(
           onTap: () {
-            _dataController.sortSubjects(title);
+            _dataController.sortAscendingSubjectSchedules(title);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,6 +217,6 @@ class _AdminSubjectsState extends State<AdminSubjects> {
   }
 
   void _onSearchSubmittedStudents(String query) {
-    _dataController.filterSubjects(query);
+    _dataController.filterSubjectSchedule(query);
   }
 }
