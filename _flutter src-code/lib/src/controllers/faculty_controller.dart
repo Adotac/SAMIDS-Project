@@ -279,7 +279,7 @@ class FacultyController with ChangeNotifier {
       CRUDReturn response =
           await FacultyService.getFacultyClasses(faculty.facultyNo);
       if (response.success) {
-        handleEventJsonFacultyClassesInput(response);
+        handleEventJsonFacultyClasses(response);
         for (final element in facultyClasses) {
           await getAttendanceBySchedId(element.schedId);
         }
