@@ -208,6 +208,7 @@ void loop() {
   }
   else if (retCtr > 0){
     publishMessage(client, camtopic, espcamToJson(myData, "Retrying...", false, false, true));
+    retrySend = false;
     retCtr = 0;
   }
 
