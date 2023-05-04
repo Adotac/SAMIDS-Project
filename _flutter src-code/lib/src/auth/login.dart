@@ -35,14 +35,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '';
+    _usernameController.text = '0000';
     // _usernameController.text = '20001';
 
-//   200005 faculty
-//35526 admin
-//91204 user
+    //200005 faculty
+    //35526 admin
+    //91204 user
     _passwordController = TextEditingController();
-    _passwordController.text = '';
+    _passwordController.text = 'admin';
+
+    _onLogin(context);
     // _passwordController.text = '200012';
     super.initState();
   }
@@ -374,11 +376,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           backgroundColor: Theme.of(context).primaryColor,
                           foregroundColor: Colors.white),
                       onPressed: () async {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => ChangePasswordPage()),
-                        // );
                         await _onLogin(context);
                       },
                       child: _isloading

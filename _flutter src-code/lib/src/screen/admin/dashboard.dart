@@ -73,7 +73,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         return WebView(
           appBarTitle: "Admin Dashboard",
           selectedWidgetMarker: 0,
-          body: _webDashboardBody(),
+          body:
+              //  adminController.config == null
+              //     ? const Center(child: CircularProgressIndicator())
+              //     :
+              _webDashboardBody(),
         );
       },
     );
@@ -109,17 +113,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _webDashboardBody() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 18.0),
       child: Row(
         children: [
           Expanded(
             child: _buildConfig(context),
           ),
-          const VerticalDivider(width: 8.0),
+          const SizedBox(width: 8.0),
           Expanded(
             child: _buildUpload(),
           ),
-          const VerticalDivider(width: 8.0),
+          const SizedBox(width: 8.0),
           Expanded(
             child: _buildDownloadCSV(),
           )
@@ -128,98 +132,241 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Widget _buildUpload() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Upload CSV',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            TextButton(
-              onPressed: () {
-                adminController.clearList();
-              },
-              child: const Text("Clear all"),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildTextButton('Student', () => _uploadCSV(0)),
-            _buildTextButton('Subject', () => _uploadCSV(1)),
-            _buildTextButton('Faculty', () => _uploadCSV(2)),
-            _buildTextButton('Faculty Subject', () => _uploadCSV(3)),
-            _buildTextButton('Student Subject', () => _uploadCSV(4)),
-          ],
-        ),
-        const SizedBox(height: 4.0),
-        Expanded(
-          child: Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.28,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('File Name')),
-                    DataColumn(label: Text('Table Selected')),
-                    DataColumn(label: Text('Status')),
-                  ],
-                  rows: List.generate(
-                    adminController.selectedFiles.length,
-                    (index) => DataRow(
-                      cells: [
-                        DataCell(Text(adminController.selectedFiles[index])),
-                        DataCell(
-                            Text(adminController.selectedFileTable[index])),
-                        DataCell(
-                          Text(
-                            adminController.uploadStatus[index],
-                            style: TextStyle(
-                              color: adminController.uploadStatus[index] ==
-                                      'Failed'
-                                  ? Theme.of(context).colorScheme.error
-                                  : adminController.uploadStatus[index] ==
-                                          'Uploading'
-                                      ? Colors.black
-                                      : Colors.green,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+  void _showInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                color: Theme.of(context).primaryColor,
               ),
+              const SizedBox(width: 8.0),
+              const Text('CSV Format Information'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoRow(
+                    '1. Faculty:', 'Faculty Number,Last Name,First Name'),
+                const SizedBox(height: 12),
+                _buildInfoRow('2. Student:',
+                    'Student Number,RFID,Last Name,First Name,Course,Year Level'),
+                const SizedBox(height: 12),
+                _buildInfoRow('3. Subject:',
+                    'Subject ID,Subject Name,Subject Description,Start Time,End Time,Day,Room'),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                    '4. Student Subject:', 'Student Number,Offer Code'),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                    '5. Faculty Subject:', 'Faculty Number,Offer Code'),
+              ],
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(String title, String details) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: Text(details),
         ),
       ],
     );
   }
 
-  Widget _buildDownloadCSV() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Download Attendance CSV',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  Widget _buildUpload() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(0.0),
+            child: Container(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        'Upload',
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _showInfoDialog(context);
+                        },
+                        icon: Icon(
+                          Icons.info_outline_rounded,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTextButton('Student', () => _uploadCSV(0)),
+                      const SizedBox(width: 12.0),
+                      _buildTextButton('Subject', () => _uploadCSV(1)),
+                      const SizedBox(width: 12.0),
+                      _buildTextButton('Faculty', () => _uploadCSV(2)),
+                    ],
+                  ),
+                  const SizedBox(height: 12.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildTextButton(
+                          'Faculty Subject', () => _uploadCSV(3), 180),
+                      const SizedBox(width: 12.0),
+                      _buildTextButton(
+                          'Student Subject', () => _uploadCSV(4), 180),
+                    ],
+                  ),
+                  const SizedBox(height: 12.0),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12.0),
+          _uploadList(),
+        ],
+      ),
+    );
+  }
+
+  Card _uploadList() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () {
+                    adminController.clearList();
+                  },
+                  child: const Text("Clear all"),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(
+                    color: Color(0xFFF2F2F2),
+                    width: 2.0,
+                  )),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.27,
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('File Name')),
+                      DataColumn(label: Text('Table Selected')),
+                      DataColumn(label: Text('Status')),
+                    ],
+                    rows: adminController.selectedFiles.isEmpty
+                        ? List.generate(
+                            10,
+                            (index) => const DataRow(
+                              cells: [
+                                DataCell(Text('')),
+                                DataCell(Text('')),
+                                DataCell(Text('')),
+                              ],
+                            ),
+                          )
+                        : List.generate(
+                            adminController.selectedFiles.length,
+                            (index) => DataRow(
+                              cells: [
+                                DataCell(
+                                    Text(adminController.selectedFiles[index])),
+                                DataCell(Text(
+                                    adminController.selectedFileTable[index])),
+                                DataCell(
+                                  Text(
+                                    adminController.uploadStatus[index],
+                                    style: TextStyle(
+                                      color: adminController
+                                                  .uploadStatus[index] ==
+                                              'Failed'
+                                          ? Theme.of(context).colorScheme.error
+                                          : adminController
+                                                      .uploadStatus[index] ==
+                                                  'Uploading'
+                                              ? Colors.black
+                                              : Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8.0),
-        _downloadForm(),
-        const SizedBox(height: 6.0),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildDownloadCSV() {
+    return Card(
+      margin: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 0.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(18.0),
+            child: Text(
+              'Download Attendance CSV',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          _downloadForm(),
+          const SizedBox(height: 6.0),
+        ],
+      ),
     );
   }
 
@@ -395,10 +542,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Card _downloadForm() {
+  Container _downloadForm() {
     final DateFormat displayDateFormat = DateFormat('MMMM d, y');
     final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-    return Card(
+    return Container(
+      margin: const EdgeInsets.all(18.0),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(
+            color: Color(0xFFF2F2F2),
+            width: 2.0,
+          )),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -509,106 +663,110 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ],
             ),
             const SizedBox(height: 12.0),
-            const Text(
-              "From Attendance",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: "Student ID",
-              ),
-              controller: adminController.studentIdController,
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: "Subject ID",
-              ),
-              controller: adminController.subjectIdStudController,
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () async {
-                    if (!isNumber(adminController.studentIdController.text)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Student ID must be a number"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-                    if (adminController
-                            .subjectIdStudController.text.isNotEmpty &&
-                        !isNumber(
-                            adminController.subjectIdStudController.text)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Subject ID must be a number"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      return;
-                    }
-                    // if (adminController.selectedDateStud == null) {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text("Please select a date"),
-                    //       backgroundColor: Colors.red,
-                    //     ),
-                    //   );
-                    //   return;
-                    // }
-                    await adminController.getDataToDownload(
-                        0,
-                        int.parse(adminController.studentIdController.text),
-                        adminController.selectedDateStud == null
-                            ? null
-                            : dateFormat
-                                .format(adminController.selectedDateStud!),
-                        adminController.subjectIdStudController.text.isNotEmpty
-                            ? int.parse(
-                                adminController.subjectIdStudController.text)
-                            : null,
-                        context);
-                  },
-                  child: const Text('Download'),
-                ),
-                const Spacer(),
-                Text(
-                  adminController.selectedDateStud == null
-                      ? "Select Date"
-                      : displayDateFormat
-                          .format(adminController.selectedDateStud!),
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.titleLarge?.color,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                    );
-                    if (selectedDate != null) {
-                      print(selectedDate);
-                      adminController.setSelectedDateStud(selectedDate);
-
-                      // Do something with the selected date
-                    }
-                  },
-                  icon: const Icon(Icons.calendar_today),
-                ),
-              ],
-            ),
+            _fromAttendance(dateFormat, displayDateFormat)
           ],
         ),
       ),
+    );
+  }
+
+  Widget _fromAttendance(dateFormat, displayDateFormat) {
+    return Column(
+      children: [
+        const Text(
+          "From Attendance",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8.0),
+        TextField(
+          decoration: const InputDecoration(
+            labelText: "Student ID",
+          ),
+          controller: adminController.studentIdController,
+        ),
+        const SizedBox(height: 8.0),
+        TextField(
+          decoration: const InputDecoration(
+            labelText: "Subject ID",
+          ),
+          controller: adminController.subjectIdStudController,
+        ),
+        const SizedBox(height: 8.0),
+        Row(
+          children: [
+            TextButton(
+              onPressed: () async {
+                if (!isNumber(adminController.studentIdController.text)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Student ID must be a number"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (adminController.subjectIdStudController.text.isNotEmpty &&
+                    !isNumber(adminController.subjectIdStudController.text)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Subject ID must be a number"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                // if (adminController.selectedDateStud == null) {
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     const SnackBar(
+                //       content: Text("Please select a date"),
+                //       backgroundColor: Colors.red,
+                //     ),
+                //   );
+                //   return;
+                // }
+                await adminController.getDataToDownload(
+                    0,
+                    int.parse(adminController.studentIdController.text),
+                    adminController.selectedDateStud == null
+                        ? null
+                        : dateFormat.format(adminController.selectedDateStud!),
+                    adminController.subjectIdStudController.text.isNotEmpty
+                        ? int.parse(
+                            adminController.subjectIdStudController.text)
+                        : null,
+                    context);
+              },
+              child: const Text('Download'),
+            ),
+            const Spacer(),
+            Text(
+              adminController.selectedDateStud == null
+                  ? "Select Date"
+                  : displayDateFormat.format(adminController.selectedDateStud!),
+              style: TextStyle(
+                color: Theme.of(context).textTheme.titleLarge?.color,
+              ),
+            ),
+            IconButton(
+              onPressed: () async {
+                final DateTime? selectedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                );
+                if (selectedDate != null) {
+                  print(selectedDate);
+                  adminController.setSelectedDateStud(selectedDate);
+
+                  // Do something with the selected date
+                }
+              },
+              icon: const Icon(Icons.calendar_today),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -733,7 +891,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 title: Text('Error',
                     style:
                         TextStyle(color: Theme.of(context).colorScheme.error)),
-                content: Text('Failed to upload file: $e'),
+                content: Text('Failed to upload file: ${e.toString()}'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -771,80 +929,92 @@ class _AdminDashboardState extends State<AdminDashboard> {
     }
   }
 
-  Widget _buildTextButton(String buttonName, VoidCallback onPressed) {
+  Widget _buildTextButton(String buttonName, VoidCallback onPressed,
+      [double width = 130]) {
     return TextButton(
       onPressed: onPressed,
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(
-          Theme.of(context).primaryColor,
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
-        foregroundColor: MaterialStateProperty.all<Color>(
-          Theme.of(context).colorScheme.onPrimary,
+        foregroundColor: MaterialStateProperty.all<Color>(Colors.black54),
+      ),
+      child: Container(
+        width: width,
+        height: 80,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          buttonName,
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
-      child: Text(buttonName),
     );
   }
 
   Widget _buildConfig(context) {
-    return adminController.config == null
-        ? const SizedBox(
-            height: 500,
-            child: CircularProgressIndicator(),
-          )
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Configurations",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4.0),
-              _termInfo(),
-              const SizedBox(height: 4.0),
-              _timeOffset(),
-              const SizedBox(height: 18.0),
-                    // const Text(
-                    //   'Reset Password',
-                    //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    // ),
-                    // const SizedBox(height: 6.0),
-              // _resetPasswordForm(),
-              // const SizedBox(height: 12.0),
-              // Expanded(child: _dataTableClasses(context))
-            ],
-          );
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 6.0),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 20.0, bottom: 20.0, right: 20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 18.0),
+            const Text(
+              "Term Configurations",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 18.0),
+            _termInfo(),
+            const SizedBox(height: 18.0),
+            _timeOffset(),
+            const SizedBox(height: 18.0),
+            // const Text(
+            //   'Reset Password',
+            //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // ),
+            // const SizedBox(height: 6.0),
+            // _resetPasswordForm(),
+            // const SizedBox(height: 12.0),
+            // Expanded(child: _dataTableClasses(context))
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _mBuildConfig(context) {
     return //add scroll view here
-        adminController.config == null
-            ? const SizedBox(
-                height: 50,
-                width: 50,
-                child: CircularProgressIndicator(),
-              )
-            : Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Configurations",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8.0),
-                    _mTermInfo(),
-                    const SizedBox(height: 8.0),
-                    _mTimeOffset(),
-                    const SizedBox(height: 8.0),
-                    // Expanded(child: _dataTableClasses(context))
-                  ],
-                ),
-              );
+        // adminController.config == null
+        //     ? const SizedBox(
+        //         height: 50,
+        //         width: 50,
+        //         child: CircularProgressIndicator(),
+        //       )
+        //     :
+        Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            "Term Configurations",
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8.0),
+          // _mTermInfo(),
+          SizedBox(height: 8.0),
+          // _mTimeOffset(),
+          SizedBox(height: 8.0),
+          // Expanded(child: _dataTableClasses(context))
+        ],
+      ),
+    );
   }
 
   Widget _mTermInfo() {
@@ -1117,52 +1287,59 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Card _termInfo() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
+  Container _termInfo() {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(
+            color: Color(0xFFF2F2F2),
+            width: 2.0,
+          )),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Term Information',
+                  'Information',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const Spacer(),
+
+                // const Spacer(),
                 TextButton(
                   onPressed: () {
-                    _showSetTermDialog(context);
+                    // _showSetTermDialog(context);
                   },
                   child: const Text('Set Term'),
                 ),
               ],
             ),
             const SizedBox(height: 18.0),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    const Text('Current Year'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(adminController.config!.currentYear)),
-                    const Text('Current Year'),
+                        child: _titleText("adminController")),
+                    // _titleText(adminController.config!.currentYear)),
                   ],
                 ),
                 const SizedBox(width: 24.0),
-                Column(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    const Text('Current Term'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(adminController.config!.currentTerm)),
-                    const Text('Current Term'),
+                        child: _titleText("adminController.")),
+                    // child: _titleText(adminController.config!.currentTerm)),
                   ],
                 ),
               ],
@@ -1173,11 +1350,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Card _timeOffset() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
+  Container _timeOffset() {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(
+            color: Color(0xFFF2F2F2),
+            width: 2.0,
+          )),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: Column(
@@ -1186,7 +1366,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             Row(
               children: [
                 const Text(
-                  'Time Offset',
+                  'Offset',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
@@ -1199,28 +1379,30 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ],
             ),
             const SizedBox(height: 18.0),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    const Text('Minutes Late'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(
-                            '${adminController.config!.lateMinutes} mins')),
-                    const Text('Minutes Late'),
+                        child: _titleText('12 mins')),
+                    // _titleText(
+                    //     '${adminController.config!.lateMinutes} mins')),
                   ],
                 ),
                 const SizedBox(width: 24.0),
-                Column(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
+                    const Text('Minutes Absent'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText(
-                            '${adminController.config!.absentMinutes} mins')),
-                    const Text('Minutes Absent'),
+                        child: _titleText('12 mins')),
+                    // _titleText(
+                    // '${adminController.config!.absentMinutes} mins')),
                   ],
                 ),
               ],
@@ -1236,7 +1418,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       text,
       style: Theme.of(context)
           .textTheme
-          .headlineSmall
+          .titleLarge
           ?.copyWith(fontWeight: FontWeight.bold),
     );
   }

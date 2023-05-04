@@ -13,7 +13,7 @@ import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/admin/manage_faculty.dart';
 import 'package:samids_web_app/src/screen/admin/manage_student.dart';
-import 'package:samids_web_app/src/screen/admin/subjects.dart';
+import 'package:samids_web_app/src/screen/admin/manage_subjects.dart';
 import 'package:samids_web_app/src/screen/change_password.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/classes.dart';
@@ -112,7 +112,7 @@ class MyApp extends StatelessWidget {
 
             primaryColor: const Color(0xFF0597F2),
             cardTheme: CardTheme(
-              elevation: 0.2,
+              elevation: 0.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(
                     radius), // set circular border radius for Cards
@@ -143,6 +143,14 @@ class MyApp extends StatelessWidget {
             ),
             textButtonTheme: TextButtonThemeData(
               style: ButtonStyle(
+                // padding: MaterialStateProperty.all(
+                //   const EdgeInsets.all(8.0),
+                // ),
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                ),
+                foregroundColor:
+                    MaterialStateProperty.all<Color>(Colors.black87),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),

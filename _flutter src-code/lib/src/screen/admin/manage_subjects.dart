@@ -63,8 +63,8 @@ class _AdminSubjectsState extends State<AdminSubjects> {
 
   Widget _webView(BuildContext context) {
     return WebView(
-      appBarTitle: "Admin Manage Subjects",
-      selectedWidgetMarker: 3,
+      appBarTitle: "Manage Subjects",
+      selectedWidgetMarker: 4,
       body: AnimatedBuilder(
           animation: _dataController,
           builder: (context, child) {

@@ -10,7 +10,7 @@ import 'package:samids_web_app/src/screen/admin/attendance.dart';
 import 'package:samids_web_app/src/screen/admin/dashboard.dart';
 import 'package:samids_web_app/src/screen/admin/manage_faculty.dart';
 import 'package:samids_web_app/src/screen/admin/manage_student.dart';
-import 'package:samids_web_app/src/screen/admin/subjects.dart';
+import 'package:samids_web_app/src/screen/admin/manage_subjects.dart';
 import 'package:samids_web_app/src/screen/faculty/attendance.dart';
 import 'package:samids_web_app/src/screen/faculty/dashboard.dart';
 import 'package:samids_web_app/src/screen/settings.dart';
