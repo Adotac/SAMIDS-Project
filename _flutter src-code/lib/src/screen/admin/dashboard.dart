@@ -805,12 +805,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
               const SizedBox(height: 4.0),
               _timeOffset(),
               const SizedBox(height: 18.0),
-              const Text(
-                'Reset Password',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6.0),
-              _resetPasswordForm(),
+                    // const Text(
+                    //   'Reset Password',
+                    //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    // ),
+                    // const SizedBox(height: 6.0),
+              // _resetPasswordForm(),
               // const SizedBox(height: 12.0),
               // Expanded(child: _dataTableClasses(context))
             ],

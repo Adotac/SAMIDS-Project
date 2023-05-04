@@ -126,11 +126,11 @@ class _FacultySubjectClassListState extends State<FacultySubjectClassList> {
                     'Student No. ${student.studentNo}',
                   ),
                   Text(
-                    'First Name ${student.firstName}',
+                    '${student.firstName}  ${student.lastName}',
                   ),
-                  Text(
-                    'Last Name: ${student.lastName}',
-                  ),
+                  // Text(
+                  //   'Last Name: ${student.lastName}',
+                  // ),
                 ],
               ),
             ),
@@ -140,24 +140,24 @@ class _FacultySubjectClassListState extends State<FacultySubjectClassList> {
               children: [
                 const SizedBox(height: 4),
                 Text(
-                  'Year: ${student.year.name}',
+                  '${student.course} ${student.year.index +1}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                 ),
-                SizedBox(
-                  width: 150,
-                  child: Text(
-                    'Course: ${student.course}',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                    ),
-                  ),
-                ),
+                    // SizedBox(
+                    //   width: 150,
+                    //   child: Text(
+                    //     'Course: ',
+                    //     maxLines: 2,
+                    //     overflow: TextOverflow.ellipsis,
+                    //     style: TextStyle(
+                    //       fontSize: 14,
+                    //       color: Theme.of(context).textTheme.bodySmall?.color,
+                    //     ),
+                    //   ),
+                    // ),
               ],
             ),
           ],

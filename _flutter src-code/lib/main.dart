@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:samids_web_app/src/controllers/auth.controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 
@@ -6,8 +7,10 @@ import 'src/api/api_controller.dart';
 import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 import './app.dart';
-
+import 'dart:ui' as ui;
 void main() async {
+   RenderErrorBox.backgroundColor = Colors.transparent;
+    RenderErrorBox.textStyle = ui.TextStyle(color: Colors.transparent);
   // ApiController apiController = ApiController();
   // var future = await apiController.get("Student");
   // print(future);

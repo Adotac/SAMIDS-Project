@@ -571,7 +571,7 @@ class AdminController with ChangeNotifier {
 
     notifyListeners();
   }
-
+  List<Faculty> tempFac = [];
   void handleEventJsonFaculty(CRUDReturn result) {
     try {
       if (filteredFaculties.isNotEmpty) filteredFaculties.clear();
@@ -581,7 +581,7 @@ class AdminController with ChangeNotifier {
           filteredFaculties.add(Faculty.fromJson(map));
         }
       }
-
+tempFac = filteredFaculties;
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonFaculty $e $stacktrace');
@@ -602,7 +602,7 @@ class AdminController with ChangeNotifier {
 
   void searchFaculties(String query) {
     if (query.isEmpty) {
-      filteredFaculties = filteredFaculties;
+      filteredFaculties = tempFac;
       notifyListeners();
       return;
     }

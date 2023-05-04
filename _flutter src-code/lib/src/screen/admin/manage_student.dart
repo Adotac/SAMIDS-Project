@@ -77,11 +77,12 @@ class _ManageStudentState extends State<ManageStudent> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center     ,
         children: [
           _buildCard(context, 'Students', _searchBarStudent(context),
-              _buildStudentList(), 4),
-          _buildCard(context, 'Faculty', _searchBarFaculty(context),
-              _buildFacultyList(), 2),
+              _buildStudentList(),),
+          // _buildCard(context, 'Faculty', _searchBarFaculty(context),
+          //     _buildFacultyList(), 2),
         ],
       ),
     );
@@ -181,7 +182,7 @@ class _ManageStudentState extends State<ManageStudent> {
   //   );
   // }
 
-  DataColumn _dataColumn(String title, [double width = 100]) {
+  DataColumn _dataColumn(String title, [double width =  300]) {
     bool isSortedColumn = _dataController.sortColumn == title;
 
     return DataColumn(
@@ -194,7 +195,7 @@ class _ManageStudentState extends State<ManageStudent> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
+              Flexible(   
                 child: Text(
                   overflow: TextOverflow.ellipsis,
                   title,
