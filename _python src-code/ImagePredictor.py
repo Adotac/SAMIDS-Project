@@ -9,7 +9,7 @@ from collections import OrderedDict
 import os
 
 class ImagePredictor:
-    def __init__(self, svm_path='svm_classifier.pkl', weights_path='./models/facenet-vggface2.pt'):
+    def __init__(self, svm_path='svm_classifier-main.pkl', weights_path='./models/facenet-vggface2.pt'):
         self.svm_path = svm_path
         self.weights_path = weights_path
 

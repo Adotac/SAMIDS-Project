@@ -60,8 +60,7 @@ class FrameExtractor:
 
             # Initialize the frame count
             frame_count = 0
-            # Loop through each frame in the video
-            # 200 frames is the minimum input data per person as it roughly equates for a video clip under 10 seconds
+            # Loop through frames in the video
             for i in range(max_frame_size):
                 if frame_count < self.max_frames and cap.isOpened():
                     # Read the next frame from the video
