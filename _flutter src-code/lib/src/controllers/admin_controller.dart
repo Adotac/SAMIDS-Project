@@ -41,8 +41,10 @@ class AdminController with ChangeNotifier {
   String selectedUserType = 'Student';
   List<Faculty> filteredFaculties = [];
 
-  DateTime? selectedDateStud;
-  DateTime? selectedDateFac;
+  DateTime? selectedDateStudFrom;
+  DateTime? selectedDateStudTo;
+  DateTime? selectedDateFacFrom;
+  DateTime? selectedDateFacTo;
 
   bool isStudentClassesCollected = false;
   bool isCountCalculated = false;
@@ -83,13 +85,23 @@ class AdminController with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedDateStud(DateTime date) {
-    selectedDateStud = date;
+  void setSelectedDateStudFrom(DateTime date) {
+    selectedDateStudFrom = date;
     notifyListeners();
   }
 
-  void setSelectedDateFac(DateTime date) {
-    selectedDateFac = date;
+  void setSelectedDateFacFrom(DateTime date) {
+    selectedDateFacFrom = date;
+    notifyListeners();
+  }
+
+  void setSelectedDateStudTo(DateTime date) {
+    selectedDateStudTo = date;
+    notifyListeners();
+  }
+
+  void setSelectedDateFacTo(DateTime date) {
+    selectedDateFacTo = date;
     notifyListeners();
   }
 
@@ -571,6 +583,7 @@ class AdminController with ChangeNotifier {
 
     notifyListeners();
   }
+
   List<Faculty> tempFac = [];
   void handleEventJsonFaculty(CRUDReturn result) {
     try {
@@ -581,7 +594,7 @@ class AdminController with ChangeNotifier {
           filteredFaculties.add(Faculty.fromJson(map));
         }
       }
-tempFac = filteredFaculties;
+      tempFac = filteredFaculties;
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonFaculty $e $stacktrace');

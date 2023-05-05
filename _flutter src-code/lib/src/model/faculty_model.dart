@@ -18,7 +18,7 @@ class Faculty {
   static Faculty fromJson(Map<String, dynamic> json) {
     try {
       return Faculty(
-        facultyId: json['facultyId'],
+        facultyId: json['facultyId'] ?? 0,
         facultyNo: json['facultyNo'],
         lastName: json['lastName'],
         firstName: json['firstName'],

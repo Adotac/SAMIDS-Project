@@ -115,6 +115,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 18.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: _buildConfig(context),
@@ -180,6 +182,48 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
+  void _showInfoDialogDownload(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(width: 8.0),
+              const Text('Download Requirements'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoRow(
+                    '1. Faculty Id and student Id should not be null.', ''),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                    '2. Subject Id if left empty will default to ALL.', ''),
+                const SizedBox(height: 12),
+                _buildInfoRow(
+                    '3. From and to date if left empty will default to ALL.',
+                    ''),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildInfoRow(String title, String details) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,9 +235,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
-        Expanded(
-          flex: 3,
-          child: Text(details),
+        Visibility(
+          visible: details.isNotEmpty,
+          child: Expanded(
+            flex: 3,
+            child: Text(details),
+          ),
         ),
       ],
     );
@@ -202,6 +249,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget _buildUpload() {
     return SingleChildScrollView(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Card(
             margin: const EdgeInsets.all(0.0),
@@ -268,6 +317,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -294,8 +344,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   )),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.27,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: MediaQuery.of(context).size.width * 0.27,
+                    minHeight: 500,
+                  ),
                   child: DataTable(
                     columns: const [
                       DataColumn(label: Text('File Name')),
@@ -356,11 +409,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(18.0),
-            child: Text(
-              'Download Attendance CSV',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Row(
+              children: [
+                const Text(
+                  'Download Attendance',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _showInfoDialogDownload(context);
+                  },
+                  icon: Icon(
+                    Icons.info_outline_rounded,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
             ),
           ),
           _downloadForm(),
@@ -542,11 +608,199 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Container _downloadForm() {
+  Column _downloadForm() {
     final DateFormat displayDateFormat = DateFormat('MMMM d, y');
     final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.all(18.0),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: Color(0xFFF2F2F2),
+                width: 2.0,
+              )),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Faculty's Student",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 16.0,
+                ),
+                TextField(
+                  decoration: const InputDecoration(
+                    labelText: "Faculty ID",
+                  ),
+                  controller: adminController.facultyIdController,
+
+                  // Do something with the new value
+                ),
+                const SizedBox(height: 8.0),
+                TextField(
+                  decoration: const InputDecoration(
+                    labelText: "Subject ID",
+                  ),
+                  controller: adminController.subjectIdFacController,
+                ),
+                // const SizedBox(height: 8.0),
+                // add date picker here
+                const SizedBox(height: 8.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "From",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          adminController.selectedDateFacFrom == null
+                              ? "Select Date"
+                              : displayDateFormat
+                                  .format(adminController.selectedDateFacFrom!),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final DateTime? selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime.now(),
+                            );
+                            if (selectedDate != null) {
+                              print(selectedDate);
+                              adminController
+                                  .setSelectedDateFacFrom(selectedDate);
+
+                              // Do something with the selected date
+                            }
+                          },
+                          icon: const Icon(Icons.calendar_today),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "To",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          adminController.selectedDateFacTo == null
+                              ? "Select Date"
+                              : displayDateFormat
+                                  .format(adminController.selectedDateFacTo!),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final DateTime? selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime.now(),
+                            );
+                            if (selectedDate != null) {
+                              print(selectedDate);
+                              adminController
+                                  .setSelectedDateFacTo(selectedDate);
+
+                              // Do something with the selected date
+                            }
+                          },
+                          icon: const Icon(Icons.calendar_today),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () async {
+                        if (!isNumber(
+                            adminController.facultyIdController.text)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Faculty ID must be a number"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+                        if (adminController
+                                .subjectIdStudController.text.isNotEmpty &&
+                            !isNumber(
+                                adminController.subjectIdFacController.text)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Subject ID must be a number"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        // await adminController.getDataToDownload(
+                        //     1,
+                        //     int.parse(adminController.facultyIdController.text),
+                        //     adminController.selectedDateFac == null
+                        //         ? null
+                        //         : dateFormat
+                        //             .format(adminController.selectedDateFac!),
+                        //     adminController
+                        //             .subjectIdStudController.text.isNotEmpty
+                        //         ? int.parse(
+                        //             adminController.subjectIdFacController.text)
+                        //         : null,
+                        //     context);
+                        // Do something with the faculty data
+                      },
+                      child: Container(
+                          alignment: Alignment.center,
+                          width: 420,
+                          height: 50,
+                          child: const Text('Download')),
+                    ),
+                    const Spacer(),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        _fromAttendance(dateFormat, displayDateFormat)
+      ],
+    );
+  }
+
+  Widget _fromAttendance(dateFormat, displayDateFormat) {
     return Container(
-      margin: const EdgeInsets.all(18.0),
+      margin: const EdgeInsets.symmetric(horizontal: 18.0),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
@@ -559,38 +813,121 @@ class _AdminDashboardState extends State<AdminDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "From Faculty",
+              "Student",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(
-              height: 8.0,
-            ),
+            const SizedBox(height: 16.0),
             TextField(
               decoration: const InputDecoration(
-                labelText: "Faculty ID",
+                labelText: "Student ID",
               ),
-              controller: adminController.facultyIdController,
-
-              // Do something with the new value
+              controller: adminController.studentIdController,
             ),
             const SizedBox(height: 8.0),
             TextField(
               decoration: const InputDecoration(
                 labelText: "Subject ID",
               ),
-              controller: adminController.subjectIdFacController,
+              controller: adminController.subjectIdStudController,
             ),
-            // const SizedBox(height: 8.0),
-            // add date picker here
             const SizedBox(height: 8.0),
-            Row(
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "From",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          adminController.selectedDateStudFrom == null
+                              ? "Select Date"
+                              : displayDateFormat.format(
+                                  adminController.selectedDateStudFrom!),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final DateTime? selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime.now(),
+                            );
+                            if (selectedDate != null) {
+                              print(selectedDate);
+                              adminController
+                                  .setSelectedDateStudFrom(selectedDate);
+
+                              // Do something with the selected date
+                            }
+                          },
+                          icon: const Icon(Icons.calendar_today),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "To",
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          adminController.selectedDateStudTo == null
+                              ? "Select Date"
+                              : displayDateFormat
+                                  .format(adminController.selectedDateStudTo!),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            final DateTime? selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime.now(),
+                            );
+                            if (selectedDate != null) {
+                              print(selectedDate);
+                              adminController
+                                  .setSelectedDateStudTo(selectedDate);
+
+                              // Do something with the selected date
+                            }
+                          },
+                          icon: const Icon(Icons.calendar_today),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8.0),
                 TextButton(
                   onPressed: () async {
-                    if (!isNumber(adminController.facultyIdController.text)) {
+                    if (!isNumber(adminController.studentIdController.text)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text("Faculty ID must be a number"),
+                          content: Text("Student ID must be a number"),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -599,7 +936,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     if (adminController
                             .subjectIdStudController.text.isNotEmpty &&
                         !isNumber(
-                            adminController.subjectIdFacController.text)) {
+                            adminController.subjectIdStudController.text)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Subject ID must be a number"),
@@ -608,7 +945,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       );
                       return;
                     }
-                    // if (adminController.selectedDateFac == null) {
+                    // if (adminController.selectedDateStud == null) {
                     //   ScaffoldMessenger.of(context).showSnackBar(
                     //     const SnackBar(
                     //       content: Text("Please select a date"),
@@ -617,156 +954,30 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     //   );
                     //   return;
                     // }
-                    await adminController.getDataToDownload(
-                        1,
-                        int.parse(adminController.facultyIdController.text),
-                        adminController.selectedDateFac == null
-                            ? null
-                            : dateFormat
-                                .format(adminController.selectedDateFac!),
-                        adminController.subjectIdStudController.text.isNotEmpty
-                            ? int.parse(
-                                adminController.subjectIdFacController.text)
-                            : null,
-                        context);
-                    // Do something with the faculty data
+                    // await adminController.getDataToDownload(
+                    //     0,
+                    //     int.parse(adminController.studentIdController.text),
+                    //     adminController.selectedDateStud == null
+                    //         ? null
+                    //         : dateFormat
+                    //             .format(adminController.selectedDateStud!),
+                    //     adminController.subjectIdStudController.text.isNotEmpty
+                    //         ? int.parse(
+                    //             adminController.subjectIdStudController.text)
+                    //         : null,
+                    //     context);
                   },
-                  child: const Text('Download'),
-                ),
-                const Spacer(),
-                Text(
-                  adminController.selectedDateFac == null
-                      ? "Select Date"
-                      : displayDateFormat
-                          .format(adminController.selectedDateFac!),
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.titleLarge?.color,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    final DateTime? selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                    );
-                    if (selectedDate != null) {
-                      print(selectedDate);
-                      adminController.setSelectedDateFac(selectedDate);
-
-                      // Do something with the selected date
-                    }
-                  },
-                  icon: const Icon(Icons.calendar_today),
+                  child: Container(
+                      alignment: Alignment.center,
+                      width: double.infinity,
+                      height: 50,
+                      child: const Text('Download')),
                 ),
               ],
             ),
-            const SizedBox(height: 12.0),
-            _fromAttendance(dateFormat, displayDateFormat)
           ],
         ),
       ),
-    );
-  }
-
-  Widget _fromAttendance(dateFormat, displayDateFormat) {
-    return Column(
-      children: [
-        const Text(
-          "From Attendance",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8.0),
-        TextField(
-          decoration: const InputDecoration(
-            labelText: "Student ID",
-          ),
-          controller: adminController.studentIdController,
-        ),
-        const SizedBox(height: 8.0),
-        TextField(
-          decoration: const InputDecoration(
-            labelText: "Subject ID",
-          ),
-          controller: adminController.subjectIdStudController,
-        ),
-        const SizedBox(height: 8.0),
-        Row(
-          children: [
-            TextButton(
-              onPressed: () async {
-                if (!isNumber(adminController.studentIdController.text)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Student ID must be a number"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-                if (adminController.subjectIdStudController.text.isNotEmpty &&
-                    !isNumber(adminController.subjectIdStudController.text)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Subject ID must be a number"),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-                // if (adminController.selectedDateStud == null) {
-                //   ScaffoldMessenger.of(context).showSnackBar(
-                //     const SnackBar(
-                //       content: Text("Please select a date"),
-                //       backgroundColor: Colors.red,
-                //     ),
-                //   );
-                //   return;
-                // }
-                await adminController.getDataToDownload(
-                    0,
-                    int.parse(adminController.studentIdController.text),
-                    adminController.selectedDateStud == null
-                        ? null
-                        : dateFormat.format(adminController.selectedDateStud!),
-                    adminController.subjectIdStudController.text.isNotEmpty
-                        ? int.parse(
-                            adminController.subjectIdStudController.text)
-                        : null,
-                    context);
-              },
-              child: const Text('Download'),
-            ),
-            const Spacer(),
-            Text(
-              adminController.selectedDateStud == null
-                  ? "Select Date"
-                  : displayDateFormat.format(adminController.selectedDateStud!),
-              style: TextStyle(
-                color: Theme.of(context).textTheme.titleLarge?.color,
-              ),
-            ),
-            IconButton(
-              onPressed: () async {
-                final DateTime? selectedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime.now(),
-                );
-                if (selectedDate != null) {
-                  print(selectedDate);
-                  adminController.setSelectedDateStud(selectedDate);
-
-                  // Do something with the selected date
-                }
-              },
-              icon: const Icon(Icons.calendar_today),
-            ),
-          ],
-        ),
-      ],
     );
   }
 
@@ -891,7 +1102,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 title: Text('Error',
                     style:
                         TextStyle(color: Theme.of(context).colorScheme.error)),
-                content: Text('Failed to upload file: ${e.toString()}'),
+                content: const Text(
+                    'Upload failed: Please ensure that the CSV format is valid.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -1364,6 +1576,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Text(
                   'Offset',
@@ -1380,7 +1593,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
             const SizedBox(height: 18.0),
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
