@@ -10,7 +10,7 @@ from collections import OrderedDict
 from CustomAugment import RandomBrightnessContrast
 
 # Define the path to the trained SVM model
-svm_path = 'svm_classifier.pkl'
+svm_path = './j-notebooks/svm-rbf_classifier.pkl'
 
 # Load the SVM model from the pickle file
 with open(svm_path, "rb") as f:
