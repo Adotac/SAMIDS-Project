@@ -24,6 +24,36 @@ class FacultyService {
     }
   }
 
+  static Future<CRUDReturn> createFaculty(
+      int facultyNo, String lastName, String firstName) async {
+    try {
+      final body = {
+        'facultyNo': facultyNo,
+        'lastName': lastName,
+        'firstName': firstName,
+      };
+      final jsonBody = json.encode(body);
+
+      final response = await HttpService.post(
+        '$_baseUrl/Faculty',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonBody,
+      );
+
+      if (kDebugMode) {
+        _logger.i('createFaculty ${response.statusCode} ${response.body}');
+      }
+
+      final jsonResponse = json.decode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' createFaculty $e $stacktrace');
+      rethrow;
+    }
+  }
+
   static Future<CRUDReturn> getFacultyClasses(int id) async {
     try {
       final response =
@@ -40,46 +70,51 @@ class FacultyService {
     }
   }
 
-  static Future<void> updateFaculty(
-      int facultyNo, String firstName, String lastName) async {
+  static Future<CRUDReturn> addFaculty(
+      int facultyNo, String lastName, String firstName) async {
     try {
       final body = {
         'facultyNo': facultyNo,
-        'firstName': firstName,
         'lastName': lastName,
+        'firstName': firstName,
       };
+      print('addFaculty Payload: $body');
 
-      // Add a print statement to check the payload
-      print('Payload: $body');
-
-      final response = await HttpService.patch(
+      final response = await HttpService.post(
         '$_baseUrl/Faculty',
         headers: {
-          'accept': 'text/plain',
           'Content-Type': 'application/json',
         },
         body: body,
       );
+
       if (kDebugMode) {
-        _logger.i('updateFaculty ${response.statusCode} ${response.body}');
+        _logger.i('createFaculty ${response.statusCode} ${response.body}');
       }
+
+      final jsonResponse = json.decode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
     } catch (e, stacktrace) {
-      if (kDebugMode) _logger.i(' updateFaculty $e $stacktrace');
+      if (kDebugMode) _logger.i(' createFaculty $e $stacktrace');
       rethrow;
     }
   }
 
   static Future<CRUDReturn> getFacultyById(int id) async {
-    final response = await HttpService.get('$_baseUrl/Faculty/$id');
-    final jsonResponse = json.decode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
-  }
-
-  static Future<CRUDReturn> addFaculty(AddFacultyDto faculty) async {
-    final body = json.encode(faculty.toJson());
-    final response = await HttpService.post('$_baseUrl/Faculty', body: body);
-    final jsonResponse = json.decode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
+    try {
+      final response =
+          await HttpService.get('$_baseUrl/Faculty?id=$id', headers: {
+        'accept': 'application/json',
+      });
+      if (kDebugMode) {
+        _logger.i('getFacultyById ${response.statusCode} ${response.body}');
+      }
+      final jsonResponse = json.decode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' getFacultyById $e $stacktrace');
+      rethrow;
+    }
   }
 
   static Future<CRUDReturn> deleteFaculty(int id) async {
@@ -97,12 +132,48 @@ class FacultyService {
     return CRUDReturn.fromJson(jsonResponse);
   }
 
-  static Future<CRUDReturn> addFacultySubjects(
-      FacultySubjectDto<dynamic> request) async {
-    final body = json.encode(request.toJson());
-    final response =
-        await HttpService.patch('$_baseUrl/Faculty/AddSubjects', body: body);
-    final jsonResponse = json.decode(response.body);
-    return CRUDReturn.fromJson(jsonResponse);
+  static Future<CRUDReturn> addFacultySubject(
+      int facultyNo, int subjectId) async {
+    try {
+      // Add a print statement to check the payload
+      final body = {
+        'facultyNo': facultyNo,
+        'subject': subjectId,
+      };
+
+      print('Payload: $body');
+
+      final response = await HttpService.patch(
+        '$_baseUrl/Faculty/AddSubject',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      );
+
+      if (kDebugMode) {
+        _logger.i('addFacultySubject ${response.statusCode} ${response.body}');
+      }
+
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          return CRUDReturn.fromJson(jsonResponse);
+        } else {
+          throw Exception("Empty response body");
+        }
+      } else {
+        String errorMessage = "Something went wrong.";
+        if (response.body.isNotEmpty) {
+          final jsonResponse = jsonDecode(response.body);
+          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+        }
+        throw Exception(
+            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+      }
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' addFacultySubject $e $stacktrace');
+      rethrow;
+    }
   }
 }

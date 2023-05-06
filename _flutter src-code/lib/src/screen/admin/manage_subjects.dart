@@ -19,17 +19,17 @@ import '../../widgets/students_data_source.dart';
 import '../../widgets/web_view.dart';
 import '../page_size_constriant.dart';
 
-class AdminSubjects extends StatefulWidget {
+class ManageSubjects extends StatefulWidget {
   static const routeName = '/admin-subjects';
   final AdminController adminController;
 
-  const AdminSubjects({super.key, required this.adminController});
+  const ManageSubjects({super.key, required this.adminController});
 
   @override
-  State<AdminSubjects> createState() => _AdminSubjectsState();
+  State<ManageSubjects> createState() => _ManageSubjectsState();
 }
 
-class _AdminSubjectsState extends State<AdminSubjects> {
+class _ManageSubjectsState extends State<ManageSubjects> {
   final _textEditingController = TextEditingController();
 
   AdminController get _dataController => widget.adminController;
@@ -137,6 +137,7 @@ class _AdminSubjectsState extends State<AdminSubjects> {
         _dataColumn('Time Start'),
         _dataColumn('Time End'),
         _dataColumn('Day'),
+        _dataColumn('Actions'),
         // _dataColumn('Student Count'),
       ],
       showFirstLastButtons: true,

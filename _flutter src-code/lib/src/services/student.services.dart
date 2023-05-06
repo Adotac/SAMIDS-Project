@@ -22,6 +22,9 @@ class StudentService {
       final response = await HttpService.get(
         '$_baseUrl/Student',
       );
+      if (kDebugMode) {
+        _logger.i('getStudent ${response.statusCode} ${response.body}');
+      }
       return CRUDReturn.fromJson(jsonDecode(response.body));
     } catch (e, stacktrace) {
       if (kDebugMode) _logger.i(' getStudents $e $stacktrace');

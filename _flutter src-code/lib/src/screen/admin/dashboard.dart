@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:samids_web_app/src/screen/admin/manage_subjects.dart';
 import 'package:samids_web_app/src/screen/page_size_constriant.dart';
 
 import '../../controllers/admin_controller.dart';
@@ -40,6 +41,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     adminController.getStudents();
     adminController.getAttendanceAll(null);
     adminController.getFaculties();
+    Navigator.popAndPushNamed(context, ManageSubjects.routeName);
     super.initState();
   }
 
@@ -1409,7 +1411,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   // Save the changes to the AdminController Config
-                  print('adminController.config');
+                  // print('adminController.config');
                   print(adminController.config!.toJson());
                   adminController.updateConfig(adminController.config!);
                   Navigator.of(context).pop();
@@ -1539,8 +1541,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     const Text('Current Year'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("adminController")),
-                    // _titleText(adminController.config!.currentYear)),
+                        child:
+                            // _titleText("adminController")),
+                            _titleText(adminController.config!.currentYear)),
                   ],
                 ),
                 const SizedBox(width: 24.0),
@@ -1550,8 +1553,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     const Text('Current Term'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText("adminController.")),
-                    // child: _titleText(adminController.config!.currentTerm)),
+                        // child: _titleText("adminController.")),
+                        child: _titleText(adminController.config!.currentTerm)),
                   ],
                 ),
               ],
@@ -1601,9 +1604,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     const Text('Minutes Late'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText('12 mins')),
-                    // _titleText(
-                    //     '${adminController.config!.lateMinutes} mins')),
+                        child:
+                            // _titleText('12 mins')),
+                            _titleText(
+                                '${adminController.config!.lateMinutes} mins')),
                   ],
                 ),
                 const SizedBox(width: 24.0),
@@ -1613,9 +1617,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     const Text('Minutes Absent'),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: _titleText('12 mins')),
-                    // _titleText(
-                    // '${adminController.config!.absentMinutes} mins')),
+                        child:
+                            // _titleText('12 mins')),
+                            _titleText(
+                                '${adminController.config!.absentMinutes} mins')),
                   ],
                 ),
               ],

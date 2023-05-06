@@ -8,6 +8,8 @@ class FacultyDataSource extends DataTableSource {
   final List<Faculty> _faculties;
   final AdminController adminController;
   final context;
+  int _selectedRowIndex = -1;
+
   FacultyDataSource(this._faculties, this.adminController, this.context);
 
   @override
@@ -15,34 +17,48 @@ class FacultyDataSource extends DataTableSource {
     assert(index >= 0);
     if (index >= _faculties.length) return const DataRow(cells: []);
     final Faculty faculty = _faculties[index];
+    final isSelected = _selectedRowIndex == index;
+    final backgroundColor = isSelected
+        ? Colors.grey.withOpacity(0.3)
+        : (index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.1));
     return DataRow.byIndex(
       index: index,
+      color: MaterialStateProperty.resolveWith<Color?>(
+          (Set<MaterialState> states) {
+        if (states.contains(MaterialState.selected))
+          return Theme.of(context).colorScheme.primary.withOpacity(0.1);
+        if (states.contains(MaterialState.hovered))
+          return Theme.of(context).colorScheme.primary.withOpacity(0.05);
+        return backgroundColor;
+      }),
+      // onSelectChanged: (bool? value) {
+      //   // notifyListeners();
+
+      // },
       cells: [
         DataCell(
-          Text('${faculty.facultyNo}'),
+          mouseRegion(faculty, faculty.facultyNo.toString()),
         ),
         DataCell(
-          GestureDetector(
-            child: Text(faculty.lastName),
-            onTap: () {
-              // Handle cell tap here
-              adminController.selectedFaculty = faculty;
-              adminController.getFacultyClassesTemp(faculty.facultyNo);
-
-              // _showEditDialog(context, faculty.lastName, faculty, 'Last Name');
-            },
-          ),
+          mouseRegion(faculty, faculty.lastName),
         ),
         DataCell(
-          GestureDetector(
-            child: Text(faculty.firstName),
-            onTap: () {
-              adminController.selectedFaculty = faculty;
-              adminController.getFacultyClassesTemp(faculty.facultyNo);
-            },
-          ),
+          mouseRegion(faculty, faculty.firstName),
         ),
       ],
+    );
+  }
+
+  MouseRegion mouseRegion(Faculty faculty, String title) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          adminController.selectedFaculty = faculty;
+          adminController.getFacultyClassesTemp(faculty.facultyNo);
+        },
+        child: Text(title),
+      ),
     );
   }
 

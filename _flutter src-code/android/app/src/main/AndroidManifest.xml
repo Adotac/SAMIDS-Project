@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.samids_web_app">
    <application
-        android:label="samids_web_app"
+        android:label="BiSAMS"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

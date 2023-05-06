@@ -155,7 +155,7 @@ class _SideMenuState extends State<SideMenu> {
               title: 'Subjects',
               index: 4,
               onTap: () {
-                Navigator.popAndPushNamed(context, AdminSubjects.routeName);
+                Navigator.popAndPushNamed(context, ManageSubjects.routeName);
               },
             ),
           ),

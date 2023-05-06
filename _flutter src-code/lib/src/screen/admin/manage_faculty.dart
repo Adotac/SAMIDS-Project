@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 
@@ -12,6 +13,7 @@ import '../../model/attendance_model.dart';
 import '../../model/student_model.dart';
 import '../../model/subjectSchedule_model.dart';
 import '../../services/auth.services.dart';
+import '../../services/faculty.services.dart';
 import '../../widgets/pagination/admin_attendance_data_source.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/pagination/faculties_data_source.dart';
@@ -33,7 +35,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
   final _textEditingController = TextEditingController();
   final _textEditingControllerFaculty = TextEditingController();
 
-  AdminController get _dataController => widget.adminController;
+  AdminController get _controller => widget.adminController;
 
   @override
   void initState() {
@@ -67,7 +69,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
       appBarTitle: "Manage Faculty",
       selectedWidgetMarker: 3,
       body: AnimatedBuilder(
-          animation: _dataController,
+          animation: _controller,
           builder: (context, child) {
             return _webMngUser(context);
           }),
@@ -78,6 +80,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildCard(
             context,
@@ -122,13 +125,20 @@ class _ManageFacultyState extends State<ManageFaculty> {
                           fontWeight: FontWeight.w900),
                     ),
                     Visibility(
-                      visible: title == 'Faculty' ? false : true,
+                      visible: title == 'Faculty',
+                      child: const Spacer(),
+                    ),
+                    Visibility(
+                      visible: title == 'Faculty',
+                      child: _addFaculty(),
+                    ),
+                    Visibility(
+                      visible: title != 'Faculty',
                       child: Row(
                         children: [
                           Visibility(
                             visible:
-                                _dataController.selectedFaculty?.firstName !=
-                                    null,
+                                _controller.selectedFaculty?.firstName != null,
                             child: Text(
                               'Selected Faculty: ',
                               style: TextStyle(
@@ -139,7 +149,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
                             ),
                           ),
                           Text(
-                            '${_dataController.selectedFaculty?.firstName ?? ''} ${_dataController.selectedFaculty?.lastName ?? ''}',
+                            '${_controller.selectedFaculty?.firstName ?? ''} ${_controller.selectedFaculty?.lastName ?? ''}',
                             style: TextStyle(
                                 decorationThickness: 5.0,
                                 fontSize: 24,
@@ -164,12 +174,76 @@ class _ManageFacultyState extends State<ManageFaculty> {
     );
   }
 
+  TextButton _addFaculty() {
+    return TextButton(
+      onPressed: () async {
+        String? firstName;
+        String? lastName;
+
+        // Show a dialog to get the first name and last name
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Add Faculty'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  decoration: InputDecoration(labelText: 'First Name'),
+                  onChanged: (value) => firstName = value,
+                ),
+                SizedBox(height: 8.0),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Last Name'),
+                  onChanged: (value) => lastName = value,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  // Check if first name and last name are not empty
+                  if (firstName == null || lastName == null) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text('Error'),
+                        content: Text('First name and last name are required.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Call onUpdateFaculty to add the faculty
+                  await _controller.addNewFaculty(
+                    firstName!,
+                    lastName!,
+                  );
+
+                  Navigator.of(context).pop();
+                },
+                child: Text('Add'),
+              ),
+            ],
+          ),
+        );
+      },
+      child: Text('Add Faculty'),
+    );
+  }
+
   Widget buildInformationList() {
     return SingleChildScrollView(
       child: Column(
         children: [
           Container(
-            height: 480,
+            height: MediaQuery.of(context).size.height * 0.52,
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
@@ -179,7 +253,116 @@ class _ManageFacultyState extends State<ManageFaculty> {
               ),
             ),
             padding: const EdgeInsets.all(18.0),
-            child: _dataTableClasses(context),
+            child: Column(
+              children: [
+                _controller.selectedFaculty?.firstName == null
+                    ? SizedBox(
+                        height: 10,
+                      )
+                    : Container(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            TextEditingController subjectIdController =
+                                TextEditingController();
+                            await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Add Subject'),
+                                content: TextField(
+                                  controller: subjectIdController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter subject ID',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () async {
+                                      // Validate the subject ID
+                                      String subjectId =
+                                          subjectIdController.text;
+                                      if (subjectId.isEmpty) {
+                                        return;
+                                      }
+                                      int id = int.tryParse(subjectId) ?? -1;
+                                      if (id == -1) {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: Text('Invalid Subject ID',
+                                                style: TextStyle(
+                                                    color: Colors.red)),
+                                            content: Text(
+                                                'Subject ID must be a number'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      // Add the subject to the selected faculty
+                                      CRUDReturn response =
+                                          await _controller.addFacultySubject(
+                                        _controller.selectedFaculty!.facultyNo,
+                                        id,
+                                      );
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).pop();
+                                      // ignore: use_build_context_synchronously
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text(
+                                            style: TextStyle(
+                                                color: response.success
+                                                    ? Colors.green
+                                                    : Colors.red),
+                                            response.success
+                                                ? 'Success'
+                                                : 'Error',
+                                          ),
+                                          content: Text(response.data),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                              child: Text('OK'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Text('Add'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: const Text("Add Subject"),
+                        ),
+                      ),
+                _controller.isGettingClasses
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context)
+                                .primaryColor, // Customize the color
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        width: double.infinity,
+                        child: _dataTableClasses(context)),
+              ],
+            ),
           ),
           SizedBox(height: 8.0),
           Container(
@@ -206,54 +389,52 @@ class _ManageFacultyState extends State<ManageFaculty> {
       TextEditingController();
   Widget _resetPasswordForm() {
     usernameController.text =
-        _dataController.selectedFaculty?.facultyNo.toString() ?? '';
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Reset faculty password",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        _controller.selectedFaculty?.facultyNo.toString() ?? '';
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Reset faculty password",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12.0),
+          TextField(
+            controller: usernameController,
+            decoration: const InputDecoration(
+              labelText: 'Username',
             ),
-            const SizedBox(height: 12.0),
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
+          ),
+          const SizedBox(height: 8.0),
+          TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(
+              labelText: 'New Password',
+            ),
+            obscureText: true,
+          ),
+          const SizedBox(height: 8.0),
+          TextField(
+            controller: passwordControllerConfirm,
+            decoration: const InputDecoration(
+              labelText: 'Confirm Password',
+            ),
+            obscureText: true,
+          ),
+          const SizedBox(height: 24.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () {
+                  _onForgetPasswordClick(context);
+                },
+                child: const Text('Submit'),
               ),
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'New Password',
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 8.0),
-            TextField(
-              controller: passwordControllerConfirm,
-              decoration: const InputDecoration(
-                labelText: 'Confirm Password',
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 24.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    _onForgetPasswordClick(context);
-                  },
-                  child: const Text('Submit'),
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -291,7 +472,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
     final result = await AuthService.changePassword(
       passwordController.text,
       int.parse(usernameController.text),
-      _dataController.selectedUserType == 'Student' ? 'studentNo' : 'facultyNo',
+      _controller.selectedUserType == 'Student' ? 'studentNo' : 'facultyNo',
     );
     print('result.success');
     print(result.success);
@@ -338,7 +519,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
         customDataColumn(label: Text('Time'), flex: 1),
         customDataColumn(label: Text('Day'), flex: 1),
       ],
-      rows: _dataController.tempFacultyClasses
+      rows: _controller.tempFacultyClasses
           .map((attendance) => _buildDataRowClasses(context, attendance))
           .toList(),
     );
@@ -380,14 +561,14 @@ class _ManageFacultyState extends State<ManageFaculty> {
   }
 
   String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
-    final timeStart = _dataController
-        .formatTime(subjectSchedule?.timeStart ?? DateTime.now());
+    final timeStart =
+        _controller.formatTime(subjectSchedule?.timeStart ?? DateTime.now());
     final timeEnd =
-        _dataController.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
+        _controller.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
     return '$timeStart - $timeEnd';
   }
 
-  DataColumn customDataColumn({required Widget label, int flex = 1}) {
+  DataColumn customDataColumn({required Widget label, int flex = 2}) {
     return DataColumn(
       label: Expanded(
         flex: flex,
@@ -403,14 +584,14 @@ class _ManageFacultyState extends State<ManageFaculty> {
   // }
 
   DataColumn _dataColumnFaculty(String title) {
-    bool isSortedColumn = _dataController.sortColumnFaculties == title;
+    bool isSortedColumn = _controller.sortColumnFaculties == title;
 
     return DataColumn(
       label: SizedBox(
         width: 150,
         child: InkWell(
           onTap: () {
-            _dataController.sortFaculties(title);
+            _controller.sortFaculties(title);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -424,7 +605,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
               ),
               if (isSortedColumn)
                 Icon(
-                  _dataController.sortAscending
+                  _controller.sortAscending
                       ? Icons.arrow_drop_up_rounded
                       : Icons.arrow_drop_down_rounded,
                   color: Theme.of(context).primaryColor,
@@ -439,7 +620,9 @@ class _ManageFacultyState extends State<ManageFaculty> {
 
   Widget _dataTableFaculty(BuildContext context) {
     return Container(
-      child: PaginatedDataTable(
+      child:
+          //  SizedBox(),
+          PaginatedDataTable(
         columns: [
           _dataColumnFaculty('Faculty No'),
           _dataColumnFaculty('Last Name'),
@@ -451,13 +634,14 @@ class _ManageFacultyState extends State<ManageFaculty> {
           print('Page changed to $value');
         },
         source: _createFacultyDataSource(),
+        // checkboxHorizontalMargin: 0,
       ),
     );
   }
 
   FacultyDataSource _createFacultyDataSource() {
     return FacultyDataSource(
-        _dataController.filteredFaculties, _dataController, context);
+        _controller.filteredFaculties, _controller, context);
   }
 
   Widget _searchBarStudent(context) {
@@ -482,7 +666,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
   }
 
   void _onSearchSubmittedStudents(String query) {
-    _dataController.searchStudents(query);
+    _controller.searchStudents(query);
   }
 
   Widget _searchBarFaculty(context) {
@@ -508,6 +692,6 @@ class _ManageFacultyState extends State<ManageFaculty> {
   }
 
   void _onSearchSubmittedFaculties(String query) {
-    _dataController.searchFaculties(query);
+    _controller.searchFaculties(query);
   }
 }

@@ -82,6 +82,18 @@ class SubjectDataSource extends DataTableSource {
           SingleChildScrollView(
               scrollDirection: Axis.horizontal, child: Text(schedule.day)),
         ),
+        DataCell(
+          SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.edit_outlined)),
+                  IconButton(
+                      onPressed: () {}, icon: const Icon(Icons.info_outline))
+                ],
+              )),
+        ),
         // DataCell(
         //   SingleChildScrollView(
         //       scrollDirection: Axis.horizontal,

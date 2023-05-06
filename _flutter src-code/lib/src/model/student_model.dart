@@ -24,7 +24,7 @@ class Student {
 
   static Student fromJson(Map<String, dynamic> json) {
     return Student(
-      studentID: json['studentID'],
+      studentID: json['studentID'] ?? 0,
       studentNo: json['studentNo'] ?? 0,
       rfid: json['rfid'] ?? 0,
       lastName: json['lastName'] ?? '',

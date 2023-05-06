@@ -220,9 +220,9 @@ class MyApp extends StatelessWidget {
             print(settings.name);
 
             switch (settings.name) {
-              case AdminSubjects.routeName:
+              case ManageSubjects.routeName:
                 return MaterialPageRoute(
-                    builder: (_) => AdminSubjects(
+                    builder: (_) => ManageSubjects(
                           adminController: AdminController.instance,
                         ));
               case ChangePasswordPage.routeName:

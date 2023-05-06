@@ -51,14 +51,14 @@ class _WebViewState extends State<WebView> {
   String currentYear = '';
   @override
   void initState() {
-    _getConfigData();
+    // _getConfigData();
     super.initState();
   }
 
-  void _getConfigData() async {
-    await _getConfig();
-    await _getCurrentTerm();
-  }
+  // void _getConfigData() async {
+  //   await _getConfig();
+  //   await _getCurrentTerm();
+  // }
 
   Widget _buildNotificationsList(BuildContext context) {
     // Dummy data for notifications

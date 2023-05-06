@@ -77,10 +77,14 @@ class _ManageStudentState extends State<ManageStudent> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center     ,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildCard(context, 'Students', _searchBarStudent(context),
-              _buildStudentList(),),
+          _buildCard(
+            context,
+            'Students',
+            _searchBarStudent(context),
+            _buildStudentList(),
+          ),
           // _buildCard(context, 'Faculty', _searchBarFaculty(context),
           //     _buildFacultyList(), 2),
         ],
@@ -135,20 +139,6 @@ class _ManageStudentState extends State<ManageStudent> {
         child: _dataTableStudents(context));
   }
 
-  Widget _buildFacultyList() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(
-          color: Color(0xFFF2F2F2),
-          width: 2.0,
-        ),
-      ),
-      padding: const EdgeInsets.all(18.0),
-      child: _dataTableFaculty(context),
-    );
-  }
-
   Widget _dataTableStudents(BuildContext context) {
     return PaginatedDataTable(
       columns: [
@@ -169,6 +159,7 @@ class _ManageStudentState extends State<ManageStudent> {
   }
 
   StudentDataSource _createStudentDataSource() {
+    print(_dataController.filteredStudents);
     return StudentDataSource(
       _dataController.filteredStudents,
       _dataController,
@@ -182,7 +173,7 @@ class _ManageStudentState extends State<ManageStudent> {
   //   );
   // }
 
-  DataColumn _dataColumn(String title, [double width =  300]) {
+  DataColumn _dataColumn(String title, [double width = 300]) {
     bool isSortedColumn = _dataController.sortColumn == title;
 
     return DataColumn(
@@ -195,7 +186,7 @@ class _ManageStudentState extends State<ManageStudent> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(   
+              Flexible(
                 child: Text(
                   overflow: TextOverflow.ellipsis,
                   title,

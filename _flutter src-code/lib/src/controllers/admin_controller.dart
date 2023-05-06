@@ -17,6 +17,7 @@ import 'package:samids_web_app/src/model/student_model.dart';
 
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/model/subject_model.dart';
+import 'package:samids_web_app/src/services/DTO/add_faculty.dart';
 import 'package:samids_web_app/src/services/DTO/crud_return.dart';
 import 'package:samids_web_app/src/services/attendance.services.dart';
 import '../model/config_model.dart';
@@ -52,7 +53,7 @@ class AdminController with ChangeNotifier {
   bool isAllAttendanceCollected = false;
   bool sortAscending = true;
   bool sortAscendingStudent = true;
-
+  bool isGettingClasses = false;
   String sortColumn = "";
   String currentYear = '';
   String currentTerm = '';
@@ -76,7 +77,7 @@ class AdminController with ChangeNotifier {
   }
 
   Faculty? selectedFaculty;
-
+  Faculty? tempFaculty;
   void clearList() {
     selectedFiles.clear();
     selectedFileTable.clear();
@@ -299,6 +300,33 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  void handleEventJsonFacultySingle(CRUDReturn result) {
+    try {
+      if (result.data.isNotEmpty) {
+        tempFaculty = Faculty.fromJson(result.data);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      _logger.i('handleEventJsonFaculty $e $stacktrace');
+    }
+  }
+
+  Future<void> getFacultyById(int id) async {
+    try {
+      CRUDReturn response = await FacultyService.getFacultyById(id);
+      if (response.success) {
+        handleEventJsonFacultySingle(response);
+      }
+    } catch (e, stacktrace) {
+      _logger.i('adminController getFacultyById $e $stacktrace');
+    }
+  }
+
+  Future<void> addNewFaculty(String firstName, String lastName) async {
+    await onUpdateFaculty(
+        filteredFaculties.last.facultyNo + 1, firstName, lastName);
+  }
+
   bool isEditingFaculty = false;
   Future<void> onUpdateFaculty(
       int facultyNo, String firstName, String lastName) async {
@@ -306,7 +334,7 @@ class AdminController with ChangeNotifier {
       isEditingFaculty = true;
       notifyListeners();
 
-      await FacultyService.updateFaculty(facultyNo, firstName, lastName);
+      await FacultyService.addFaculty(facultyNo, firstName, lastName);
       await getFaculties();
 
       isEditingFaculty = false;
@@ -329,15 +357,17 @@ class AdminController with ChangeNotifier {
 
   void _handleEventJsonStudent(CRUDReturn result) {
     try {
+      print('result.data.isNotEmpty ${result.data.isNotEmpty}');
       if (result.data.isNotEmpty) {
         students = List<Student>.from(
           result.data.map((studentJson) => Student.fromJson(studentJson)),
         );
       }
+      print('students.length ${students.length}');
       notifyListeners();
     } catch (e, stacktrace) {
       if (kDebugMode) {
-        print('handleEventJsonStudent $e $stacktrace');
+        _logger.i('handleEventJsonStudent $e $stacktrace');
       }
     }
   }
@@ -432,9 +462,13 @@ class AdminController with ChangeNotifier {
   }
 
   List<Student> get filteredStudents {
+    print("students");
+    print(students);
     if (_searchQueryStudent.isEmpty) {
+      print(true);
       return students;
     } else {
+      print('else');
       return students
           .where((student) =>
               student.lastName
@@ -894,9 +928,30 @@ class AdminController with ChangeNotifier {
     }
   }
 
+  Future<CRUDReturn> addFacultySubject(int facultyNo, int subjectId) async {
+    try {
+      CRUDReturn response =
+          await FacultyService.addFacultySubject(facultyNo, subjectId);
+
+      if (response.success) {
+        notifyListeners();
+        await getFacultyClassesTemp(facultyNo);
+        return response;
+      }
+      notifyListeners();
+      return response;
+    } catch (e, stacktrace) {
+      _logger.i('adminController addFacultySubject $e $stacktrace');
+      CRUDReturn response = CRUDReturn(success: false, data: '$e');
+      return response;
+    }
+  }
+
   Future<void> getFacultyClassesTemp(int facultyNo) async {
     try {
-      if (isStudentClassesCollected) return;
+      // if (isStudentClassesCollected) return;
+      isGettingClasses = true;
+      notifyListeners();
       CRUDReturn response = await FacultyService.getFacultyClasses(facultyNo);
       if (response.success) {
         handleEventJsonFacultyClassesInput(response);
@@ -904,6 +959,9 @@ class AdminController with ChangeNotifier {
       notifyListeners();
     } catch (e, stacktrace) {
       print('getFacultyClassesTemp $e $stacktrace');
+    } finally {
+      isGettingClasses = false;
+      notifyListeners();
     }
   }
 }
