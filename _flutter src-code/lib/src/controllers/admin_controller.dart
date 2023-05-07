@@ -77,6 +77,8 @@ class AdminController with ChangeNotifier {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
   }
 
+  Student? selectedStudent;
+
   Faculty? selectedFaculty;
   Faculty? tempFaculty;
   void clearList() {
@@ -1071,6 +1073,37 @@ class AdminController with ChangeNotifier {
       notifyListeners();
     } catch (e, stacktrace) {
       print('StudentListController getStudentListbySchedId $e $stacktrace');
+    }
+  }
+
+  Future<void> getStudentClassesTemp() async {
+    try {
+      isGettingClasses = true;
+      notifyListeners();
+      CRUDReturn response =
+          await StudentService.getStudentClasses(selectedStudent!.studentNo);
+      if (response.success) {
+        handleEventJsonStudentClasses(response);
+      }
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('StudentDashboardController getStudentClasses $e $stacktrace');
+    } finally {
+      isGettingClasses = false;
+      notifyListeners();
+    }
+  }
+
+  void handleEventJsonStudentClasses(CRUDReturn result) {
+    try {
+      if (studentClasses.isNotEmpty) studentClasses.clear();
+      for (Map<String, dynamic> map in result.data) {
+        studentClasses.add(SubjectSchedule.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonStudentClasses $e $stacktrace');
     }
   }
 }

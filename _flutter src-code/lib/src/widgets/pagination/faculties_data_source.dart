@@ -19,16 +19,14 @@ class FacultyDataSource extends DataTableSource {
     final Faculty faculty = _faculties[index];
     final isSelected = _selectedRowIndex == index;
     final backgroundColor = isSelected
-        ? Colors.grey.withOpacity(0.3)
-        : (index % 2 == 0 ? Colors.white : Colors.grey.withOpacity(0.1));
+        ? Theme.of(context).primaryColor.withOpacity(0.3)
+        : (index % 2 == 0
+            ? Colors.white
+            : Theme.of(context).primaryColor.withOpacity(0.05));
     return DataRow.byIndex(
       index: index,
       color: MaterialStateProperty.resolveWith<Color?>(
           (Set<MaterialState> states) {
-        if (states.contains(MaterialState.selected))
-          return Theme.of(context).colorScheme.primary.withOpacity(0.1);
-        if (states.contains(MaterialState.hovered))
-          return Theme.of(context).colorScheme.primary.withOpacity(0.05);
         return backgroundColor;
       }),
       // onSelectChanged: (bool? value) {

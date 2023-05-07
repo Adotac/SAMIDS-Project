@@ -29,7 +29,7 @@ class AttendanceDataSourceAd extends DataTableSource {
         dataCell(attendance.student?.studentNo.toString() ?? 'No student ID'),
         dataCell(
             '${attendance.student?.firstName} ${attendance.student?.lastName}'),
-        dataCell(attendance.attendanceId.toString()),
+        // dataCell(attendance.attendanceId.toString()),
         dataCell(attendance.subjectSchedule?.room ?? 'No Room'),
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),

@@ -144,6 +144,10 @@ class StudentService {
 
   static Future<CRUDReturn> getStudentClasses(int studentNo) async {
     try {
+      if (kDebugMode) {
+        _logger.i(
+            'getStudentClasses $_baseUrl/Student/Classes?studentNo=$studentNo');
+      }
       final response = await HttpService.get(
           '$_baseUrl/Student/Classes?studentNo=$studentNo');
       if (kDebugMode) {

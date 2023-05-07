@@ -114,26 +114,26 @@ class _AdminAttendanceState extends State<AdminAttendance> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                    onPressed: () async {
-                      await _dataController.downloadData(context);
-                    },
-                    child: Text("Download Table")),
-                TextButton(
-                    onPressed: () {
-                      _dataController.attendanceReset();
-                    },
-                    child: Text("Reset"))
-              ],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.end,
+            //   children: [
+            //     TextButton(
+            //         onPressed: () async {
+            //           await _dataController.downloadData(context);
+            //         },
+            //         child: Text("Download Table")),
+            //     TextButton(
+            //         onPressed: () {
+            //           _dataController.attendanceReset();
+            //         },
+            //         child: Text("Reset"))
+            //   ],
+            // ),
             PaginatedDataTable(
               columns: [
                 _dataColumn("Student ID"),
                 _dataColumn("Name"),
-                _dataColumn("Reference ID"),
+                // _dataColumn("Reference ID"),
                 _dataColumn("Room"),
                 _dataColumn("Subject"),
                 _dataColumn("Date"),
@@ -174,7 +174,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
 
     return DataColumn(
       label: SizedBox(
-        width: 100,
+        width: 120,
         child: InkWell(
           onTap: () {
             _dataController.sortAttendance(title);

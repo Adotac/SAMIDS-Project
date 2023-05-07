@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/constant/constant_values.dart';
-import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 
@@ -11,6 +10,7 @@ import '../../controllers/student_controller.dart';
 import '../../model/attendance_model.dart';
 import '../../model/student_model.dart';
 import '../../model/subjectSchedule_model.dart';
+import '../../services/DTO/crud_return.dart';
 import '../../widgets/pagination/admin_attendance_data_source.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/pagination/faculties_data_source.dart';
@@ -30,9 +30,8 @@ class ManageStudent extends StatefulWidget {
 
 class _ManageStudentState extends State<ManageStudent> {
   final _textEditingController = TextEditingController();
-  final _textEditingControllerFaculty = TextEditingController();
 
-  AdminController get _dataController => widget.adminController;
+  AdminController get _controller => widget.adminController;
 
   @override
   void initState() {
@@ -66,7 +65,7 @@ class _ManageStudentState extends State<ManageStudent> {
       appBarTitle: "Manage Student",
       selectedWidgetMarker: 2,
       body: AnimatedBuilder(
-          animation: _dataController,
+          animation: _controller,
           builder: (context, child) {
             return _webMngUser(context);
           }),
@@ -85,8 +84,13 @@ class _ManageStudentState extends State<ManageStudent> {
             _searchBarStudent(context),
             _buildStudentList(),
           ),
-          // _buildCard(context, 'Faculty', _searchBarFaculty(context),
-          //     _buildFacultyList(), 2),
+          const SizedBox(width: 3.0),
+          _buildCard(
+            context,
+            'Information',
+            SizedBox(),
+            _buildInformationList(),
+          ),
         ],
       ),
     );
@@ -105,12 +109,43 @@ class _ManageStudentState extends State<ManageStudent> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                      decorationThickness: 5.0,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900),
+                Row(
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                          decorationThickness: 5.0,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900),
+                    ),
+                    Spacer(),
+                    Visibility(
+                      visible: title != 'Students',
+                      child: Row(
+                        children: [
+                          Visibility(
+                            visible:
+                                _controller.selectedStudent?.firstName != null,
+                            child: Text(
+                              'Selected Student: ',
+                              style: TextStyle(
+                                  decorationThickness: 5.0,
+                                  fontSize: 24,
+                                  color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                          Text(
+                            '${_controller.selectedStudent?.firstName ?? ''} ${_controller.selectedStudent?.lastName ?? ''}',
+                            style: TextStyle(
+                                decorationThickness: 5.0,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 4.0),
                 Container(
@@ -142,12 +177,12 @@ class _ManageStudentState extends State<ManageStudent> {
   Widget _dataTableStudents(BuildContext context) {
     return PaginatedDataTable(
       columns: [
-        _dataColumn('Student No', 80),
+        _dataColumn('Student No', 70),
         // _dataColumn('RFID'),
         _dataColumn('Last Name'),
         _dataColumn('First Name'),
         _dataColumn('Course'),
-        _dataColumn('Year'),
+        _dataColumn('Year', 40),
       ],
       showFirstLastButtons: true,
       rowsPerPage: 20,
@@ -159,11 +194,8 @@ class _ManageStudentState extends State<ManageStudent> {
   }
 
   StudentDataSource _createStudentDataSource() {
-    print(_dataController.filteredStudents);
     return StudentDataSource(
-      _dataController.filteredStudents,
-      _dataController,
-    );
+        _controller.filteredStudents, _controller, context);
   }
 
   // AttendanceDataSource _createAttendanceDataSource() {
@@ -173,15 +205,15 @@ class _ManageStudentState extends State<ManageStudent> {
   //   );
   // }
 
-  DataColumn _dataColumn(String title, [double width = 300]) {
-    bool isSortedColumn = _dataController.sortColumn == title;
+  DataColumn _dataColumn(String title, [double width = 90]) {
+    bool isSortedColumn = _controller.sortColumn == title;
 
     return DataColumn(
       label: SizedBox(
         width: width,
         child: InkWell(
           onTap: () {
-            _dataController.sortStudents(title);
+            _controller.sortStudents(title);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -195,7 +227,7 @@ class _ManageStudentState extends State<ManageStudent> {
               ),
               if (isSortedColumn)
                 Icon(
-                  _dataController.sortAscending
+                  _controller.sortAscending
                       ? Icons.arrow_drop_up_rounded
                       : Icons.arrow_drop_down_rounded,
                   color: Theme.of(context).primaryColor,
@@ -206,64 +238,6 @@ class _ManageStudentState extends State<ManageStudent> {
       ),
       numeric: false,
     );
-  }
-
-  DataColumn _dataColumnFaculty(String title) {
-    bool isSortedColumn = _dataController.sortColumnFaculties == title;
-
-    return DataColumn(
-      label: SizedBox(
-        width: 100,
-        child: InkWell(
-          onTap: () {
-            _dataController.sortFaculties(title);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  overflow: TextOverflow.ellipsis,
-                  title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              if (isSortedColumn)
-                Icon(
-                  _dataController.sortAscending
-                      ? Icons.arrow_drop_up_rounded
-                      : Icons.arrow_drop_down_rounded,
-                  color: Theme.of(context).primaryColor,
-                ),
-            ],
-          ),
-        ),
-      ),
-      numeric: false,
-    );
-  }
-
-  Widget _dataTableFaculty(BuildContext context) {
-    return Container(
-      child: PaginatedDataTable(
-        columns: [
-          _dataColumnFaculty('Faculty No'),
-          _dataColumnFaculty('Last Name'),
-          _dataColumnFaculty('First Name'),
-        ],
-        showFirstLastButtons: true,
-        rowsPerPage: 20,
-        onPageChanged: (int value) {
-          print('Page changed to $value');
-        },
-        source: _createFacultyDataSource(),
-      ),
-    );
-  }
-
-  FacultyDataSource _createFacultyDataSource() {
-    return FacultyDataSource(
-        _dataController.filteredFaculties, _dataController, context);
   }
 
   Widget _searchBarStudent(context) {
@@ -288,32 +262,205 @@ class _ManageStudentState extends State<ManageStudent> {
   }
 
   void _onSearchSubmittedStudents(String query) {
-    _dataController.searchStudents(query);
+    _controller.searchStudents(query);
   }
 
-  Widget _searchBarFaculty(context) {
-    return SizedBox(
-      child: TextField(
-        onSubmitted: _onSearchSubmittedFaculties,
-        controller: _textEditingControllerFaculty,
-        decoration: InputDecoration(
-          suffixIcon: Icon(Icons.search_outlined),
-          suffixIconColor: Color(0xFFF2F2F2),
-          border: InputBorder.none,
-          hintText: 'Search Faculty',
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFFF2F2F2),
-              width: 2.0,
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordControllerConfirm =
+      TextEditingController();
+
+  Widget _buildInformationList() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * 0.52,
             ),
-            borderRadius: BorderRadius.circular(12.0),
+            // height: MediaQuery.of(context).size.height * 0.52,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: Color(0xFFF2F2F2),
+                width: 2.0,
+              ),
+            ),
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              children: [
+                _controller.isGettingClasses
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Theme.of(context)
+                                .primaryColor, // Customize the color
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        width: double.infinity,
+                        child: _dataTableClasses(context)),
+              ],
+            ),
           ),
-        ),
+          SizedBox(height: 8.0),
+          Container(
+            height: 320,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: Color(0xFFF2F2F2),
+                width: 2.0,
+              ),
+            ),
+            padding: const EdgeInsets.all(8.0),
+            child: _resetPasswordForm(),
+          ),
+        ],
       ),
     );
   }
 
-  void _onSearchSubmittedFaculties(String query) {
-    _dataController.searchFaculties(query);
+  Widget _resetPasswordForm() {
+    usernameController.text =
+        _controller.selectedStudent?.studentNo.toString() ?? '';
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Reset Student password",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12.0),
+          TextField(
+            controller: usernameController,
+            decoration: const InputDecoration(
+              labelText: 'Username',
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(
+              labelText: 'New Password',
+            ),
+            obscureText: true,
+          ),
+          const SizedBox(height: 8.0),
+          TextField(
+            controller: passwordControllerConfirm,
+            decoration: const InputDecoration(
+              labelText: 'Confirm Password',
+            ),
+            obscureText: true,
+          ),
+          const SizedBox(height: 24.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () {
+                  _onForgetPasswordClick(context);
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  DataColumn customDataColumn({required Widget label, int flex = 2}) {
+    return DataColumn(
+      label: Expanded(
+        flex: flex,
+        child: label,
+      ),
+    );
+  }
+
+  Widget _dataTableClasses(context) {
+    return DataTable(
+      columns: [
+        customDataColumn(label: Text('Subject'), flex: 3),
+        customDataColumn(label: Text('Room'), flex: 1),
+        customDataColumn(label: Text('Time'), flex: 1),
+        customDataColumn(label: Text('Day'), flex: 1),
+      ],
+      rows: _controller.studentClasses
+          .map((attendance) => _buildDataRowClasses(context, attendance))
+          .toList(),
+    );
+  }
+
+  DataRow _buildDataRowClasses(BuildContext context, SubjectSchedule schedule) {
+    return DataRow(
+      cells: [
+        DataCell(
+          Text(
+            "${schedule.schedId} - ${schedule.subject?.subjectName ?? 'No subject name'}",
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            schedule.room.toString(),
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        DataCell(
+          Text(
+            getTimeStartEnd(schedule),
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        ),
+        DataCell(
+          Text(
+            schedule.day,
+            style: TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
+    final timeStart =
+        _controller.formatTime(subjectSchedule?.timeStart ?? DateTime.now());
+    final timeEnd =
+        _controller.formatTime(subjectSchedule?.timeEnd ?? DateTime.now());
+    return '$timeStart - $timeEnd';
+  }
+
+  void _onForgetPasswordClick(context) async {
+    if (usernameController.text.isEmpty || passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter a username or password.'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+    if (int.tryParse(usernameController.text) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Username must be a number.'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
   }
 }
