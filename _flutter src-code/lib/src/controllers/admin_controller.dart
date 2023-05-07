@@ -39,6 +39,7 @@ class AdminController with ChangeNotifier {
 
   List<Attendance> filteredAttendanceList = [];
   List<Student> students = [];
+  List<Student> studentsTemp = [];
   String selectedUserType = 'Student';
   List<Faculty> filteredFaculties = [];
 
@@ -962,6 +963,114 @@ class AdminController with ChangeNotifier {
     } finally {
       isGettingClasses = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> downloadClassListSchedId(
+      context, int schedId, String subjectName, int subjectId) async {
+    if (studentsTemp.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('No attendance data found'),
+            content: const Text('There is no attendance data to download.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    List<List<dynamic>> csvData = [
+      // Add headers to the CSV file
+      [
+        "Student No",
+        "Name",
+        "Year",
+        "Course",
+      ],
+    ];
+
+    for (Student student in studentsTemp) {
+      List<dynamic> row = [
+        student.studentNo,
+        '${student.firstName} ${student.lastName}',
+        student.year.name,
+        student.course,
+      ];
+      csvData.add(row);
+    }
+
+    String csv = const ListToCsvConverter().convert(csvData);
+    String fileName = "${subjectId}_${subjectName}_Class_List.csv";
+    if (kIsWeb) {
+      // Web implementation
+      AnchorElement(href: "data:text/csv;charset=utf-8,$csv")
+        ..setAttribute("download", fileName)
+        ..click();
+    } else {
+// Mobile implementation
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final file = io.File('$path/fileName');
+      await file.writeAsString(csv);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('CSV file saved to: ${file.path}')),
+      );
+    }
+  }
+
+  void handleEventJsonStudentList(CRUDReturn result) {
+    try {
+      if (studentsTemp.isNotEmpty) studentsTemp.clear();
+      Subject subjectStudent = Subject.fromJson(result.data[0]);
+      if (subjectStudent.students == null) {
+        return;
+      }
+
+      for (Student student in subjectStudent.students!) {
+        print(student);
+        studentsTemp.add(student);
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      if (kDebugMode) {
+        print('handleEventJsonStudentList $e $stacktrace');
+      }
+    }
+  }
+
+  bool isGetStudentListByLoading = false;
+  Future<void> getStudentListbySchedId(int schedId) async {
+    try {
+      isGetStudentListByLoading = true;
+      notifyListeners();
+
+      CRUDReturn response = await StudentService.getStudentsBySchedId(schedId);
+      if (kDebugMode) {
+        _logger.i(' getStudentListbySchedId ${response.data}');
+      }
+
+      if (response.success) {
+        if (kDebugMode) {
+          _logger.i(' response.success');
+        }
+        handleEventJsonStudentList(response);
+      }
+      isGetStudentListByLoading = false;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('StudentListController getStudentListbySchedId $e $stacktrace');
     }
   }
 }

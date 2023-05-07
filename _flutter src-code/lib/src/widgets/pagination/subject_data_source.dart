@@ -5,6 +5,7 @@ import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 import 'package:samids_web_app/src/services/config.services.dart';
 
+import '../../model/student_model.dart';
 import '../../model/subject_model.dart';
 
 class SubjectDataSource extends DataTableSource {
@@ -105,7 +106,16 @@ class SubjectDataSource extends DataTableSource {
                             .withOpacity(0.5),
                       )),
                   IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _dataController.getStudentListbySchedId(
+                            schedule.subject?.subjectID ?? 0);
+                        _showMyClassesDialog(
+                          context,
+                          schedule.schedId,
+                          schedule.subject?.subjectName ?? 'No Subject',
+                          schedule.schedId,
+                        );
+                      },
                       icon: Icon(
                         Icons.info_outline,
                         color: Theme.of(context)
@@ -282,6 +292,88 @@ class SubjectDataSource extends DataTableSource {
           },
         );
       },
+    );
+  }
+
+  void _showMyClassesDialog(
+      BuildContext context, subjectId, title, int schedId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AnimatedBuilder(
+          animation: _dataController,
+          builder: (context, _) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('$title - Class List'),
+                  TextButton(
+                      onPressed: () async {
+                        await _dataController.downloadClassListSchedId(
+                            context, schedId, title, subjectId);
+                      },
+                      child: Text("Download Table")),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: _dataTableClassList(context, schedId),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _dataTableClassList(context, int schedId) {
+    // if (_dataController.isGetStudentListByLoading) {
+    //   return Center(child: CircularProgressIndicator());
+    // }
+
+    return DataTable(
+      columns: [
+        _customDataColumn(label: Text('Student No.'), flex: 3),
+        _customDataColumn(label: Text('First Name'), flex: 1),
+        _customDataColumn(label: Text('Last Name'), flex: 1),
+        _customDataColumn(label: Text('Year'), flex: 1),
+        _customDataColumn(label: Text('Course'), flex: 1),
+      ],
+      rows: _dataController.studentsTemp
+          .map((student) => _buildDataRowClassList(context, student))
+          .toList(),
+    );
+  }
+
+  DataColumn _customDataColumn({required Widget label, int flex = 1}) {
+    return DataColumn(
+      label: Expanded(
+        flex: flex,
+        child: label,
+      ),
+    );
+  }
+
+  DataRow _buildDataRowClassList(BuildContext context, Student student) {
+    return DataRow(
+      cells: [
+        _tableDataCell(student.studentNo.toString()),
+        _tableDataCell(student.firstName),
+        _tableDataCell(student.lastName),
+        _tableDataCell(student.year.name),
+        _tableDataCell(student.course),
+      ],
+    );
+  }
+
+  _tableDataCell(String text) {
+    return DataCell(
+      Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+        ),
+      ),
     );
   }
 }

@@ -532,7 +532,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  DataColumn customDataColumn({required Widget label, int flex = 1}) {
+  DataColumn _customDataColumn({required Widget label, int flex = 1}) {
     return DataColumn(
       label: Expanded(
         flex: flex,
@@ -1303,11 +1303,11 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
 
     return DataTable(
       columns: [
-        customDataColumn(label: Text('Student No.'), flex: 3),
-        customDataColumn(label: Text('First Name'), flex: 1),
-        customDataColumn(label: Text('Last Name'), flex: 1),
-        customDataColumn(label: Text('Year'), flex: 1),
-        customDataColumn(label: Text('Course'), flex: 1),
+        _customDataColumn(label: Text('Student No.'), flex: 3),
+        _customDataColumn(label: Text('First Name'), flex: 1),
+        _customDataColumn(label: Text('Last Name'), flex: 1),
+        _customDataColumn(label: Text('Year'), flex: 1),
+        _customDataColumn(label: Text('Course'), flex: 1),
       ],
       rows: _dataController.students
           .map((student) => _buildDataRowClassList(context, student))
@@ -1318,10 +1318,10 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   Widget _dataTableClasses(context) {
     return DataTable(
       columns: [
-        customDataColumn(label: Text('Subject'), flex: 3),
-        customDataColumn(label: Text('Room'), flex: 1),
-        customDataColumn(label: Text('Time'), flex: 1),
-        customDataColumn(label: Text('Day'), flex: 1),
+        _customDataColumn(label: Text('Subject'), flex: 3),
+        _customDataColumn(label: Text('Room'), flex: 1),
+        _customDataColumn(label: Text('Time'), flex: 1),
+        _customDataColumn(label: Text('Day'), flex: 1),
       ],
       rows: _dataController.facultyClasses
           .map((attendance) => _buildDataRowClasses(context, attendance))
