@@ -14,9 +14,9 @@ class FacultyService {
   static Future<CRUDReturn> getFaculties() async {
     try {
       final response = await HttpService.get('$_baseUrl/Faculty');
-      if (kDebugMode) {
-        _logger.i('getFaculties ${response.statusCode} ${response.body}');
-      }
+      // if (kDebugMode) {
+      //   _logger.i('getFaculties ${response.statusCode} ${response.body}');
+      // }
       return CRUDReturn.fromJson(jsonDecode(response.body));
     } catch (e, stacktrace) {
       if (kDebugMode) _logger.i(' getFaculties $e $stacktrace');

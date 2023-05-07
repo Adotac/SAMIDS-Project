@@ -28,20 +28,19 @@ class AttendanceDataSourceSt extends DataTableSource {
   DataRow _buildAttendanceRow(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
-        dataCell(attendance.attendanceId.toString()),
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
         dataCell(sdController.formatDate(attendance.actualTimeIn!)),
-        dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
+        dataCell(attendance.subjectSchedule?.day.toString() ?? 'No Date'),
         dataCell(
           attendance.subjectSchedule?.room.toString() ?? 'No room code',
         ),
         dataCell(attendance.actualTimeIn != null
             ? sdController.formatTime(attendance.actualTimeIn!)
-            : 'No Time In'),
+            : 'Pending'),
         dataCell(attendance.actualTimeOut != null
             ? sdController.formatTime(attendance.actualTimeOut!)
-            : 'No Time Out'),
+            : 'Pending'),
         DataCell(sdController.getStatusText(attendance.remarks.name)),
         // DataCell(
         //   Row(

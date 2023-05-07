@@ -141,6 +141,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                     await _dataController.downloadData(context);
                   },
                   child: Text("Download Table")),
+              const SizedBox(width: 4.0),
               TextButton(
                   onPressed: () {
                     _dataController.attendanceReset();
@@ -255,6 +256,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                             await _dataController.downloadData(context);
                           },
                           child: Text("Download Table")),
+                      const SizedBox(width: 4.0),
                       TextButton(
                           onPressed: () {
                             _dataController.attendanceReset();

@@ -44,7 +44,7 @@ class Attendance {
       actualTimeOut: json['actualTimeOut'] != null
           ? DateTime.parse(json['actualTimeOut'])
           : null,
-      remarks: remarksValues.map[json['remarks']]!,
+      remarks: remarksValues.map[json['remarks']] ?? Remarks.onTime,
     );
   }
 

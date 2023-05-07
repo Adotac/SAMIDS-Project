@@ -165,6 +165,8 @@ class _StudentAttendanceState extends State<StudentAttendance>
                       await _dataController.downloadData(context);
                     },
                     child: Text("Download Table")),
+                const SizedBox(width: 4.0),
+                const SizedBox(width: 4.0),
                 TextButton(
                     onPressed: () {
                       _dataController.attendanceReset();
@@ -188,7 +190,6 @@ class _StudentAttendanceState extends State<StudentAttendance>
         builder: (context, snapshot) {
           return PaginatedDataTable(
               columns: [
-                _dataColumn('Reference No'),
                 _dataColumn("Subject"),
                 _dataColumn("Date"),
                 _dataColumn("Day"),
@@ -296,7 +297,8 @@ class _StudentAttendanceState extends State<StudentAttendance>
                   onPressed: () async {
                     await _dataController.downloadData(context);
                   },
-                  child: Text("Download Table")),
+                  child: Text("Download")),
+              const SizedBox(width: 4.0),
               TextButton(
                   onPressed: () {
                     _dataController.attendanceReset();

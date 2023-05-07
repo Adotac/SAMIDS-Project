@@ -48,7 +48,7 @@ class AttendanceService {
       if (kDebugMode) Logger().i('${query} ${date != null}');
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
-          // if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');
+          if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');
           final jsonResponse = jsonDecode(response.body);
           return CRUDReturn.fromJson(jsonResponse);
         } else {

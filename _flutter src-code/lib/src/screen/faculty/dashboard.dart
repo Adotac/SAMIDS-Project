@@ -401,6 +401,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             _dataController.filterTodayAttendance(schedId);
                           },
                           child: Text(_dataController.btnName)),
+                      SizedBox(width: 4.0),
                       TextButton(
                           onPressed: () async {
                             await _dataController.downloadAttendanceBySchedId(
@@ -831,6 +832,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                       },
                       child: Text('Class List'),
                     ),
+                    const SizedBox(width: 4.0),
                     TextButton(
                       onPressed: () {
                         _showAttendanceDialog(
@@ -884,6 +886,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                           },
                           child: Text('Class List'),
                         ),
+                        const SizedBox(width: 4.0),
                         TextButton(
                           onPressed: () {
                             Navigator.push(

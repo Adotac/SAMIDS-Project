@@ -82,10 +82,10 @@ class ConfigService {
       final response = await HttpService.get('$_baseUrl/Subject/Schedules');
 
       if (response.statusCode == 200) {
-        if (kDebugMode) {
-          _logger
-              .i('getSubjectSchedules ${response.statusCode} ${response.body}');
-        }
+        // if (kDebugMode) {
+        //   _logger
+        //       .i('getSubjectSchedules ${response.statusCode} ${response.body}');
+        // }
         if (response.body.isNotEmpty) {
           final jsonResponse = jsonDecode(response.body);
           List<dynamic> jsonData = jsonResponse[
@@ -339,9 +339,9 @@ class ConfigService {
   static Future<CRUDReturn> getSubjects() async {
     try {
       final response = await HttpService.get('$_baseUrl/Subject');
-      if (kDebugMode) {
-        _logger.i('getSubjects ${response.statusCode} ${response.body}');
-      }
+      // if (kDebugMode) {
+      //   _logger.i('getSubjects ${response.statusCode} ${response.body}');
+      // }
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           final jsonResponse = jsonDecode(response.body);

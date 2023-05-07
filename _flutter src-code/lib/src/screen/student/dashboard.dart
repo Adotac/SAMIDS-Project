@@ -104,8 +104,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
                                         child: Card(
                                           child: StudentInfoCard(
                                             id: _sdController.student.studentNo,
-                                            year:
-                                                _sdController.student.year.name,
+                                            year: _sdController
+                                                .student.year.index
+                                                .toString(),
                                             course:
                                                 _sdController.student.course,
                                             firstName:

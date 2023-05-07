@@ -60,6 +60,7 @@ class _FacultySubjectAttendanceListState
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor),
                   ),
+                  const SizedBox(width: 4.0),
                   TextButton(
                       onPressed: () async {
                         await _dataController.downloadAttendanceBySchedId(

@@ -297,6 +297,8 @@ class AdminController with ChangeNotifier {
         await handEventJsonAttendanceAll(response);
         isAllAttendanceCollected = true;
         notifyListeners();
+      } else {
+        _logger.i('adminController else ${response.data}');
       }
     } catch (e, stacktrace) {
       _logger.i('adminController getAttendanceAll $e $stacktrace');
@@ -511,6 +513,7 @@ class AdminController with ChangeNotifier {
     for (Map<String, dynamic> map in result.data) {
       allAttendanceList.add(Attendance.fromJson(map));
     }
+    _logger.i('allAttendanceList $allAttendanceList');
     filteredAttendanceList = allAttendanceList;
     attendanceListToDownload = allAttendanceList;
     notifyListeners();

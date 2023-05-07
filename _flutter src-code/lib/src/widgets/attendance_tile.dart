@@ -122,16 +122,16 @@ class AttendanceTile extends StatelessWidget {
           children: [
             remarks,
             const Spacer(),
-            Expanded(
-              child: IconButton(
-                  onPressed: () {
-                    const EditAttendanceDialog();
-                  },
-                  icon: Icon(
-                    Icons.report_gmailerrorred_outlined,
-                    color: Theme.of(context).primaryColor,
-                  )),
-            ),
+            // Expanded(
+            //   child: IconButton(
+            //       onPressed: () {
+            //         const EditAttendanceDialog();
+            //       },
+            //       icon: Icon(
+            //         Icons.report_gmailerrorred_outlined,
+            //         color: Theme.of(context).primaryColor,
+            //       )),
+            // ),
           ],
         ),
       ),

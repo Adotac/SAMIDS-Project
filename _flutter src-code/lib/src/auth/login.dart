@@ -35,17 +35,18 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '0000';
-    // _usernameController.text = '20001';
+    // _usernameController.text = '0000';
+
+    _usernameController.text = '200007';
 
     //200005 faculty
     //35526 admin
-    //91204 user
-    _passwordController = TextEditingController();
-    _passwordController.text = 'admin';
 
+    _passwordController = TextEditingController();
+    // _passwordController.text = 'admin';
+    _passwordController.text = '200007';
+    // _passwordController.text = '100003';
     _onLogin(context);
-    // _passwordController.text = '200012';
     super.initState();
   }
 
@@ -393,6 +394,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 10,
                   ),
                   TextButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                    ),
                     onPressed: () => _showForgetPasswordDialog(context),
                     child: const Text("Forget password?"),
                   ),
@@ -400,6 +405,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 4,
                   ),
                   TextButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.white),
+                    ),
                     onPressed: () => {_controller.setShowRegister(true)},
                     child: const Text("Don't have an account? Register"),
                   ),
@@ -595,6 +604,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 20,
               ),
               TextButton(
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.white),
+                ),
                 onPressed: () => _showForgetPasswordDialog(context),
                 child: const Text("Forget password?"),
               ),
@@ -602,6 +615,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 3,
               ),
               TextButton(
+                style:
+                    TextButton.styleFrom(backgroundColor: Colors.transparent),
                 onPressed: () => {_controller.setShowRegister(true)},
                 child: const Text("Don't have an account? Register"),
               ),
