@@ -408,4 +408,23 @@ class ConfigService {
       rethrow;
     }
   }
+
+  static Future<CRUDReturn> updateSubject(
+      int id, int timeStart, int timeEnd, int schedId) async {
+    try {
+      final response = await HttpService.patch(
+        '$_baseUrl/Subject?id=$id&timeStart=$timeStart&timeEnd=$timeEnd&schedId=$schedId',
+        headers: {
+          'accept': 'text/plain',
+        },
+      );
+      if (kDebugMode) {
+        _logger.i('updateSubject ${response.statusCode} ${response.body}');
+      }
+      return CRUDReturn.fromJson(jsonDecode(response.body));
+    } catch (e, stacktrace) {
+      if (kDebugMode) _logger.i(' updateSubject $e $stacktrace');
+      rethrow;
+    }
+  }
 }

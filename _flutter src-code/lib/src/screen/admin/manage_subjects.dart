@@ -94,12 +94,28 @@ class _ManageSubjectsState extends State<ManageSubjects> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                    decorationThickness: 5.0,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900),
+              Row(
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                        decorationThickness: 5.0,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900),
+                  ),
+                  const Spacer(),
+                  // TextButton(
+                  //   onPressed: () {
+                  //     showEditSubjectScheduleDialog(context);
+                  //   },
+                  //   child: Text('Edit Subject'),
+                  // ),
+                  // const SizedBox(width: 8.0),
+                  // TextButton(
+                  //   onPressed: () {},
+                  //   child: Text('View Class'),
+                  // ),
+                ],
               ),
               SizedBox(height: 4.0),
               Container(

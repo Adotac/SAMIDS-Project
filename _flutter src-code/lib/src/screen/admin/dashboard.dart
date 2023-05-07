@@ -41,7 +41,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     adminController.getStudents();
     adminController.getAttendanceAll(null);
     adminController.getFaculties();
-    Navigator.popAndPushNamed(context, ManageSubjects.routeName);
+
     super.initState();
   }
 
@@ -52,6 +52,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (lbCon, BoxConstraints constraints) {
+      // Navigator.popAndPushNamed(context, ManageSubjects.routeName);
       if (constraints.maxWidth < 360 || constraints.maxHeight < 650) {
         return const ScreenSizeWarning();
       }

@@ -88,16 +88,32 @@ class SubjectDataSource extends DataTableSource {
               child: Row(
                 children: [
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.edit_outlined)),
+                      onPressed: () {
+                        showEditSubjectScheduleDialog(context);
+                      },
+                      icon: Icon(
+                        Icons.edit_outlined,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.5),
+                      )),
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.info_outline))
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.info_outline,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.5),
+                      ))
                 ],
               )),
         ),
         // DataCell(
         //   SingleChildScrollView(
         //       scrollDirection: Axis.horizontal,
-        //       child: Text('${schedule.subject?.students?.length  ?? '0'}')),
+        //       child: Text('${schedule.subject?.students?.length ?? '0'}')),
         // ),
       ],
     );
@@ -125,6 +141,86 @@ class SubjectDataSource extends DataTableSource {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> showEditSubjectScheduleDialog(BuildContext context) async {
+    TimeOfDay startTime = TimeOfDay.now();
+    TimeOfDay endTime =
+        TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
+
+    Future<void> _pickTime(BuildContext context, TimeOfDay initialTime,
+        Function(TimeOfDay) onPicked) async {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: initialTime,
+      );
+
+      if (pickedTime != null) {
+        onPicked(pickedTime);
+      }
+    }
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Edit Subject Schedule'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('Start Time'),
+                  SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await _pickTime(context, startTime, (newStartTime) {
+                        setState(() {
+                          startTime = newStartTime;
+                        });
+                      });
+                    },
+                    child: Text(
+                      '${startTime.format(context)}',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('End Time'),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      await _pickTime(context, endTime, (newEndTime) {
+                        setState(() {
+                          endTime = newEndTime;
+                        });
+                      });
+                    },
+                    child: Text(
+                      '${endTime.format(context)}',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    // Save your changes here
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );
