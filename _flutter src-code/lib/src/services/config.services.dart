@@ -410,13 +410,12 @@ class ConfigService {
   }
 
   static Future<CRUDReturn> updateSubject(
-      int id, int timeStart, int timeEnd, int schedId) async {
+      String timeStart, String timeEnd, int schedId) async {
     try {
+      print([timeStart, timeEnd, schedId]);
       final response = await HttpService.patch(
-        '$_baseUrl/Subject?id=$id&timeStart=$timeStart&timeEnd=$timeEnd&schedId=$schedId',
-        headers: {
-          'accept': 'text/plain',
-        },
+        '$_baseUrl/Subject?timeStart=$timeStart&timeEnd=$timeEnd&schedId=$schedId',
+        headers: {'accept': 'text/plain'},
       );
       if (kDebugMode) {
         _logger.i('updateSubject ${response.statusCode} ${response.body}');

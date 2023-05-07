@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:samids_web_app/src/controllers/admin_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
+import 'package:samids_web_app/src/services/config.services.dart';
 
 import '../../model/subject_model.dart';
 
@@ -89,7 +90,12 @@ class SubjectDataSource extends DataTableSource {
                 children: [
                   IconButton(
                       onPressed: () {
-                        showEditSubjectScheduleDialog(context);
+                        showEditSubjectScheduleDialog(
+                            context,
+                            schedule.schedId,
+                            schedule.subject?.subjectName ?? 'No Code',
+                            schedule.timeStart,
+                            schedule.timeEnd);
                       },
                       icon: Icon(
                         Icons.edit_outlined,
@@ -146,10 +152,10 @@ class SubjectDataSource extends DataTableSource {
     );
   }
 
-  Future<void> showEditSubjectScheduleDialog(BuildContext context) async {
-    TimeOfDay startTime = TimeOfDay.now();
-    TimeOfDay endTime =
-        TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
+  Future<void> showEditSubjectScheduleDialog(BuildContext context, int schedId,
+      String code, DateTime timeStart, DateTime timeEnd) async {
+    TimeOfDay startTime = TimeOfDay.fromDateTime(timeStart);
+    TimeOfDay endTime = TimeOfDay.fromDateTime(timeEnd);
 
     Future<void> _pickTime(BuildContext context, TimeOfDay initialTime,
         Function(TimeOfDay) onPicked) async {
@@ -169,22 +175,39 @@ class SubjectDataSource extends DataTableSource {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Text('Edit Subject Schedule'),
+              title: Row(
+                children: [
+                  const Text('Edit '),
+                  Text(
+                    code,
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                  const Text(' schedule'),
+                ],
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text('Start Time'),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
+                  const Text('Start Time'),
+                  const SizedBox(height: 8),
                   GestureDetector(
                     onTap: () async {
                       await _pickTime(context, startTime, (newStartTime) {
                         setState(() {
                           startTime = newStartTime;
+
+                          if (startTime.hour > endTime.hour ||
+                              (startTime.hour == endTime.hour &&
+                                  startTime.minute > endTime.minute)) {
+                            endTime = TimeOfDay(
+                                hour: startTime.hour, minute: startTime.minute);
+                          }
                         });
                       });
                     },
                     child: Text(
-                      '${startTime.format(context)}',
+                      startTime.format(context),
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                       ),
@@ -198,11 +221,37 @@ class SubjectDataSource extends DataTableSource {
                       await _pickTime(context, endTime, (newEndTime) {
                         setState(() {
                           endTime = newEndTime;
+
+                          if (endTime.hour < startTime.hour ||
+                              (endTime.hour == startTime.hour &&
+                                  endTime.minute < startTime.minute)) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Error',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                  content: const Text(
+                                      'End time cannot be earlier than start time.'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                         });
                       });
                     },
                     child: Text(
-                      '${endTime.format(context)}',
+                      endTime.format(context),
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                       ),
@@ -213,8 +262,18 @@ class SubjectDataSource extends DataTableSource {
               actions: <Widget>[
                 TextButton(
                   child: const Text('Save'),
-                  onPressed: () {
-                    // Save your changes here
+                  onPressed: () async {
+                    DateTime endTimeDate =
+                        DateTime(2023, 1, 1, endTime.hour, endTime.minute);
+                    String isoTimeEnd = endTimeDate.toIso8601String();
+
+                    DateTime startTimeDate =
+                        DateTime(2023, 1, 1, startTime.hour, startTime.minute);
+                    String isoTimeStart = startTimeDate.toIso8601String();
+                    await ConfigService.updateSubject(
+                        isoTimeStart, isoTimeEnd, schedId);
+                    await _dataController.getSubjectSchedules();
+
                     Navigator.of(context).pop();
                   },
                 ),
