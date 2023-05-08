@@ -88,15 +88,12 @@ class AdminController with ChangeNotifier {
   static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
-    
   }
 
   Student? selectedStudent;
 
   Faculty? selectedFaculty;
   Faculty? tempFaculty;
-
-
 
   void clearList() {
     selectedFiles.clear();
@@ -201,13 +198,13 @@ class AdminController with ChangeNotifier {
 
   handEventJsonAttendanceAll(CRUDReturn result) {
     if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
-    if(result.count != null){
-      if(result.count! < 10){
+    if (result.count != null) {
+      if (result.count! < 10) {
         print(result.count!);
-      setParams(pageSize: result.count!);
+        setParams(pageSize: result.count!);
+      }
     }
-    }
-    
+
     for (Map<String, dynamic> map in result.data) {
       allAttendanceList.add(Attendance.fromJson(map));
     }
@@ -1190,7 +1187,7 @@ class AdminController with ChangeNotifier {
       isGetStudentAttendanceLoading = true;
       notifyListeners();
 
-      CRUDReturn response = await AttendanceService.getAll(
+      CRUDReturn response = await AttendanceService.getAttendances(
           schedId: schedId, studentNo: selectedStudent!.studentNo);
       if (kDebugMode) {
         _logger.i(' getStudentAttendance ${response.data}');

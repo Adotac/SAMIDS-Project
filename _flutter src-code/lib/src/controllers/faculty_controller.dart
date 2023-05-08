@@ -342,6 +342,28 @@ class FacultyController with ChangeNotifier {
     );
   }
 
+  Future<void> getAttendanceBySchedId(int schedId, DateTime date) async {
+    try {
+      print([1, schedId]);
+      final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+      CRUDReturn response = await AttendanceService.getAttendances(
+        schedId: schedId,
+        //Remove me
+        date: dateFormat.format(date),
+        // studentNo: faculty.facultyNo,
+        // studentNo: 91204,
+      );
+      if (response.success) {
+        handleEventJsonAttendanceBySchedId(response, schedId);
+
+        dateSelected = null;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
+    }
+  }
+
   //create function to query to FacultyService getFacultyClasses
   Future<void> getFacultyClasses() async {
     try {
@@ -395,11 +417,11 @@ class FacultyController with ChangeNotifier {
     try {
       // if (isAllAttendanceCollected && date == null) return;
       CRUDReturn response = date != null
-          ? await AttendanceService.getAll(
+          ? await AttendanceService.getAttendances(
               facultyNo: faculty.facultyNo,
               date: date,
             )
-          : await AttendanceService.getAll(
+          : await AttendanceService.getAttendances(
               facultyNo: faculty.facultyNo,
             );
 

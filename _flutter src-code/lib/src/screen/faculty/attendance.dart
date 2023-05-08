@@ -253,7 +253,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                                 );
                               });
                             } else {
-                              _dataController.attendanceReset();
+                              // _dataController.attendanceReset();
                             }
                           },
                         ),
