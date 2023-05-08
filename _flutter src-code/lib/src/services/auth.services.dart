@@ -59,7 +59,7 @@ class AuthService {
       String newPassword, int? userNo, String? token  ) async {
     try {
       print('changePassword');
-      print('newPassword=$newPassword&$userType=$userNo');
+      //print('newPassword=$newPassword&$userType=$userNo');
       final response = await HttpService.patch(
         '$_baseUrl/change-password?',
         query: {"newPassword": newPassword, "id": userNo, "token": token},

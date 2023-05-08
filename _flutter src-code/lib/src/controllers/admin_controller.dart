@@ -35,7 +35,6 @@ class AdminController with ChangeNotifier {
   List<SubjectSchedule> studentClasses = [];
 
   List<SubjectSchedule> filteredSubjectSchedule = [];
-
   List<Attendance> filteredAttendanceList = [];
   List<Student> students = [];
   List<Student> studentsTemp = [];
@@ -60,9 +59,24 @@ class AdminController with ChangeNotifier {
   String sortColumnStudent = "";
   String lateMinutes = '';
   String absentMinutes = '';
-
+  String? sear;
   String sortColumnFaculties = '';
   bool sortAscendingFaculties = true;
+
+//Attendance Parameters for filtering
+  DateTime? date;
+  String? room;
+  int? studentNo;
+  int? facultyNo;
+  Remarks? remarks;
+  int? subjectId;
+  int? schedId;
+  String? search;
+  DateTime? fromDate;
+  DateTime? toDate;
+  int page = 1;
+  int pageSize = 10;
+
   final Logger _logger = Logger();
 
   final facultyIdController = TextEditingController();
@@ -74,12 +88,16 @@ class AdminController with ChangeNotifier {
   static AdminController get instance => GetIt.instance<AdminController>();
   static void initialize() {
     GetIt.instance.registerSingleton<AdminController>(AdminController());
+    
   }
 
   Student? selectedStudent;
 
   Faculty? selectedFaculty;
   Faculty? tempFaculty;
+
+
+
   void clearList() {
     selectedFiles.clear();
     selectedFileTable.clear();
@@ -119,6 +137,83 @@ class AdminController with ChangeNotifier {
     } else {
       uploadStatus.add(message);
     }
+    notifyListeners();
+  }
+
+  Future<void> getAttendanceAll() async {
+    try {
+      //if (isAllAttendanceCollected) return;
+      CRUDReturn response = await AttendanceService.getAttendances(
+        date: date != null ? date!.toIso8601String() : null,
+        room: room,
+        studentNo: studentNo,
+        facultyNo: facultyNo,
+        remarks: remarks,
+        subjectId: subjectId,
+        schedId: schedId,
+        search: search,
+        fromDate: fromDate,
+        toDate: toDate,
+        page: page,
+        pageSize: pageSize,
+      );
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        //isAllAttendanceCollected = true;
+        notifyListeners();
+      } else {
+        _logger.i('adminController else ${response.data}');
+      }
+    } catch (e, stacktrace) {
+      _logger.i('adminController getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  setParams({
+    DateTime? date,
+    String? room,
+    int? studentNo,
+    int? facultyNo,
+    Remarks? remarks,
+    int? subjectId,
+    int? schedId,
+    String? search,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? page,
+    int? pageSize,
+  }) {
+    this.date = date;
+    this.room = room;
+    this.studentNo = studentNo;
+    this.facultyNo = facultyNo;
+    this.remarks = remarks;
+    this.subjectId = subjectId;
+    this.schedId = schedId;
+    this.search = search;
+    this.fromDate = fromDate;
+    this.toDate = toDate;
+    this.page = page ?? this.page;
+    this.pageSize = pageSize ?? this.pageSize;
+    getAttendanceAll();
+    notifyListeners();
+  }
+
+  handEventJsonAttendanceAll(CRUDReturn result) {
+    if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
+    if(result.count != null){
+      if(result.count! < 10){
+        print(result.count!);
+      setParams(pageSize: result.count!);
+    }
+    }
+    
+    for (Map<String, dynamic> map in result.data) {
+      allAttendanceList.add(Attendance.fromJson(map));
+    }
+    _logger.i('allAttendanceList $allAttendanceList');
+    // filteredAttendanceList = allAttendanceList;
+    // attendanceListToDownload = allAttendanceList;
     notifyListeners();
   }
 
@@ -232,32 +327,33 @@ class AdminController with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void filterAttendance(String query) {
-    if (query.isEmpty) {
-      filteredAttendanceList = allAttendanceList;
-      attendanceListToDownload = filteredAttendanceList;
-    } else {
-      filteredAttendanceList = allAttendanceList.where((attendance) {
-        final studentNo = attendance.student?.studentNo.toString() ?? '';
-        final firstName = attendance.student?.firstName.toLowerCase() ?? '';
-        final lastName = attendance.student?.lastName.toLowerCase() ?? '';
-        final subjectName =
-            attendance.subjectSchedule?.subject?.subjectName.toLowerCase() ??
-                '';
+//Searching - Depecrated
+  // void filterAttendance(String query) {
+  //   if (query.isEmpty) {
+  //     filteredAttendanceList = allAttendanceList;
+  //     attendanceListToDownload = filteredAttendanceList;
+  //   } else {
+  //     filteredAttendanceList = allAttendanceList.where((attendance) {
+  //       final studentNo = attendance.student?.studentNo.toString() ?? '';
+  //       final firstName = attendance.student?.firstName.toLowerCase() ?? '';
+  //       final lastName = attendance.student?.lastName.toLowerCase() ?? '';
+  //       final subjectName =
+  //           attendance.subjectSchedule?.subject?.subjectName.toLowerCase() ??
+  //               '';
 
-        final room = attendance.subjectSchedule?.room.toLowerCase() ?? '';
-        // final remarks = attendance.remarks.name.toLowerCase();
-        return firstName.contains(query.toLowerCase()) ||
-            studentNo.toString() == query ||
-            lastName.contains(query.toLowerCase()) ||
-            subjectName.contains(query.toLowerCase()) ||
-            room.contains(query.toLowerCase());
-        // remarks.contains(query.toLowerCase());
-      }).toList();
-    }
-    attendanceListToDownload = filteredAttendanceList;
-    notifyListeners();
-  }
+  //       final room = attendance.subjectSchedule?.room.toLowerCase() ?? '';
+  //       final remarks = attendance.remarks.name.toLowerCase();
+  //       return firstName.contains(query.toLowerCase()) ||
+  //           studentNo.toString() == query ||
+  //           lastName.contains(query.toLowerCase()) ||
+  //           subjectName.contains(query.toLowerCase()) ||
+  //           room.contains(query.toLowerCase()) ||
+  //           remarks.contains(query.toLowerCase());
+  //     }).toList();
+  //   }
+  //   attendanceListToDownload = filteredAttendanceList;
+  //   notifyListeners();
+  // }
 
   logout() {
     isStudentClassesCollected = false;
@@ -279,27 +375,6 @@ class AdminController with ChangeNotifier {
       notifyListeners();
     } catch (e, stacktrace) {
       print('handleEventJsonConfig $e $stacktrace');
-    }
-  }
-
-  Future<void> getAttendanceAll(String? date) async {
-    try {
-      if (isAllAttendanceCollected) return;
-
-      CRUDReturn response = date != null
-          ? await AttendanceService.getAll(
-              date: date,
-            )
-          : await AttendanceService.getAll();
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
-        isAllAttendanceCollected = true;
-        notifyListeners();
-      } else {
-        _logger.i('adminController else ${response.data}');
-      }
-    } catch (e, stacktrace) {
-      _logger.i('adminController getAttendanceAll $e $stacktrace');
     }
   }
 
@@ -396,12 +471,12 @@ class AdminController with ChangeNotifier {
 
     switch (column) {
       case "Student ID":
-        filteredAttendanceList.sort((a, b) =>
+        allAttendanceList.sort((a, b) =>
             order *
             (a.student?.studentNo.compareTo(b.student?.studentNo ?? 0) ?? 0));
         break;
       case "Name":
-        filteredAttendanceList.sort((a, b) {
+        allAttendanceList.sort((a, b) {
           int compare =
               a.student?.lastName.compareTo(b.student?.lastName ?? '') ?? 0;
           if (compare == 0) {
@@ -412,17 +487,17 @@ class AdminController with ChangeNotifier {
         });
         break;
       case "Reference ID":
-        filteredAttendanceList
+        allAttendanceList
             .sort((a, b) => order * a.attendanceId.compareTo(b.attendanceId));
         break;
       case "Room":
-        filteredAttendanceList.sort((a, b) =>
+        allAttendanceList.sort((a, b) =>
             order *
             (a.subjectSchedule?.room.compareTo(b.subjectSchedule?.room ?? '') ??
                 0));
         break;
       case "Subject":
-        filteredAttendanceList.sort((a, b) =>
+        allAttendanceList.sort((a, b) =>
             order *
             (a.subjectSchedule?.subject?.subjectName
                     .compareTo(b.subjectSchedule?.subject?.subjectName ?? '') ??
@@ -435,23 +510,23 @@ class AdminController with ChangeNotifier {
       //           .compareTo(b.subjectSchedule?.day.index as num));
       //   break;
       case "Date":
-        filteredAttendanceList.sort((a, b) =>
+        allAttendanceList.sort((a, b) =>
             order * (a.date?.compareTo(b.date ?? DateTime.now()) ?? 0));
         break;
       case "Time In":
-        filteredAttendanceList.sort((a, b) =>
+        allAttendanceList.sort((a, b) =>
             order *
             (a.actualTimeIn?.hour.compareTo(b.actualTimeIn?.hour ?? 0) ?? 0));
         break;
       case "Time Out":
-        filteredAttendanceList.sort((a, b) =>
+        allAttendanceList.sort((a, b) =>
             order *
             (a.actualTimeOut?.hour.compareTo(b.actualTimeOut?.hour ?? 0) ?? 0));
         break;
-      // case "Remarks":
-      //   filteredAttendanceList
-      //       .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
-      //   break;
+      case "Remarks":
+        allAttendanceList
+            .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
+        break;
     }
 
     notifyListeners();
@@ -495,17 +570,15 @@ class AdminController with ChangeNotifier {
     }
   }
 
-  handEventJsonAttendanceAll(CRUDReturn result) {
-    if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
+  // handEventJsonAttendance(CRUDReturn result) {
+  //   if (attendance.isNotEmpty) attendance.clear();
+  //   for (Map<String, dynamic> map in result.data) {
+  //     attendance.add(Attendance.fromJson(map));
+  //   }
 
-    for (Map<String, dynamic> map in result.data) {
-      allAttendanceList.add(Attendance.fromJson(map));
-    }
-    _logger.i('allAttendanceList $allAttendanceList');
-    filteredAttendanceList = allAttendanceList;
-    attendanceListToDownload = allAttendanceList;
-    notifyListeners();
-  }
+  //   isAttendanceTodayCollected = true;
+  //   notifyListeners();
+  // }
 
   void _handleEventJsonSchedule(CRUDReturn result) {
     try {
@@ -698,67 +771,67 @@ class AdminController with ChangeNotifier {
 
   List<Attendance> attendanceListToDownload = [];
 
-  handEventJsonAttendanceAllDownload(CRUDReturn result) {
-    if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
+  // handEventJsonAttendanceAllDownload(CRUDReturn result) {
+  //   if (allAttendanceList.isNotEmpty) allAttendanceList.clear();
 
-    for (Map<String, dynamic> map in result.data) {
-      attendanceListToDownload.add(Attendance.fromJson(map));
-    }
-    filteredAttendanceList = allAttendanceList;
-    notifyListeners();
-  }
+  //   for (Map<String, dynamic> map in result.data) {
+  //     attendanceListToDownload.add(Attendance.fromJson(map));
+  //   }
+  //   filteredAttendanceList = allAttendanceList;
+  //   notifyListeners();
+  // }
 
   String userTypeName = 'Attendance';
   int userId = 0;
 
-  Future<void> getDataToDownload(
-      int type, int? userNo, String? date, int? schedId, context) async {
-    CRUDReturn response;
-    try {
-      userTypeName = type == 0 ? 'Student' : 'Faculty';
-      userId = userNo ?? 0;
-      if (type == 0) {
-        response = await AttendanceService.getAll(
-          studentNo: userNo,
-          schedId: schedId,
-          date: date,
-        );
-      } else {
-        response = await AttendanceService.getAll(
-          facultyNo: userNo,
-          schedId: schedId,
-          date: date,
-        );
-      }
+  // Future<void> getDataToDownload(
+  //     int type, int? userNo, String? date, int? schedId, context) async {
+  //   CRUDReturn response;
+  //   try {
+  //     userTypeName = type == 0 ? 'Student' : 'Faculty';
+  //     userId = userNo ?? 0;
+  //     if (type == 0) {
+  //       response = await AttendanceService.getAll(
+  //         studentNo: userNo,
+  //         schedId: schedId,
+  //         date: date,
+  //       );
+  //     } else {
+  //       response = await AttendanceService.getAll(
+  //         facultyNo: userNo,
+  //         schedId: schedId,
+  //         date: date,
+  //       );
+  //     }
 
-      if (response.success) {
-        handEventJsonAttendanceAllDownload(response);
-        downloadData(context);
-      }
-    } catch (e, stacktrace) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error', style: TextStyle(color: Colors.red)),
-            content: Text(
-              '$e',
-              overflow: TextOverflow.ellipsis,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-      print('StudentDashboardController getAttendanceAll $e $stacktrace');
-    }
-  }
+  //     if (response.success) {
+  //       handEventJsonAttendanceAllDownload(response);
+  //       downloadData(context);
+  //     }
+  //   } catch (e, stacktrace) {
+  //     showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           title: const Text('Error', style: TextStyle(color: Colors.red)),
+  //           content: Text(
+  //             '$e',
+  //             overflow: TextOverflow.ellipsis,
+  //           ),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //               },
+  //               child: Text('OK'),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //     print('StudentDashboardController getAttendanceAll $e $stacktrace');
+  //   }
+  // }
 
   bool sortAscendingSub = true;
 

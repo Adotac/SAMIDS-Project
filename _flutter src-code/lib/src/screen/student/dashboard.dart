@@ -42,7 +42,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
   void initState() {
     _sdController.getConfig();
     _sdController.getAttendanceToday();
-    _sdController.getAttendanceAll(null);
+    //_sdController.getAttendanceAll(null);
     _sdController.getStudentClasses();
     _sdController.startStream(context);
     super.initState();

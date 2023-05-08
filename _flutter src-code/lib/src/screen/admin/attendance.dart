@@ -89,6 +89,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
 
   Widget _webView(BuildContext context) {
     return WebView(
+      adminController: _dataController,
       appBarTitle: "Admin Attendance",
       appBarActionWidget: _searchBar(context),
       selectedWidgetMarker: 1,
@@ -104,7 +105,11 @@ class _AdminAttendanceState extends State<AdminAttendance> {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       scrollDirection: Axis.vertical,
-      child: _dataTableAttendance(context),
+      child: AnimatedBuilder(
+        animation: _dataController,
+        builder:(context, child){
+          return  _dataTableAttendance(context);
+        }),
     );
   }
 
@@ -143,9 +148,10 @@ class _AdminAttendanceState extends State<AdminAttendance> {
                 _dataColumn("Remarks"),
               ],
               showFirstLastButtons: true,
-              rowsPerPage: 20,
+              rowsPerPage: _dataController.pageSize,
               onPageChanged: (int value) {
                 print('Page changed to $value');
+                _dataController.setParams(page: value);
               },
               source: _createAttendanceDataSource(),
             ),
@@ -164,7 +170,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
 
   AttendanceDataSourceAd _createAttendanceDataSource() {
     return AttendanceDataSourceAd(
-      _dataController.filteredAttendanceList,
+      _dataController.allAttendanceList,
       _dataController,
     );
   }
@@ -216,9 +222,15 @@ class _AdminAttendanceState extends State<AdminAttendance> {
       //     border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
         autofocus: true,
-        onSubmitted: (query) {
+        onChanged: (value) {
+          _dataController.setParams(search: value);
+          _dataController.getAttendanceAll();
+        },
+        onSubmitted: (value) {
           // Call filterAttendance with the search query entered by the user
-          _dataController.filterAttendance(query);
+         _dataController.setParams(search: value);
+         _dataController.getAttendanceAll();
+
         },
         controller: _textEditingController,
         decoration: const InputDecoration(
@@ -238,7 +250,8 @@ class _AdminAttendanceState extends State<AdminAttendance> {
         autofocus: true,
         onSubmitted: (query) {
           // Call filterAttendance with the search query entered by the user
-          _dataController.filterAttendance(query);
+          _dataController.setParams(search: query);
+          _dataController.getAttendanceAll();
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

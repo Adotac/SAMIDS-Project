@@ -23,7 +23,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
   @override
   void initState() {
     super.initState();
-    _dataController.getFacultyClasses();
+    // _dataController.getFacultyClasses();
   }
 
   @override

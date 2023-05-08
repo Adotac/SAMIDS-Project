@@ -101,46 +101,42 @@ class FacultyController with ChangeNotifier {
   //     print('StudentDashboardController getStudentClasses $e $stacktrace');
   //   }
   // }
-  Future<void> attendanceReset() async {
-    try {
-      CRUDReturn response = await AttendanceService.getAll(
-        studentNo: faculty.facultyNo,
-        // studentNo: 91204,
-      );
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
-        getRemarksCount();
-        isAllAttendanceCollected = true;
+  // Future<void> attendanceReset() async {
+  //   try {
+  //     CRUDReturn response = await AttendanceService.getAll(
+  //         // studentNo: faculty.facultyNo,
+  //         // studentNo: 91204,
+  //         );
+  //     if (response.success) {
+  //       await handEventJsonAttendanceAll(response);
+  //       getRemarksCount();
+  //       isAllAttendanceCollected = true;
 
-        dateSelected = null;
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      print('attendanceReset $e $stacktrace');
-    }
-  }
+  //       dateSelected = null;
+  //       notifyListeners();
+  //     }
+  //   } catch (e, stacktrace) {
+  //     print('attendanceReset $e $stacktrace');
+  //   }
+  // }
 
-  Future<void> getAttendanceBySchedId(int schedId, DateTime date) async {
-    try {
-      print([1, schedId]);
-      final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-      CRUDReturn response = await AttendanceService.getAll(
-        schedId: schedId,
-        //Remove me
-        date: dateFormat.format(date),
-        // studentNo: faculty.facultyNo,
-        // studentNo: 91204,
-      );
-      if (response.success) {
-        handleEventJsonAttendanceBySchedId(response, schedId);
+  // Future<void> getAttendanceBySchedId(int schedId) async {
+  //   try {
+  //     CRUDReturn response = await AttendanceService.getAll(
+  //       schedId: schedId,
+  //       // studentNo: faculty.facultyNo,
+  //       // studentNo: 91204,
+  //     );
+  //     if (response.success) {
+  //       handleEventJsonAttendanceBySchedId(response, schedId);
 
-        dateSelected = null;
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
-    }
-  }
+  //       dateSelected = null;
+  //       notifyListeners();
+  //     }
+  //   } catch (e, stacktrace) {
+  //     print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
+  //   }
+  // }
 
   Future<void> getConfig() async {
     try {
