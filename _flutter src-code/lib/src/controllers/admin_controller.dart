@@ -1107,4 +1107,45 @@ class AdminController with ChangeNotifier {
       print('handleEventJsonStudentClasses $e $stacktrace');
     }
   }
+
+  List<Attendance> studentAttendance = [];
+
+  //get student attendance
+  bool isGetStudentAttendanceLoading = false;
+  Future<void> getStudentAttendance(int schedId) async {
+    try {
+      isGetStudentAttendanceLoading = true;
+      notifyListeners();
+
+      CRUDReturn response = await AttendanceService.getAll(
+          schedId: schedId, studentNo: selectedStudent!.studentNo);
+      if (kDebugMode) {
+        _logger.i(' getStudentAttendance ${response.data}');
+      }
+
+      if (response.success) {
+        if (kDebugMode) {
+          _logger.i(' response.success');
+        }
+        handleEventJsonStudentAttendance(response);
+      }
+      isGetStudentAttendanceLoading = false;
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('StudentListController getStudentAttendance $e $stacktrace');
+    }
+  }
+
+  void handleEventJsonStudentAttendance(CRUDReturn result) {
+    try {
+      if (studentAttendance.isNotEmpty) studentAttendance.clear();
+      for (Map<String, dynamic> map in result.data) {
+        studentAttendance.add(Attendance.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonStudentAttendance $e $stacktrace');
+    }
+  }
 }

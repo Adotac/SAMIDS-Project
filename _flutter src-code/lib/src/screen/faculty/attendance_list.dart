@@ -96,13 +96,7 @@ class _FacultySubjectAttendanceListState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Ref No. ${attendance.attendanceId}',
-                  ),
-                  Text(
-                    'First Name ${attendance.student?.firstName ?? 'No First Name'}',
-                  ),
-                  Text(
-                    'Last Name: ${attendance.student?.lastName ?? 'No Last Name'}',
+                    'Name: ${attendance.student?.firstName ?? 'No First Name'} ${attendance.student?.lastName ?? 'No Last Name'}',
                   ),
                 ],
               ),

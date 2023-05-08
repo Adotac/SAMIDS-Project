@@ -1,5 +1,6 @@
 import 'package:samids_web_app/src/model/Subject_model.dart';
 import 'package:samids_web_app/src/model/enum_values.dart';
+import 'package:samids_web_app/src/model/faculty_model.dart';
 
 // enum Weekday {
 //   monday,
@@ -18,7 +19,7 @@ class SubjectSchedule {
   DateTime timeEnd;
   String day;
   String room;
-
+  Faculty? faculty;
   SubjectSchedule({
     required this.schedId,
     this.subject,
@@ -26,6 +27,7 @@ class SubjectSchedule {
     required this.timeEnd,
     required this.day,
     required this.room,
+    this.faculty,
   });
 
   static SubjectSchedule fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,8 @@ class SubjectSchedule {
       timeEnd: DateTime.parse(json['timeEnd']),
       day: displayDay(json['daysOfWeek'] ?? []),
       room: json['room'],
+      faculty:
+          json['faculty'] != null ? Faculty.fromJson(json['faculty']) : null,
     );
   }
 

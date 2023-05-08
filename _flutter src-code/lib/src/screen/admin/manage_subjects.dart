@@ -147,6 +147,7 @@ class _ManageSubjectsState extends State<ManageSubjects> {
     return PaginatedDataTable(
       columns: [
         _dataColumn('Subject Id'),
+        _dataColumn('Faculty'),
         _dataColumn('Code'),
         _dataColumn('Description', 400.0),
         _dataColumn('Room'),

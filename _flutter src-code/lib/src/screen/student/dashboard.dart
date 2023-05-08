@@ -295,7 +295,21 @@ class _StudentDashboardState extends State<StudentDashboard> {
         DataCell(
           Expanded(
             child: Text(
-              _sdController.formatTime(_getActualTime(attendance)),
+              attendance.actualTimeIn != null
+                  ? _sdController.formatTime(attendance.actualTimeIn!)
+                  : 'No Time In',
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        DataCell(
+          Expanded(
+            child: Text(
+              attendance.actualTimeOut != null
+                  ? _sdController.formatTime(attendance.actualTimeOut!)
+                  : 'No Time out',
               style: TextStyle(
                 fontSize: 14,
               ),
@@ -359,7 +373,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     label: Text('Room'),
                   ),
                   DataColumn(
-                    label: Text('Time'),
+                    label: Text('Time In'),
+                  ),
+                  DataColumn(
+                    label: Text('Time Out'),
                   ),
                   DataColumn(
                     label: Text('Remarks'),

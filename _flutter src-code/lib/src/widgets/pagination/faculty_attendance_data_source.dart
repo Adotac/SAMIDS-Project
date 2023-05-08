@@ -35,8 +35,8 @@ class AttendanceDataSourceFac extends DataTableSource {
             '${attendance.student?.firstName} ${attendance.student?.lastName}'),
         // dataCell(attendance.attendanceId.toString()),
         dataCell(attendance.subjectSchedule?.room ?? 'No Room'),
-        dataCell(attendance.subjectSchedule?.subject?.subjectName ??
-            'No subject name'),
+        dataCell(
+            '${attendance.subjectSchedule!.schedId} - ${attendance.subjectSchedule?.subject?.subjectName ?? 'No subject name'}'),
         dataCell(_dataController.formatDate(attendance.actualTimeIn!)),
         // dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
 

@@ -51,6 +51,17 @@ class SubjectDataSource extends DataTableSource {
             child: Container(
               constraints: const BoxConstraints(maxWidth: 120),
               child: Text(
+                '${schedule.faculty?.firstName ?? 'No Faculty'} ${schedule.faculty?.lastName ?? ''} ',
+              ),
+            ),
+          ),
+        ),
+        DataCell(
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: Text(
                 schedule.subject?.subjectName ?? 'No subject name',
               ),
             ),

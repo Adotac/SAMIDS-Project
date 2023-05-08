@@ -306,12 +306,14 @@ class StudentController with ChangeNotifier {
     }
   }
 
-  String formatTime(DateTime dateTime) {
+  String formatTime(DateTime? dateTime) {
+    if (dateTime == null) return 'N/A';
     final formattedTime = DateFormat('hh:mm a').format(dateTime);
     return formattedTime;
   }
 
-  String formatDate(DateTime dateTime) {
+  String formatDate(DateTime? dateTime) {
+    if (dateTime == null) return 'N/A';
     final formattedDate = DateFormat('MMMM d, yyyy').format(dateTime);
     return formattedDate;
   }

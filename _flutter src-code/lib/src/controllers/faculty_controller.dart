@@ -1,6 +1,7 @@
 //faculty
 //75779
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:io' as io;
@@ -67,8 +68,14 @@ class FacultyController with ChangeNotifier {
 
   static FacultyController get I => GetIt.instance<FacultyController>();
   static FacultyController get instance => GetIt.instance<FacultyController>();
-
+  Timer? timer;
   Config? config;
+  void startStream(context) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      print(timer.tick);
+      getFacultyClasses();
+    });
+  }
 
   void handleEventJsonConfig(CRUDReturn result) {
     try {
@@ -97,9 +104,9 @@ class FacultyController with ChangeNotifier {
   Future<void> attendanceReset() async {
     try {
       CRUDReturn response = await AttendanceService.getAll(
-          // studentNo: faculty.facultyNo,
-          // studentNo: 91204,
-          );
+        studentNo: faculty.facultyNo,
+        // studentNo: 91204,
+      );
       if (response.success) {
         await handEventJsonAttendanceAll(response);
         getRemarksCount();
@@ -113,10 +120,14 @@ class FacultyController with ChangeNotifier {
     }
   }
 
-  Future<void> getAttendanceBySchedId(int schedId) async {
+  Future<void> getAttendanceBySchedId(int schedId, DateTime date) async {
     try {
+      print([1, schedId]);
+      final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
       CRUDReturn response = await AttendanceService.getAll(
         schedId: schedId,
+        //Remove me
+        date: dateFormat.format(date),
         // studentNo: faculty.facultyNo,
         // studentNo: 91204,
       );
@@ -335,54 +346,6 @@ class FacultyController with ChangeNotifier {
     );
   }
 
-  Widget getNearestDate(String weekdays, context) {
-    List<String> weekdaysList = weekdays.split(', ');
-    List<DateTime> weekdaysDateTimeList = weekdaysList.map((weekday) {
-      try {
-        return DateTime.now().weekday < DateTime.parse(weekday).weekday
-            ? DateTime.parse(weekday)
-            : DateTime.parse(weekday).add(Duration(days: 7));
-      } catch (e) {
-        // return a default date if parsing fails
-        return DateTime.now();
-      }
-    }).toList();
-
-    DateTime now = DateTime.now();
-    Duration smallestDifference = weekdaysDateTimeList[0].difference(now);
-    DateTime nearestDate = weekdaysDateTimeList[0];
-
-    for (DateTime date in weekdaysDateTimeList) {
-      Duration difference = date.difference(now);
-      if (difference < smallestDifference) {
-        smallestDifference = difference;
-        nearestDate = date;
-      }
-    }
-
-    String monthName = DateFormat.MMMM().format(nearestDate);
-    String day = '${nearestDate.day}'.padLeft(2, '0');
-    String weekday = weekdaysList[weekdaysDateTimeList.indexOf(nearestDate)];
-
-    return Row(
-      children: [
-        Text(
-          '$monthName, $day, ${nearestDate.year}',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const Text(' - '),
-        Text(
-          weekday,
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-      ],
-    );
-  }
-
   //create function to query to FacultyService getFacultyClasses
   Future<void> getFacultyClasses() async {
     try {
@@ -392,7 +355,8 @@ class FacultyController with ChangeNotifier {
       if (response.success) {
         handleEventJsonFacultyClasses(response);
         for (final element in facultyClasses) {
-          await getAttendanceBySchedId(element.schedId);
+          DateTime date = nearestDate(element.day)!;
+          await getAttendanceBySchedId(element.schedId, date);
         }
         getRemarksCountBySchedId();
       }
@@ -433,10 +397,10 @@ class FacultyController with ChangeNotifier {
 
   Future<void> getAttendanceAll(String? date) async {
     try {
-      if (isAllAttendanceCollected && date == null) return;
+      // if (isAllAttendanceCollected && date == null) return;
       CRUDReturn response = date != null
           ? await AttendanceService.getAll(
-              facultyNo: faculty.facultyId,
+              facultyNo: faculty.facultyNo,
               date: date,
             )
           : await AttendanceService.getAll(
@@ -447,7 +411,8 @@ class FacultyController with ChangeNotifier {
         await handEventJsonAttendanceAll(response);
 
         if (graphAttendanceList.isEmpty) {
-          graphAttendanceList = allAttendanceList;
+          // graphAttendanceList = allAttendanceList;
+          print('graphAttendanceList');
         }
         getRemarksCount();
         getRemarksCountForPercentiles();
@@ -1059,7 +1024,7 @@ class FacultyController with ChangeNotifier {
     try {
       notifyListeners();
       print('getRemarksCountForPercentiles');
-
+      print(['graphAttendanceList', 11]);
       graphAttendanceList.sort((a, b) => b.date!.compareTo(a.date!));
 
       Set<DateTime> uniqueDates = {};
@@ -1078,7 +1043,7 @@ class FacultyController with ChangeNotifier {
         divisor = uniqueDates.length;
         print(uniqueDates.length);
       }
-
+      print(['graphAttendanceList', 10]);
       int datesPerPercentile = (uniqueDates.length / divisor).ceil();
 
       for (int i = 0; i < divisor; i++) {
@@ -1091,12 +1056,13 @@ class FacultyController with ChangeNotifier {
             : '${percentileDates.first} - ${percentileDates.last}';
 
         Map<Remarks, int> remarksCount = {
+          Remarks.pending: 0,
           Remarks.onTime: 0,
           Remarks.late: 0,
           Remarks.cutting: 0,
           Remarks.absent: 0
         };
-
+        print(['graphAttendanceList', 9]);
         for (Attendance attendance in graphAttendanceList) {
           if (attendance.date != null) {
             if (attendance.remarks == null) continue;
@@ -1114,7 +1080,7 @@ class FacultyController with ChangeNotifier {
       }
 
       Remarks maxRemarks = Remarks.onTime;
-
+      print(['graphAttendanceList', 8]);
       for (Map<String, Map<Remarks, int>> data in remarksCountList) {
         String dateRange = data.keys.first;
         Map<Remarks, int> remarksCount = data.values.first;
@@ -1127,7 +1093,7 @@ class FacultyController with ChangeNotifier {
             maxRemarks = remark;
           }
         }
-
+        print(['graphAttendanceList', 7]);
         DateTime startDate = DateTime.parse(dateRange.split(' - ')[0]);
         DateTime endDate = DateTime.parse(dateRange.split(' - ')[1]);
 
@@ -1136,8 +1102,10 @@ class FacultyController with ChangeNotifier {
         formattedDateRangeList.add(formattedDateRange);
 
         for (Remarks remark in remarksCount.keys) {
-          int count = remarksCount[remark]!;
+          print(['graphAttendanceList', 99]);
+          int count = remarksCount[remark] ?? 0;
           print('$remark: $count');
+          print(['graphAttendanceList', 100]);
         }
       }
 
@@ -1149,8 +1117,8 @@ class FacultyController with ChangeNotifier {
       isRemarksCountListLoading = false;
       notifyListeners();
     } catch (e, stacktrace) {
-      print(stacktrace);
-      print(e);
+      print(['graphAttendanceList', stacktrace]);
+      print(['graphAttendanceList', e]);
       isRemarksCountListLoading = false;
       notifyListeners();
     }

@@ -35,16 +35,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _usernameController = TextEditingController();
-    _usernameController.text = '0000';
+    // _usernameController.text = '0000';
 
-    // _usernameController.text = '200005';
+    _usernameController.text = '200005';
 
     //200005 faculty
     //35526 admin
 
     _passwordController = TextEditingController();
-    _passwordController.text = 'admin';
-    // _passwordController.text = '200005';
+    // _passwordController.text = 'admin';
+    _passwordController.text = '200005';
     // _passwordController.text = '100004';
     // _onLogin(context);
     super.initState();

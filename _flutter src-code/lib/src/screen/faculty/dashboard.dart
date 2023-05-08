@@ -46,7 +46,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     _dataController.getConfig();
     _dataController.getAttendanceAll(null);
     _dataController.getFacultyClasses();
-
+    _dataController.startStream(context);
     super.initState();
   }
 
@@ -390,35 +390,39 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   ),
                 ],
               ),
-              content: SizedBox(
-                child: SingleChildScrollView(
-                  child: DataTable(
-                    columns: [
-                      DataColumn(
-                        label: Text('First Name'),
+              content: Column(
+                children: [
+                  SizedBox(
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        columns: [
+                          DataColumn(
+                            label: Text('First Name'),
+                          ),
+                          DataColumn(
+                            label: Text('Last Name'),
+                          ),
+                          DataColumn(
+                            label: Text('Date'),
+                          ),
+                          DataColumn(
+                            label: Text('Time In'),
+                          ),
+                          DataColumn(
+                            label: Text('Time out'),
+                          ),
+                          DataColumn(
+                            label: Text('Remarks'),
+                          ),
+                        ],
+                        rows: _dataController.attendanceBySchedId[schedId]!
+                            .map((attendance) =>
+                                _buildAttendanceList(context, attendance))
+                            .toList(),
                       ),
-                      DataColumn(
-                        label: Text('Last Name'),
-                      ),
-                      DataColumn(
-                        label: Text('Date'),
-                      ),
-                      DataColumn(
-                        label: Text('Time In'),
-                      ),
-                      DataColumn(
-                        label: Text('Time out'),
-                      ),
-                      DataColumn(
-                        label: Text('Remarks'),
-                      ),
-                    ],
-                    rows: _dataController.attendanceBySchedId[schedId]!
-                        .map((attendance) =>
-                            _buildAttendanceList(context, attendance))
-                        .toList(),
+                    ),
                   ),
-                ),
+                ],
               ),
             );
           },
@@ -626,7 +630,14 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
 
     return StatefulBuilder(builder: (context, setState) {
       if (!_dataController.isRemarksCountBySchedId) {
-        return Center(child: CircularProgressIndicator());
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: SizedBox(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        );
       }
 
       return SizedBox(
@@ -756,7 +767,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                     )
                   ],
                 ),
-              SizedBox(height: constraints.maxWidth >= 450 ? 18.0 : 0),
+              SizedBox(height: constraints.maxWidth >= 450 ? 18.0 : 12),
+
               Row(
                 children: [
                   Column(

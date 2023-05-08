@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:samids_web_app/src/constant/constant_values.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
@@ -200,8 +201,8 @@ class _ManageStudentState extends State<ManageStudent> {
 
   // AttendanceDataSource _createAttendanceDataSource() {
   //   return AttendanceDataSource(
-  //     _dataController.allAttendanceList,
-  //     _dataController,
+  //     _controller.allAttendanceList,
+  //     _controller,
   //   );
   // }
 
@@ -395,7 +396,10 @@ class _ManageStudentState extends State<ManageStudent> {
         customDataColumn(label: Text('Day'), flex: 1),
       ],
       rows: _controller.studentClasses
-          .map((attendance) => _buildDataRowClasses(context, attendance))
+          .map((attendance) => _buildDataRowClasses(
+                context,
+                attendance,
+              ))
           .toList(),
     );
   }
@@ -404,9 +408,17 @@ class _ManageStudentState extends State<ManageStudent> {
     return DataRow(
       cells: [
         DataCell(
-          Text(
-            "${schedule.schedId} - ${schedule.subject?.subjectName ?? 'No subject name'}",
-            style: TextStyle(fontSize: 14),
+          GestureDetector(
+            onTap: () {
+              _controller.getStudentAttendance(
+                schedule.schedId,
+              );
+              _showAttendanceDialog(context, schedule);
+            },
+            child: Text(
+              "${schedule.schedId} - ${schedule.subject?.subjectName ?? 'No subject name'}",
+              style: TextStyle(fontSize: 14),
+            ),
           ),
         ),
         DataCell(
@@ -462,5 +474,96 @@ class _ManageStudentState extends State<ManageStudent> {
       );
       return;
     }
+  }
+
+  void _showAttendanceDialog(BuildContext context, SubjectSchedule schedule) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                      '${_controller.selectedStudent?.firstName ?? ""} ${_controller.selectedStudent?.lastName ?? ""} - ${schedule.subject?.subjectName ?? 'No subject name'}'),
+                  // Row(
+                  //   children: [
+                  //     TextButton(
+                  //         onPressed: () async {
+                  //           await _controller.downloadAttendanceBySchedId(
+                  //               context, schedId, title, subjectId);
+                  //         },
+                  //         child: Text("Download Table")),
+                  //   ],
+                  // ),
+                ],
+              ),
+              content: SizedBox(
+                child: SingleChildScrollView(
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(
+                        label: Text('Date'),
+                      ),
+                      DataColumn(
+                        label: Text('Time In'),
+                      ),
+                      DataColumn(
+                        label: Text('Time out'),
+                      ),
+                      DataColumn(
+                        label: Text('Remarks'),
+                      ),
+                    ],
+                    rows: _controller.studentAttendance
+                        .map((attendance) =>
+                            _buildAttendanceList(context, attendance))
+                        .toList(),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  DataRow _buildAttendanceList(BuildContext context, Attendance attendance) {
+    return DataRow(
+      cells: [
+        // _tableDataCell(attendance.attendanceId.toString()),
+        // _tableDataCell(attendance.student?.firstName ?? 'No First Name'),
+        // _tableDataCell(attendance.student?.lastName ?? 'No Last Name'),
+        _tableDataCell(_formatDate(attendance.date!)),
+        _tableDataCell(attendance.actualTimeIn != null
+            ? _controller.formatTime(attendance.actualTimeIn!)
+            : 'No Time In'),
+        _tableDataCell(attendance.actualTimeOut != null
+            ? _controller.formatTime(attendance.actualTimeOut!)
+            : 'No Time Out'),
+        DataCell(
+          _controller.getStatusText(attendance.remarks?.name ?? 'Pending'),
+        ),
+      ],
+    );
+  }
+
+  _tableDataCell(String text) {
+    return DataCell(
+      Text(
+        text,
+        style: TextStyle(
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('MMMM d, y').format(date);
   }
 }

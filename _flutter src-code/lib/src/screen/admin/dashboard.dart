@@ -1307,7 +1307,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 const Spacer(),
                 TextButton(
                   onPressed: () {
-                    _showSetOfftimeDialog(context);
+                    _showSetOffTimeDialog(context);
                   },
                   child: const Text('Set offset'),
                 ),
@@ -1425,7 +1425,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  Future<void> _showSetOfftimeDialog(BuildContext context) async {
+  Future<void> _showSetOffTimeDialog(BuildContext context) async {
     final _formKey = GlobalKey<FormState>();
     int lateMinutes = adminController.config!.lateMinutes;
     int absentMinutes = adminController.config!.absentMinutes;
@@ -1519,16 +1519,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Information',
+                  'Year and Term',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
 
                 // const Spacer(),
                 TextButton(
                   onPressed: () {
-                    // _showSetTermDialog(context);
+                    _showSetTermDialog(context);
                   },
-                  child: const Text('Set Term'),
+                  child: const Text('Edit'),
                 ),
               ],
             ),
@@ -1589,9 +1589,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 const Spacer(),
                 TextButton(
                   onPressed: () {
-                    _showSetOfftimeDialog(context);
+                    _showSetOffTimeDialog(context);
                   },
-                  child: const Text('Set offset'),
+                  child: const Text('Edit'),
                 ),
               ],
             ),
