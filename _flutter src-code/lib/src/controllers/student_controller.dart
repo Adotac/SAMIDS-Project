@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:io' as io;
-
+import 'package:signalr_netcore/signalr_client.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import '../services/config.services.dart';
 import '../services/student.services.dart';
 
 class StudentController with ChangeNotifier {
+  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
   final Student student;
   List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
@@ -41,6 +43,15 @@ class StudentController with ChangeNotifier {
 
   Config? config;
   StudentController({required this.student});
+
+  Timer? timer;
+
+  void startStream(context) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      print(timer.tick);
+      getAttendanceToday();
+    });
+  }
 
   static void initialize(Student student) {
     GetIt.instance.registerSingleton<StudentController>(
@@ -170,10 +181,10 @@ class StudentController with ChangeNotifier {
             order *
             (a.actualTimeOut?.hour.compareTo(b.actualTimeOut?.hour ?? 0) ?? 0));
         break;
-      case "Remarks":
-        filteredAttendanceList
-            .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
-        break;
+      // case "Remarks":
+      //   filteredAttendanceList
+      //       .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
+      //   break;
     }
     notifyListeners();
   }
@@ -196,7 +207,7 @@ class StudentController with ChangeNotifier {
                 '';
 
         final room = attendance.subjectSchedule?.room.toLowerCase() ?? '';
-        final remarks = attendance.remarks.name.toLowerCase();
+        final remarks = attendance.remarks?.name.toLowerCase() ?? 'pending';
         return referenceNo.toString() == query ||
             subjectName.contains(query.toLowerCase()) ||
             room.contains(query.toLowerCase()) ||
@@ -208,8 +219,6 @@ class StudentController with ChangeNotifier {
 
   Future<void> getAttendanceToday() async {
     try {
-      if (isAttendanceTodayCollected) return;
-
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
@@ -307,18 +316,22 @@ class StudentController with ChangeNotifier {
     return formattedDate;
   }
 
-  Color getStatusColor(Remarks remarks, BuildContext context) {
-    switch (remarks) {
-      case Remarks.onTime:
-        return Colors.green; // Modify with the desired color for onTime
-      case Remarks.late:
-        return Colors.orange; // Modify with the desired color for late
-      case Remarks.cutting:
-        return Colors
-            .yellow.shade700; // Modify with the desired color for cutting
-      case Remarks.absent:
-        return Colors.red
-            .withOpacity(0.5); // Modify with the desired color for absent
+  Color getStatusColor(Remarks? remarks, BuildContext context) {
+    if (remarks == null) {
+      return Theme.of(context).primaryColor;
+    } else {
+      switch (remarks) {
+        case Remarks.onTime:
+          return Colors.green; // Modify with the desired color for onTime
+        case Remarks.late:
+          return Colors.orange; // Modify with the desired color for late
+        case Remarks.cutting:
+          return Colors
+              .yellow.shade700; // Modify with the desired color for cutting
+        case Remarks.absent:
+          return Colors.red
+              .withOpacity(0.5); // Modify with the desired color for absent
+      }
     }
   }
 
@@ -417,7 +430,7 @@ class StudentController with ChangeNotifier {
         attendance.subjectSchedule?.room ?? '',
         attendance.actualTimeIn?.hour.toString() ?? '',
         attendance.actualTimeOut?.hour.toString() ?? '',
-        attendance.remarks.index,
+        attendance.remarks?.index ?? '',
       ];
       csvData.add(row);
     }

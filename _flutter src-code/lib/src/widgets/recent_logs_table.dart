@@ -15,17 +15,8 @@ class ActivityLogsTable extends StatelessWidget {
               ? attendance.actualTimeIn!
               : DateTime.now();
 
-  IconData _getStatusIcon(Remarks remarks) {
-    switch (remarks) {
-      case Remarks.onTime:
-        return Icons.timer_outlined;
-      case Remarks.late:
-        return Icons.schedule_outlined;
-      case Remarks.cutting:
-        return Icons.cancel_outlined;
-      case Remarks.absent:
-        return Icons.highlight_off_outlined;
-    }
+  IconData _getStatusIcon(Remarks? remarks) {
+    return Icons.timer_outlined;
   }
 
   DataRow _buildDataRow(BuildContext context, Attendance attendance) {
@@ -51,7 +42,9 @@ class ActivityLogsTable extends StatelessWidget {
               ),
               SizedBox(width: 8),
               Text(
-                _sdController.getStatusText(attendance.remarks.name).toString(),
+                _sdController
+                    .getStatusText(attendance.remarks?.name ?? 'Pending')
+                    .toString(),
                 style: TextStyle(fontSize: 14),
               ),
             ],

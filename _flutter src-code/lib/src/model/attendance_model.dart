@@ -13,7 +13,7 @@ class Attendance {
   DateTime? date;
   DateTime? actualTimeIn;
   DateTime? actualTimeOut;
-  Remarks remarks;
+  Remarks? remarks;
 
   Attendance({
     required this.attendanceId,
@@ -44,7 +44,7 @@ class Attendance {
       actualTimeOut: json['actualTimeOut'] != null
           ? DateTime.parse(json['actualTimeOut'])
           : null,
-      remarks: remarksValues.map[json['remarks']] ?? Remarks.onTime,
+      remarks: remarksValues.map[json['remarks']],
     );
   }
 

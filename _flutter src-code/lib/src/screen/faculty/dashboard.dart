@@ -417,11 +417,6 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   child: DataTable(
                     columns: [
                       DataColumn(
-                        label: Expanded(
-                          child: Text('Reference No.'),
-                        ),
-                      ),
-                      DataColumn(
                         label: Text('First Name'),
                       ),
                       DataColumn(
@@ -545,7 +540,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   DataRow _buildAttendanceList(BuildContext context, Attendance attendance) {
     return DataRow(
       cells: [
-        _tableDataCell(attendance.attendanceId.toString()),
+        // _tableDataCell(attendance.attendanceId.toString()),
         _tableDataCell(attendance.student?.firstName ?? 'No First Name'),
         _tableDataCell(attendance.student?.lastName ?? 'No Last Name'),
         _tableDataCell(_formatDate(attendance.date!)),
@@ -556,7 +551,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
             ? _dataController.formatTime(attendance.actualTimeOut!)
             : 'No Time Out'),
         DataCell(
-          _dataController.getStatusText(attendance.remarks.name),
+          _dataController.getStatusText(attendance.remarks?.name ?? 'Pending'),
         ),
       ],
     );

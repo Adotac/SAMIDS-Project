@@ -437,10 +437,10 @@ class FacultyController with ChangeNotifier {
             order *
             (a.actualTimeOut?.hour.compareTo(b.actualTimeOut?.hour ?? 0) ?? 0));
         break;
-      case "Remarks":
-        filteredAttendanceList
-            .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
-        break;
+      // case "Remarks":
+      //   filteredAttendanceList
+      //       .sort((a, b) => order * a.remarks?.index.compareTo(b.remarks?.index));
+      //   break;
     }
     notifyListeners();
   }
@@ -464,6 +464,10 @@ class FacultyController with ChangeNotifier {
         break;
       case 'late':
         color = Colors.orange;
+        text = 'Late';
+        break;
+      case 'pending':
+        color = Colors.yellow;
         text = 'Late';
         break;
       default:
@@ -503,11 +507,12 @@ class FacultyController with ChangeNotifier {
 
         final remarksCount = <Remarks, int>{};
         for (var attendance in attendanceList) {
+          if (attendance.remarks == null) continue;
           if (remarksCount.containsKey(attendance.remarks)) {
-            remarksCount[attendance.remarks] =
+            remarksCount[attendance.remarks!] =
                 remarksCount[attendance.remarks]! + 1;
           } else {
-            remarksCount[attendance.remarks] = 1;
+            remarksCount[attendance.remarks!] = 1;
           }
         }
 
@@ -551,7 +556,7 @@ class FacultyController with ChangeNotifier {
 
         final referenceId = attendance.attendanceId.toString();
         final room = attendance.subjectSchedule?.room.toLowerCase() ?? '';
-        final remarks = attendance.remarks.name.toLowerCase();
+        final remarks = attendance.remarks?.name.toLowerCase() ?? 'Pending';
         return firstName.contains(query.toLowerCase()) ||
             referenceId.contains(query.toLowerCase()) ||
             studentNo.toString() == query ||
@@ -630,7 +635,7 @@ class FacultyController with ChangeNotifier {
         attendance.subjectSchedule?.day?.toString() ?? '',
         attendance.actualTimeIn?.hour.toString() ?? '',
         attendance.actualTimeOut?.hour.toString() ?? '',
-        attendance.remarks.index,
+        attendance.remarks?.index,
       ];
       csvData.add(row);
     }
@@ -721,7 +726,7 @@ class FacultyController with ChangeNotifier {
         '${attendance.student?.firstName ?? ''} ${attendance.student?.lastName ?? ''}',
         attendance.actualTimeIn?.toString() ?? '',
         attendance.actualTimeOut?.toString() ?? '',
-        attendance.remarks.name,
+        attendance.remarks?.name ?? 'Pending',
       ];
       csvData.add(row);
     }
@@ -996,11 +1001,12 @@ class FacultyController with ChangeNotifier {
 
         for (Attendance attendance in graphAttendanceList) {
           if (attendance.date != null) {
+            if (attendance.remarks == null) continue;
             DateTime dateOnly = DateTime(attendance.date!.year,
                 attendance.date!.month, attendance.date!.day);
 
             if (percentileDates.contains(dateOnly)) {
-              remarksCount[attendance.remarks] =
+              remarksCount[attendance.remarks!] =
                   remarksCount[attendance.remarks]! + 1;
             }
           }

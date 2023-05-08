@@ -31,7 +31,6 @@ class AdminController with ChangeNotifier {
   List<String> selectedFileTable = [];
   List<String> uploadStatus = [];
 
-  List<Attendance> attendance = [];
   List<Attendance> allAttendanceList = [];
   List<SubjectSchedule> studentClasses = [];
 
@@ -247,13 +246,13 @@ class AdminController with ChangeNotifier {
                 '';
 
         final room = attendance.subjectSchedule?.room.toLowerCase() ?? '';
-        final remarks = attendance.remarks.name.toLowerCase();
+        // final remarks = attendance.remarks.name.toLowerCase();
         return firstName.contains(query.toLowerCase()) ||
             studentNo.toString() == query ||
             lastName.contains(query.toLowerCase()) ||
             subjectName.contains(query.toLowerCase()) ||
-            room.contains(query.toLowerCase()) ||
-            remarks.contains(query.toLowerCase());
+            room.contains(query.toLowerCase());
+        // remarks.contains(query.toLowerCase());
       }).toList();
     }
     attendanceListToDownload = filteredAttendanceList;
@@ -266,7 +265,6 @@ class AdminController with ChangeNotifier {
     isAttendanceTodayCollected = false;
     isAllAttendanceCollected = false;
 
-    attendance.clear();
     allAttendanceList.clear();
     studentClasses.clear();
   }
@@ -327,9 +325,9 @@ class AdminController with ChangeNotifier {
     }
   }
 
-  Future<void> addNewFaculty(String firstName, String lastName) async {
-    await onUpdateFaculty(
-        filteredFaculties.last.facultyNo + 1, firstName, lastName);
+  Future<void> addNewFaculty(
+      String id, String firstName, String lastName) async {
+    await onUpdateFaculty(int.parse(id), firstName, lastName);
   }
 
   bool isEditingFaculty = false;
@@ -450,10 +448,10 @@ class AdminController with ChangeNotifier {
             order *
             (a.actualTimeOut?.hour.compareTo(b.actualTimeOut?.hour ?? 0) ?? 0));
         break;
-      case "Remarks":
-        filteredAttendanceList
-            .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
-        break;
+      // case "Remarks":
+      //   filteredAttendanceList
+      //       .sort((a, b) => order * a.remarks.index.compareTo(b.remarks.index));
+      //   break;
     }
 
     notifyListeners();
@@ -495,16 +493,6 @@ class AdminController with ChangeNotifier {
     } catch (e, stacktrace) {
       print('ConfigController updateConfig $e $stacktrace');
     }
-  }
-
-  handEventJsonAttendance(CRUDReturn result) {
-    if (attendance.isNotEmpty) attendance.clear();
-    for (Map<String, dynamic> map in result.data) {
-      attendance.add(Attendance.fromJson(map));
-    }
-
-    isAttendanceTodayCollected = true;
-    notifyListeners();
   }
 
   handEventJsonAttendanceAll(CRUDReturn result) {
@@ -844,7 +832,7 @@ class AdminController with ChangeNotifier {
         attendance.subjectSchedule?.day?.toString() ?? '',
         attendance.actualTimeIn?.hour.toString() ?? '',
         attendance.actualTimeOut?.hour.toString() ?? '',
-        attendance.remarks.index,
+        attendance.remarks?.index,
       ];
       csvData.add(row);
     }

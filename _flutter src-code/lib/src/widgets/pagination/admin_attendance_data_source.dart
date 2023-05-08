@@ -42,7 +42,7 @@ class AttendanceDataSourceAd extends DataTableSource {
             ? _dataController.formatTime(attendance.actualTimeOut!)
             : 'No Time Out'),
         DataCell(
-          _dataController.getStatusText(attendance.remarks.name),
+          _dataController.getStatusText(attendance.remarks?.name),
         ),
       ],
     );

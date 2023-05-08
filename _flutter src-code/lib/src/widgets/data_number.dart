@@ -14,8 +14,8 @@ class DataNumber extends StatelessWidget {
       alignment: Alignment.centerLeft,
       // padding: const EdgeInsets.only(right: 10),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // mainAxisAlignment: MainAxisAlignment.start,
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             number,

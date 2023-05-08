@@ -127,7 +127,8 @@ class _FacultySubjectAttendanceListState
                 ),
                 SizedBox(
                   width: 150,
-                  child: _dataController.getStatusText(attendance.remarks.name),
+                  child: _dataController
+                      .getStatusText(attendance.remarks?.name ?? 'Pending'),
                 ),
               ],
             ),

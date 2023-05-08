@@ -171,7 +171,8 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
           timeOut: attendance.actualTimeOut != null
               ? _dataController.formatTime(attendance.actualTimeOut!)
               : 'No Time Out',
-          remarks: _dataController.getStatusText(attendance.remarks.name),
+          remarks: _dataController
+              .getStatusText(attendance.remarks?.name ?? 'Pending'),
         );
       }),
     ];

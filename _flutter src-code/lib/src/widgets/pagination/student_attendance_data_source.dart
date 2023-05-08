@@ -41,7 +41,8 @@ class AttendanceDataSourceSt extends DataTableSource {
         dataCell(attendance.actualTimeOut != null
             ? sdController.formatTime(attendance.actualTimeOut!)
             : 'Pending'),
-        DataCell(sdController.getStatusText(attendance.remarks.name)),
+        DataCell(
+            sdController.getStatusText(attendance.remarks?.name ?? 'Pending')),
         // DataCell(
         //   Row(
         //     children: [

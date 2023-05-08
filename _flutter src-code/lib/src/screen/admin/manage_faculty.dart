@@ -179,6 +179,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
       onPressed: () async {
         String? firstName;
         String? lastName;
+        String? facultyId;
 
         // Show a dialog to get the first name and last name
         await showDialog(
@@ -188,6 +189,10 @@ class _ManageFacultyState extends State<ManageFaculty> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                TextField(
+                  decoration: InputDecoration(labelText: 'Faculty ID'),
+                  onChanged: (value) => facultyId = value,
+                ),
                 TextField(
                   decoration: InputDecoration(labelText: 'First Name'),
                   onChanged: (value) => firstName = value,
@@ -222,6 +227,7 @@ class _ManageFacultyState extends State<ManageFaculty> {
 
                   // Call onUpdateFaculty to add the faculty
                   await _controller.addNewFaculty(
+                    facultyId!,
                     firstName!,
                     lastName!,
                   );

@@ -44,7 +44,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
     _sdController.getAttendanceToday();
     _sdController.getAttendanceAll(null);
     _sdController.getStudentClasses();
-
+    _sdController.startStream(context);
     super.initState();
   }
 
@@ -303,7 +303,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
           ),
         ),
         DataCell(
-          Expanded(child: _sdController.getStatusText(attendance.remarks.name)),
+          Expanded(
+              child: _sdController
+                  .getStatusText(attendance.remarks?.name ?? "Pending")),
         ),
       ],
     );
@@ -392,8 +394,9 @@ class _StudentDashboardState extends State<StudentDashboard> {
           return CustomListTile(
             title: attendance.subjectSchedule?.subject?.subjectName ??
                 'No subject name',
-            subtitle: _sdController.getStatusText(attendance.remarks.name),
-            leadingIcon: Icon(getStatusIcon(attendance.remarks),
+            subtitle: _sdController
+                .getStatusText(attendance.remarks?.name ?? 'Pending'),
+            leadingIcon: Icon(getStatusIcon(attendance?.remarks),
                 color: Theme.of(context).scaffoldBackgroundColor),
             leadingColors:
                 _sdController.getStatusColor(attendance.remarks, context),
@@ -413,10 +416,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
               ? attendance.actualTimeIn!
               : DateTime.now();
 
-  IconData getStatusIcon(Remarks remarks) {
+  IconData getStatusIcon(Remarks? remarks) {
+    return Icons.timer_outlined;
     switch (remarks) {
       case Remarks.onTime:
-        return Icons.timer_outlined;
       case Remarks.late:
         return Icons.schedule_outlined;
       case Remarks.cutting:
@@ -439,7 +442,8 @@ class _StudentDashboardState extends State<StudentDashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   TitleMediumText(
-                    title: "Overview",
+                    title:
+                        "${_sdController.config?.currentTerm ?? ''} Overview",
                   ),
                   DataNumber(
                     number: totalLogs.toString(),
