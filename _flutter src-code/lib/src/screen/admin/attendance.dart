@@ -224,12 +224,12 @@ class _AdminAttendanceState extends State<AdminAttendance> {
         autofocus: true,
         onChanged: (value) {
           _dataController.setParams(search: value);
-          _dataController.getAttendanceAll();
+          //_dataController.getAttendanceAll();
         },
         onSubmitted: (value) {
           // Call filterAttendance with the search query entered by the user
          _dataController.setParams(search: value);
-         _dataController.getAttendanceAll();
+         //_dataController.getAttendanceAll();
 
         },
         controller: _textEditingController,
