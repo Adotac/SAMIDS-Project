@@ -70,8 +70,13 @@ class SubjectDataSource extends DataTableSource {
         DataCell(
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: Text(
-              schedule.subject?.subjectDescription ?? 'No subject description',
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 150),
+              child: Text(
+                maxLines: 2,
+                schedule.subject?.subjectDescription ??
+                    'No subject description',
+              ),
             ),
           ),
         ),

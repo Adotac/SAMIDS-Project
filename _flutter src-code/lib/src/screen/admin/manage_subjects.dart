@@ -149,7 +149,7 @@ class _ManageSubjectsState extends State<ManageSubjects> {
         _dataColumn('Subject Id'),
         _dataColumn('Faculty'),
         _dataColumn('Code'),
-        _dataColumn('Description', 400.0),
+        _dataColumn('Description', 100.0),
         _dataColumn('Room'),
         _dataColumn('Time Start'),
         _dataColumn('Time End'),

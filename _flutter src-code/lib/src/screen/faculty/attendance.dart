@@ -126,6 +126,8 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                   if (selectedDate != null) {
                     setState(() {
                       _dataController.dateSelected = selectedDate;
+                      _dataController.setParams(
+                          date: _dataController.dateSelected);
                       // _dataController.getAttendanceAll(
                       //   _dateFormat.format(_dataController.dateSelected!),
                       // );
@@ -142,18 +144,18 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                   },
                   child: Text("Download Table")),
               const SizedBox(width: 4.0),
-              TextButton(
-                  onPressed: () {
-                    // _dataController.attendanceReset();
-                  },
-                  child: Text("Reset"))
+              // TextButton(
+              //     onPressed: () {
+              //       // _dataController.attendanceReset();
+              //     },
+              //     child: Text("Reset"))
             ],
           ),
         ),
       ),
-      ...List<Widget>.generate(_dataController.filteredAttendanceList.length,
+      ...List<Widget>.generate(_dataController.allAttendanceList.length,
           (int index) {
-        Attendance attendance = _dataController.filteredAttendanceList[index];
+        Attendance attendance = _dataController.allAttendanceList[index];
         return AttendanceTileFac(
           studentNo:
               attendance.student?.studentNo.toString() ?? 'No student ID',

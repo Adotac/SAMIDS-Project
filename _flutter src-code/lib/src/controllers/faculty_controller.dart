@@ -84,8 +84,8 @@ class FacultyController with ChangeNotifier {
   Config? config;
   void startStream(context) {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      print(timer.tick);
       getFacultyClasses();
+      notifyListeners();
     });
   }
 
@@ -175,7 +175,7 @@ class FacultyController with ChangeNotifier {
     for (Map<String, dynamic> map in result.data) {
       allAttendanceList.add(Attendance.fromJson(map));
     }
-
+    graphAttendanceList = allAttendanceList;
     notifyListeners();
   }
 
@@ -343,7 +343,7 @@ class FacultyController with ChangeNotifier {
       CRUDReturn response = await AttendanceService.getAttendances(
         schedId: schedId,
         //Remove me
-        date: dateFormat.format(date),
+        // date: dateFormat.format(date),
         // studentNo: faculty.facultyNo,
         // studentNo: 91204,
       );

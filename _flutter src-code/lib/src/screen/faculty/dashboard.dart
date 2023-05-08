@@ -924,9 +924,9 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              Text('Date:'),
                               Text('Room:'),
-                              Text('Time:'),
-                              Text('Dates:'),
+                              Text('Day:'),
                             ],
                           ),
                           SizedBox(width: 8.0),
@@ -934,9 +934,13 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              _dataController.buildNearestDateRow(
+                                  context, subjectSchedule.day),
                               Text(subjectSchedule.room.toString()),
-                              Text(
-                                  '${DateFormat('hh:mm a').format(subjectSchedule.timeStart)} - ${DateFormat('hh:mm a').format(subjectSchedule.timeEnd)}'),
+
+                              // Text(
+                              //     '${DateFormat('hh:mm a').format(subjectSchedule.timeStart)} - ${DateFormat('hh:mm a').format(subjectSchedule.timeEnd)}'),
+
                               Text(subjectSchedule.day),
                             ],
                           ),
