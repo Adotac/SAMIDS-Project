@@ -76,4 +76,25 @@ class AuthService {
       return CRUDReturn(success: false, data: e);
     }
   }
+
+
+  static Future<CRUDReturn> ValidateToken(
+      String token  ) async {
+    try {
+      final response = await HttpService.get(
+        '$_baseUrl',
+        query: {"token": token},
+        headers: {'accept': 'text/plain'},
+      );
+      if (kDebugMode) {
+        print(
+            'AuthService ValidateToken ${response.statusCode} ${response.body}');
+      }
+      final jsonResponse = jsonDecode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('AuthService ValidateToken $e $stacktrace');
+      return CRUDReturn(success: false, data: e);
+    }
+  }
 }
