@@ -30,6 +30,9 @@ class AttendanceDataSourceSt extends DataTableSource {
       cells: [
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
+        dataCell(
+          '${attendance.subjectSchedule?.faculty?.firstName ?? 'No Faculty'} ${attendance.subjectSchedule?.faculty?.lastName ?? ''} ',
+        ),
         dataCell(sdController.formatDate(attendance.actualTimeIn!)),
         dataCell(
           attendance.subjectSchedule?.room.toString() ?? 'No room code',

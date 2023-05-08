@@ -129,9 +129,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             child: _buildUpload(),
           ),
           const SizedBox(width: 8.0),
-          Expanded(
-            child: _buildDownloadCSV(),
-          )
+          // Expanded(
+          //   child: _buildDownloadCSV(),
+          // )
         ],
       ),
     );
@@ -349,7 +349,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 scrollDirection: Axis.horizontal,
                 child: Container(
                   constraints: BoxConstraints(
-                    minWidth: MediaQuery.of(context).size.width * 0.27,
+                    minWidth: MediaQuery.of(context).size.width * 0.42,
                     minHeight: 500,
                   ),
                   child: DataTable(

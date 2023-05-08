@@ -41,6 +41,20 @@ class StudentController with ChangeNotifier {
   bool isAttendanceTodayCollected = false;
   bool isAllAttendanceCollected = false;
 
+//Attendance Parameters for filtering
+  DateTime? date;
+  String? room;
+  int? studentNo;
+  int? facultyNo;
+  Remarks? remarks;
+  int? subjectId;
+  int? schedId;
+  String? search;
+  DateTime? fromDate;
+  DateTime? toDate;
+  int page = 1;
+  int pageSize = 20;
+
   Config? config;
   StudentController({required this.student});
 
@@ -50,6 +64,7 @@ class StudentController with ChangeNotifier {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       print(timer.tick);
       getAttendanceToday();
+      getAttendanceAll();
     });
   }
 
@@ -278,8 +293,8 @@ class StudentController with ChangeNotifier {
 
   //     if (response.success) {
   //       await handEventJsonAttendanceAll(response);
-  //       getRemarksCount();
   //       notifyListeners();
+
   //     }
   //     isAllAttendanceCollected = true;
   //   } catch (e, stacktrace) {
@@ -461,5 +476,65 @@ class StudentController with ChangeNotifier {
         SnackBar(content: Text('CSV file saved to: ${file.path}')),
       );
     }
+  }
+
+  Future<void> getAttendanceAll() async {
+    try {
+      //if (isAllAttendanceCollected) return;
+      CRUDReturn response = await AttendanceService.getAttendances(
+        date: date != null ? date!.toIso8601String() : null,
+        room: room,
+        studentNo: student.studentNo,
+        facultyNo: facultyNo,
+        remarks: remarks,
+        subjectId: subjectId,
+        schedId: schedId,
+        search: search,
+        fromDate: fromDate,
+        toDate: toDate,
+        page: page,
+        pageSize: pageSize,
+      );
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        //isAllAttendanceCollected = true;
+        getRemarksCount();
+        notifyListeners();
+      } else {
+        print('adminController else ${response.data}');
+      }
+    } catch (e, stacktrace) {
+      print('adminController getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  setParams({
+    DateTime? date,
+    String? room,
+    int? studentNo,
+    int? facultyNo,
+    Remarks? remarks,
+    int? subjectId,
+    int? schedId,
+    String? search,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? page,
+    int? pageSize,
+  }) {
+    this.date = date;
+    this.room = room;
+    this.studentNo = student.studentNo;
+    this.facultyNo = facultyNo;
+    this.remarks = remarks;
+    this.subjectId = subjectId;
+    this.schedId = schedId;
+    this.search = search;
+    this.fromDate = fromDate;
+    this.toDate = toDate;
+    this.page = page ?? this.page;
+    this.pageSize = pageSize ?? this.pageSize;
+    getAttendanceAll();
+    notifyListeners();
   }
 }

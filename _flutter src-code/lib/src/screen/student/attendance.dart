@@ -7,6 +7,7 @@ import 'package:samids_web_app/src/controllers/student_controller.dart';
 import 'package:samids_web_app/src/widgets/app_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:samids_web_app/src/widgets/mobile_view.dart';
+import 'package:samids_web_app/src/widgets/pagination/admin_attendance_data_source.dart';
 
 import '../../model/attendance_model.dart';
 import 'package:intl/intl.dart';
@@ -111,141 +112,6 @@ class _StudentAttendanceState extends State<StudentAttendance>
     return _dataController.config?.currentTerm ?? '';
   }
 
-  Widget _webAttendanceBody(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 6.0),
-      child: Card(
-          child: Container(
-        margin: EdgeInsets.all(10),
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  _dataController.dateSelected == null
-                      ? _getCurrentYearTerm()
-                      : _displayDateFormat
-                          .format(_dataController.dateSelected!),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.titleLarge?.color,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.date_range),
-                  onPressed: () async {
-                    DateTime? selectedDate = await showDatePicker(
-                      selectableDayPredicate: (date) =>
-                          date.isBefore(DateTime.now()),
-                      context: context,
-                      initialDate:
-                          _dataController.dateSelected ?? DateTime.now(),
-                      firstDate:
-                          DateTime.now().subtract(const Duration(days: 365)),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
-                    );
-                    if (selectedDate != null) {
-                      setState(() {
-                        _dataController.dateSelected = selectedDate;
-                        // _dataController.getAttendanceAll(
-                        //   _dateFormat.format(_dataController.dateSelected!),
-                        // );
-                      });
-                    } else {
-                      // _dataController.attendanceReset();
-                    }
-                  },
-                ),
-                Spacer(),
-                TextButton(
-                    onPressed: () async {
-                      await _dataController.downloadData(context);
-                    },
-                    child: Text("Download Table")),
-                const SizedBox(width: 4.0),
-                const SizedBox(width: 4.0),
-                TextButton(
-                    onPressed: () {
-                      // _dataController.attendanceReset();
-                    },
-                    child: Text("Reset"))
-              ],
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: _dataTableAttendance(context),
-            ),
-          ],
-        ),
-      )),
-    );
-  }
-
-  Widget _dataTableAttendance(context) {
-    return StreamBuilder<Object>(
-        stream: null,
-        builder: (context, snapshot) {
-          return PaginatedDataTable(
-              columns: [
-                _dataColumn("Subject"),
-                _dataColumn("Date"),
-                _dataColumn("Room"),
-                _dataColumn("Time in"),
-                _dataColumn('Time out'),
-                _dataColumn('Remarks'),
-              ],
-              showFirstLastButtons: true,
-              rowsPerPage: 20,
-              onPageChanged: (int value) {
-                print('Page changed to $value');
-              },
-              source: _createAttendanceDataSource());
-        });
-  }
-
-  AttendanceDataSourceSt _createAttendanceDataSource() {
-    return AttendanceDataSourceSt(
-        _dataController.filteredAttendanceList, _dataController, context);
-  }
-
-  DataColumn _dataColumn(String title) {
-    bool isSortedColumn = _dataController.sortColumn == title;
-
-    return DataColumn(
-      label: SizedBox(
-        width: 100,
-        child: InkWell(
-          onTap: () {
-            _dataController.sortAttendance(title);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  overflow: TextOverflow.ellipsis,
-                  title,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              if (isSortedColumn)
-                Icon(
-                  _dataController.sortAscending
-                      ? Icons.arrow_drop_up_rounded
-                      : Icons.arrow_drop_down_rounded,
-                  color: Theme.of(context).primaryColor,
-                ),
-            ],
-          ),
-        ),
-      ),
-      numeric: false,
-    );
-  }
-
   List<Widget> _mobileAttendanceBody(BuildContext context) {
     return [
       _searchBarMobile(context),
@@ -282,9 +148,8 @@ class _StudentAttendanceState extends State<StudentAttendance>
                   if (selectedDate != null) {
                     setState(() {
                       _dataController.dateSelected = selectedDate;
-                      // _dataController.getAttendanceAll(
-                      //   _dateFormat.format(_dataController.dateSelected!),
-                      // );
+                      _dataController.setParams(
+                          date: _dataController.dateSelected);
                     });
                   } else {
                     // _dataController.attendanceReset();
@@ -310,7 +175,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.8,
         child: ListView.builder(
-          itemCount: _dataController.filteredAttendanceList.length,
+          itemCount: _dataController.allAttendanceList.length,
           itemBuilder: (BuildContext context, int i) {
             Attendance attendance = _dataController.filteredAttendanceList[i];
             return AttendanceTile(
@@ -339,14 +204,125 @@ class _StudentAttendanceState extends State<StudentAttendance>
           : attendance.actualTimeIn != null
               ? attendance.actualTimeIn!
               : DateTime.now();
+  Widget _webAttendanceBody(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      scrollDirection: Axis.vertical,
+      child: AnimatedBuilder(
+          animation: _dataController,
+          builder: (context, child) {
+            return _dataTableAttendance(context);
+          }),
+    );
+  }
+
+  Widget _dataTableAttendance(context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () async {
+                      await _dataController.downloadData(context);
+                    },
+                    child: Text("Download Table")),
+              ],
+            ),
+            PaginatedDataTable(
+              columns: [
+                _dataColumn("Subject"),
+                _dataColumn("Faculty"),
+                _dataColumn("Date"),
+                _dataColumn("Room"),
+                _dataColumn("Time in"),
+                _dataColumn('Time out'),
+                _dataColumn('Remarks'),
+              ],
+              showFirstLastButtons: true,
+              rowsPerPage: _dataController.pageSize,
+              onPageChanged: (int value) {
+                print('Page changed to $value');
+                _dataController.setParams(page: value);
+              },
+              source: _createAttendanceDataSource(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // AttendanceDataSource _createAttendanceDataSource() {
+  //   return AttendanceDataSource(
+  //     _dataController.allAttendanceList,
+  //     _dataController,p
+  //   );
+  // }
+
+  AttendanceDataSourceSt _createAttendanceDataSource() {
+    return AttendanceDataSourceSt(
+        _dataController.allAttendanceList, _dataController, context);
+  }
+
+  DataColumn _dataColumn(String title) {
+    bool isSortedColumn = _dataController.sortColumn == title;
+
+    return DataColumn(
+      label: SizedBox(
+        width: 170,
+        child: InkWell(
+          onTap: () {
+            _dataController.sortAttendance(title);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  overflow: TextOverflow.ellipsis,
+                  title,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              if (isSortedColumn)
+                Icon(
+                  _dataController.sortAscending
+                      ? Icons.arrow_drop_up_rounded
+                      : Icons.arrow_drop_down_rounded,
+                  color: Theme.of(context).primaryColor,
+                ),
+            ],
+          ),
+        ),
+      ),
+      numeric: false,
+    );
+  }
 
   Widget _searchBar(context) {
     return SizedBox(
+      // padding: const EdgeInsets.symmetric(horizontal: 12),
+      // height: 42,
       width: MediaQuery.of(context).size.width * .30,
+      // decoration: BoxDecoration(
+      //     color: Colors.white,
+      //     shape: BoxShape.rectangle,
+      //     borderRadius: BorderRadius.circular(5),
+      //     border: Border.all(color: Colors.grey, width: 1)),
       child: TextField(
         autofocus: true,
-        onSubmitted: (query) {
-          _dataController.filterAttendance(query);
+        onChanged: (value) {
+          _dataController.setParams(search: value);
+          //_dataController.getAttendanceAll();
+        },
+        onSubmitted: (value) {
+          // Call filterAttendance with the search query entered by the user
+          _dataController.setParams(search: value);
+          //_dataController.getAttendanceAll();
         },
         controller: _textEditingController,
         decoration: const InputDecoration(
@@ -360,14 +336,14 @@ class _StudentAttendanceState extends State<StudentAttendance>
   }
 
   Widget _searchBarMobile(context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.0),
-      width: double.infinity,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * .90,
       child: TextField(
         autofocus: true,
         onSubmitted: (query) {
-          print(query);
-          _dataController.filterAttendance(query);
+          // Call filterAttendance with the search query entered by the user
+          _dataController.setParams(search: query);
+          _dataController.getAttendanceAll();
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

@@ -354,3 +354,10 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
     );
   }
 }
+    //  _dataColumn("Subject"),
+    //             _dataColumn("Subject"),
+    //             _dataColumn("Date"),
+    //             _dataColumn("Room"),
+    //             _dataColumn("Time in"),
+    //             _dataColumn('Time out'),
+    //             _dataColumn('Remarks'),

@@ -42,7 +42,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
   void initState() {
     _sdController.getConfig();
     _sdController.getAttendanceToday();
-    //_sdController.getAttendanceAll(null);
+    _sdController.getAttendanceAll();
     _sdController.getStudentClasses();
     _sdController.startStream(context);
     super.initState();
@@ -469,84 +469,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
       ),
     );
   }
-// Widget _webView() {
-//     return WebView(
-//       appBarTitle: "Dashboard",
-//       selectedWidgetMarker: 0,
-//       body: AnimatedBuilder(
-//         animation: _sdController,
-//         builder: (context, child) {
-//           return !_sdController.isAllAttendanceCollected
-//               ? Center(
-//                   child: CircularProgressIndicator(
-//                     strokeWidth: 4,
-//                     valueColor: AlwaysStoppedAnimation<Color>(
-//                       Theme.of(context).primaryColor, // Customize the color
-//                     ),
-//                   ),
-//                 )
-//               : Container(
-//                   alignment: Alignment.topCenter,
-//                   child: Row(
-//                     children: [
-//                       Expanded(
-//                         child: SingleChildScrollView(
-//                           child: Padding(
-//                             padding: const EdgeInsets.only(
-//                                 left: 8.0, right: 8.0, bottom: 8.0),
-//                             child: Column(
-//                               children: [
-//                                 // StudentInfoCard(student: _sdController.student),
 
-//                                 Row(
-//                                   children: [
-//                                     Flexible(
-//                                         flex: 1,
-//                                         child: StudentInfoCard(
-//                                             user: _sdController.student)),
-//                                     Flexible(
-//                                       flex: 1,
-//                                       child: _overviewCard(5),
-//                                     ),
-//                                   ],
-//                                 ),
-//                                 SizedBox(height: 8),
-//                                 Padding(
-//                                   padding: const EdgeInsets.symmetric(
-//                                       horizontal: 8.0),
-//                                   child: Row(
-//                                     crossAxisAlignment:
-//                                         CrossAxisAlignment.start,
-//                                     mainAxisAlignment:
-//                                         MainAxisAlignment.spaceBetween,
-//                                     children: [
-//                                       Expanded(
-//                                         child: _webRecentLogsCard(
-//                                           context,
-//                                         ),
-//                                       ),
-//                                       Expanded(
-//                                         child: _myClassesCard(
-//                                           context,
-//                                         ),
-//                                       ),
-//                                       // _myClassesCard(context)
-//                                     ],
-//                                   ),
-//                                 ),
-//                                 SizedBox(height: 8),
-//                               ],
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//         },
-//       ),
-//     );
-//   }
   Widget _mobileOverviewCard(leadingFlex, [flexValue = 1]) {
     return AnimatedBuilder(
       animation: _sdController,
@@ -554,7 +477,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         double totalLogs = _sdController.allAttendanceList.length.toDouble();
         return MobileSmallCard(
           isShadow: true,
-          sideTitle: "Total logs",
+          sideTitle: "Logs",
           sideTitleTrailer: totalLogs.toString(),
           title: "Overview",
           child: Row(
