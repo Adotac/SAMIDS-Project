@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
+import 'package:samids_web_app/src/model/attendance_model.dart';
+import 'package:samids_web_app/src/model/attendance_search_params.dart';
+import 'package:samids_web_app/src/widgets/attendance/attendance_filter_form.dart';
 import 'package:samids_web_app/src/widgets/notification_tile_list.dart';
 import 'package:samids_web_app/src/widgets/side_menu.dart';
 
@@ -129,19 +132,18 @@ class _WebViewState extends State<WebView> {
 
     switch (userType) {
       case 0:
-        await studentController!.getAttendanceAll(
-          _dateFormat.format(studentController!.dateSelected!),
-        );
+        // await studentController!.getAttendanceAll(
+        //   _dateFormat.format(studentController!.dateSelected!),
+        // );
         break;
       case 1:
-        await facultyController!.getAttendanceAll(
-          _dateFormat.format(_selectedDate!),
-        );
+        // await facultyController!.getAttendanceAll(
+        //   _dateFormat.format(_selectedDate!),
+        // );
         break;
       default:
-        await adminController!.getAttendanceAll(
-          _dateFormat.format(_selectedDate!),
-        );
+        await adminController!.getAttendanceAll();
+        adminController!.setParams(date: _selectedDate);
     }
   }
 
@@ -165,19 +167,19 @@ class _WebViewState extends State<WebView> {
 
     switch (userType) {
       case 0:
-        studentController!.isAllAttendanceCollected = false;
-        studentController!.isAttendanceTodayCollected = false;
-        await studentController!.getAttendanceAll(null);
-        await studentController!.getAttendanceToday();
+        // studentController!.isAllAttendanceCollected = false;
+        // studentController!.isAttendanceTodayCollected = false;
+        // await studentController!.getAttendanceAll(null);
+        // await studentController!.getAttendanceToday();
 
         break;
       case 1:
-        facultyController!.isAllAttendanceCollected = false;
-        await facultyController!.getAttendanceAll(null);
+        // facultyController!.isAllAttendanceCollected = false;
+        // await facultyController!.getAttendanceAll(null);
         break;
       default:
         adminController!.isAllAttendanceCollected = false;
-        await adminController!.getAttendanceAll(null);
+        await adminController!.getAttendanceAll();
     }
   }
 
@@ -188,10 +190,10 @@ class _WebViewState extends State<WebView> {
         studentController?.dateSelected = date;
         break;
       case 1:
-        facultyController!.getAttendanceAll(null);
+        // facultyController!.getAttendanceAll(null);
         break;
       default:
-        adminController!.getAttendanceAll(null);
+        adminController!.getAttendanceAll();
     }
   }
 
@@ -202,10 +204,10 @@ class _WebViewState extends State<WebView> {
         print(studentController?.dateSelected);
         return studentController?.dateSelected;
       case 1:
-        facultyController!.getAttendanceAll(null);
+        // facultyController!.getAttendanceAll(null);
         break;
       default:
-        adminController!.getAttendanceAll(null);
+        adminController!.getAttendanceAll();
     }
     return null;
   }
@@ -243,58 +245,15 @@ class _WebViewState extends State<WebView> {
         actions: [
           if (widget.appBarActionWidget != null)
             Center(child: widget.appBarActionWidget!),
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: () {
+              _showFilterDialog(context, adminController!);
+            },
+          ),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.2,
           ),
-          // Visibility(
-          //   visible: widget.appBarTitle != "Settings",
-          //   child: Center(
-          //     child: Text(
-          //       _getSelectedDate() == null
-          //           ? '$currentTerm-$currentYear'
-          //           : _displayDateFormat.format(_getSelectedDate()!),
-          //       style: TextStyle(
-          //         fontSize: 18,
-          //         fontWeight: FontWeight.bold,
-          //         color: Theme.of(context).textTheme.titleLarge?.color,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // Visibility(
-          //   visible: widget.appBarTitle != "Settings",
-          //   child: IconButton(
-          //     icon: const Icon(Icons.date_range),
-          //     onPressed: () async {
-          //       DateTime? selectedDate = await showDatePicker(
-          //         selectableDayPredicate: (date) =>
-          //             date.isBefore(DateTime.now()),
-          //         context: context,
-          //         initialDate: _selectedDate ?? DateTime.now(),
-          //         firstDate: DateTime.now().subtract(const Duration(days: 365)),
-          //         lastDate: DateTime.now().add(const Duration(days: 365)),
-          //       );
-          //       if (selectedDate != null) {
-          //         setState(() {
-          //           _setSelectedDate(selectedDate);
-          //           _getAttendanceByDate();
-          //         });
-          //       } else {
-          //         _getAttendanceAll();
-          //       }
-          //     },
-          //   ),
-          // ),
-          // Builder(
-          //   builder: (BuildContext context) {
-          //     return IconButton(
-          //       icon: const Icon(Icons.notifications_none_outlined),
-          //       onPressed: () {
-          //         Scaffold.of(context).openEndDrawer();
-          //       },
-          //     );
-          //   },
-          // ),
           Builder(
             builder: (BuildContext context) {
               return IconButton(
@@ -339,6 +298,192 @@ class _WebViewState extends State<WebView> {
       //     ],
       //   ),
       // ),
+    );
+  }
+}
+
+void _showFilterDialog(
+    BuildContext context, AdminController _dataController) async {
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        content: SingleChildScrollView(
+          child: FilterForm(_dataController),
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+class FilterForm extends StatefulWidget {
+  final AdminController dataController;
+  FilterForm(this.dataController);
+
+  @override
+  _FilterFormState createState() => _FilterFormState();
+}
+
+class _FilterFormState extends State<FilterForm> {
+  DateTime? _date;
+  String? _room;
+  int? _studentNo;
+  int? _facultyNo;
+  Remarks? _remarks;
+  int? _subjectId;
+  int? _schedId;
+  DateTime? _fromDate;
+  DateTime? _toDate;
+
+  @override
+  Widget build(BuildContext context) {
+    // Add form fields for each filter criteria here
+
+    return Column(
+      children: [
+        // Form fields go here
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DateTimeFormField(
+            decoration: InputDecoration(
+              labelText: 'Date',
+            ),
+            initialValue: widget.dataController.date,
+            
+            onSaved: (value) {
+              _date = value;
+              print('Date saved: $_date');
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Room',
+            ),
+            initialValue: widget.dataController.room,
+            onChanged: (value) => _room = value,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Student No.',
+            ),
+            initialValue: widget.dataController.studentNo?.toString(),
+            keyboardType: TextInputType.number,
+            onChanged: (value) => _studentNo = int.tryParse(value ?? ''),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Faculty No.',
+            ),
+            initialValue: widget.dataController.facultyNo?.toString(),
+            keyboardType: TextInputType.number,
+            onChanged: (value) => _facultyNo = int.tryParse(value ?? ''),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DropdownButtonFormField<Remarks>(
+            decoration: InputDecoration(
+              labelText: 'Remarks',
+            ),
+            value: widget.dataController.remarks,
+            items: [
+              DropdownMenuItem(
+                value: null,
+                child: Text('Select Remarks'),
+              ),
+              ...Remarks.values.map((remarks) {
+                return DropdownMenuItem<Remarks>(
+                  value: remarks,
+                  child: Text(remarks.toString().split('.').last),
+                );
+              }).toList(),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _remarks = value;
+              });
+            },
+            onSaved: (value) => _remarks = value,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Subject Id',
+            ),
+            initialValue: widget.dataController.subjectId?.toString(),
+            keyboardType: TextInputType.number,
+            onChanged: (value) => _subjectId = int.tryParse(value ?? ''),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Sched Id',
+            ),
+            initialValue: widget.dataController.schedId?.toString(),
+            keyboardType: TextInputType.number,
+            onChanged: (value) => _schedId = int.tryParse(value ?? ''),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DateTimeFormField(
+            decoration: InputDecoration(
+              labelText: 'From Date',
+            ),
+            initialValue: null,
+            onSaved: (value) => _fromDate = value,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DateTimeFormField(
+            decoration: InputDecoration(
+              labelText: 'To Date',
+            ),
+            initialValue: null,
+            onSaved: (value) => _toDate = value,
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            // Call setParams with the appropriate values
+            widget.dataController.setParams(
+              date: _date,
+              room: _room,
+              studentNo: _studentNo,
+              facultyNo: _facultyNo,
+              remarks: _remarks,
+              subjectId: _subjectId,
+              schedId: _schedId,
+              fromDate: _fromDate,
+              toDate: _toDate,
+            );
+            Navigator.of(context).pop();
+          },
+          child: Text('Apply'),
+        ),
+      ],
     );
   }
 }

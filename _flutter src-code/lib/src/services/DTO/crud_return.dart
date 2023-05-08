@@ -1,6 +1,7 @@
 class CRUDReturn {
   bool success;
   dynamic data;
+  int? count;
   
   CRUDReturn({required this.success, required this.data});
   

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:samids_web_app/src/auth/login.dart';
+import 'package:samids_web_app/src/services/auth.services.dart';
 
 class ChangePasswordPage extends StatefulWidget {
-  static const routeName = '/change-password';
+  static const routeName = '/reset-password';
+  String? token;
+
+  ChangePasswordPage({this.token});
   @override
   _ChangePasswordPageState createState() => _ChangePasswordPageState();
 }
@@ -9,9 +14,11 @@ class ChangePasswordPage extends StatefulWidget {
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
   String? newPassword;
   String? confirmPassword;
+  
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('Change Password'),
@@ -61,8 +68,50 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Your onPressed logic here
+        onPressed: () async{
+          if(newPassword != null && newPassword == confirmPassword){
+              final res = await AuthService.changePassword(newPassword!,null ,widget.token );
+              if (res.success) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Password Changed'),
+              content: Text('Your password has been changed successfully.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, LoginScreen.routeName);
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else{
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Unsuccessful'),
+              content: Text("${res.data}"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+          }
+          
         },
         child: const Icon(Icons.save),
       ),

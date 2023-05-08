@@ -222,7 +222,7 @@ class StudentController with ChangeNotifier {
       DateTime now = DateTime.now();
       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
-      CRUDReturn response = await AttendanceService.getAll(
+      CRUDReturn response = await AttendanceService.getAttendances(
           studentNo: student.studentNo, date: formattedDate);
       if (response.success) {
         handEventJsonAttendance(response);
@@ -263,48 +263,48 @@ class StudentController with ChangeNotifier {
     }
   }
 
-  Future<void> getAttendanceAll(String? date) async {
-    try {
-      if (isAllAttendanceCollected && date == null) return;
-      print(['getAttendanceAll', date ?? 'No date', date != null]);
-      CRUDReturn response = date != null
-          ? await AttendanceService.getAll(
-              studentNo: student.studentNo,
-              date: date,
-            )
-          : await AttendanceService.getAll(
-              studentNo: student.studentNo,
-            );
+  // Future<void> getAttendanceAll(String? date) async {
+  //   try {
+  //     if (isAllAttendanceCollected && date == null) return;
+  //     print(['getAttendanceAll', date ?? 'No date', date != null]);
+  //     CRUDReturn response = date != null
+  //         ? await AttendanceService.getAll(
+  //             studentNo: student.studentNo,
+  //             date: date,
+  //           )
+  //         : await AttendanceService.getAll(
+  //             studentNo: student.studentNo,
+  //           );
 
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
-        getRemarksCount();
-        notifyListeners();
-      }
-      isAllAttendanceCollected = true;
-    } catch (e, stacktrace) {
-      isAllAttendanceCollected = true;
-      print('Admin getAttendanceAll getAll $e $stacktrace');
-    }
-  }
+  //     if (response.success) {
+  //       await handEventJsonAttendanceAll(response);
+  //       getRemarksCount();
+  //       notifyListeners();
+  //     }
+  //     isAllAttendanceCollected = true;
+  //   } catch (e, stacktrace) {
+  //     isAllAttendanceCollected = true;
+  //     print('Admin getAttendanceAll getAll $e $stacktrace');
+  //   }
+  // }
 
-  Future<void> attendanceReset() async {
-    try {
-      CRUDReturn response = await AttendanceService.getAll(
-        studentNo: student.studentNo,
-      );
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
-        getRemarksCount();
+  // Future<void> attendanceReset() async {
+  //   try {
+  //     CRUDReturn response = await AttendanceService.getAll(
+  //       studentNo: student.studentNo,
+  //     );
+  //     if (response.success) {
+  //       await handEventJsonAttendanceAll(response);
+  //       getRemarksCount();
 
-        dateSelected = null;
-        notifyListeners();
-      }
-      isAllAttendanceCollected = true;
-    } catch (e, stacktrace) {
-      print('attendanceReset getAll $e $stacktrace');
-    }
-  }
+  //       dateSelected = null;
+  //       notifyListeners();
+  //     }
+  //     isAllAttendanceCollected = true;
+  //   } catch (e, stacktrace) {
+  //     print('attendanceReset getAll $e $stacktrace');
+  //   }
+  // }
 
   String formatTime(DateTime? dateTime) {
     if (dateTime == null) return 'N/A';

@@ -56,12 +56,13 @@ class AuthService {
   // }
 
   static Future<CRUDReturn> changePassword(
-      String newPassword, int userNo, String userType) async {
+      String newPassword, int? userNo, String? token  ) async {
     try {
       print('changePassword');
-      print('newPassword=$newPassword&$userType=$userNo');
+      //print('newPassword=$newPassword&$userType=$userNo');
       final response = await HttpService.patch(
-        '$_baseUrl/change-password?newPassword=$newPassword&id=$userNo',
+        '$_baseUrl/change-password?',
+        query: {"newPassword": newPassword, "id": userNo, "token": token},
         headers: {'accept': 'text/plain'},
       );
       if (kDebugMode) {
@@ -72,6 +73,27 @@ class AuthService {
       return CRUDReturn.fromJson(jsonResponse);
     } catch (e, stacktrace) {
       if (kDebugMode) print('AuthService changePassword $e $stacktrace');
+      return CRUDReturn(success: false, data: e);
+    }
+  }
+
+
+  static Future<CRUDReturn> ValidateToken(
+      String token  ) async {
+    try {
+      final response = await HttpService.get(
+        '$_baseUrl',
+        query: {"token": token},
+        headers: {'accept': 'text/plain'},
+      );
+      if (kDebugMode) {
+        print(
+            'AuthService ValidateToken ${response.statusCode} ${response.body}');
+      }
+      final jsonResponse = jsonDecode(response.body);
+      return CRUDReturn.fromJson(jsonResponse);
+    } catch (e, stacktrace) {
+      if (kDebugMode) print('AuthService ValidateToken $e $stacktrace');
       return CRUDReturn(success: false, data: e);
     }
   }

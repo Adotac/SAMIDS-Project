@@ -24,6 +24,7 @@ import 'package:samids_web_app/src/screen/settings.dart';
 import 'package:samids_web_app/src/screen/student/attendance.dart';
 import 'package:samids_web_app/src/screen/student/classes.dart';
 import 'package:samids_web_app/src/screen/student/dashboard.dart';
+import 'package:samids_web_app/src/services/auth.services.dart';
 import 'package:samids_web_app/src/settings/settings_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -212,13 +213,27 @@ class MyApp extends StatelessWidget {
           themeMode: settingsController.themeMode,
           initialRoute: LoginScreen.routeName,
           home: LoginScreen(),
-
+          routes:{
+            '/reset-password': (ctx) => ChangePasswordPage()
+          },
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
 
           onGenerateRoute: (RouteSettings settings) {
             print(settings.name);
-
+            Uri uri = Uri.parse(settings.name!);
+          if (uri.path == '/reset-password') {
+              String? token = uri.queryParameters['token'];
+              bool success = false;
+              AuthService.ValidateToken(token!).then((value) => value.success ? success = true : success = false);
+              if (success){
+                return MaterialPageRoute(builder: (_) => ChangePasswordPage(token: token));
+              }
+              else{
+                 return MaterialPageRoute(builder: (_) => const PageNotFound());
+              }
+          
+          }
             switch (settings.name) {
               case ManageSubjects.routeName:
                 return MaterialPageRoute(

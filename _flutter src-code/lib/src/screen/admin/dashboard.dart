@@ -39,7 +39,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     adminController.getSubjects();
     adminController.getConfig();
     adminController.getStudents();
-    adminController.getAttendanceAll(null);
+    adminController.getAttendanceAll();
     adminController.getFaculties();
 
     super.initState();

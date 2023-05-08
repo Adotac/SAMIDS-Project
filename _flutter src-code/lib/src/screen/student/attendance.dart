@@ -150,12 +150,12 @@ class _StudentAttendanceState extends State<StudentAttendance>
                     if (selectedDate != null) {
                       setState(() {
                         _dataController.dateSelected = selectedDate;
-                        _dataController.getAttendanceAll(
-                          _dateFormat.format(_dataController.dateSelected!),
-                        );
+                        // _dataController.getAttendanceAll(
+                        //   _dateFormat.format(_dataController.dateSelected!),
+                        // );
                       });
                     } else {
-                      _dataController.attendanceReset();
+                      // _dataController.attendanceReset();
                     }
                   },
                 ),
@@ -169,7 +169,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
                 const SizedBox(width: 4.0),
                 TextButton(
                     onPressed: () {
-                      _dataController.attendanceReset();
+                      // _dataController.attendanceReset();
                     },
                     child: Text("Reset"))
               ],
@@ -282,12 +282,12 @@ class _StudentAttendanceState extends State<StudentAttendance>
                   if (selectedDate != null) {
                     setState(() {
                       _dataController.dateSelected = selectedDate;
-                      _dataController.getAttendanceAll(
-                        _dateFormat.format(_dataController.dateSelected!),
-                      );
+                      // _dataController.getAttendanceAll(
+                      //   _dateFormat.format(_dataController.dateSelected!),
+                      // );
                     });
                   } else {
-                    _dataController.attendanceReset();
+                    // _dataController.attendanceReset();
                   }
                 },
               ),
@@ -300,7 +300,7 @@ class _StudentAttendanceState extends State<StudentAttendance>
               const SizedBox(width: 4.0),
               TextButton(
                   onPressed: () {
-                    _dataController.attendanceReset();
+                    // _dataController.attendanceReset();
                   },
                   child: Text("Reset"))
             ],

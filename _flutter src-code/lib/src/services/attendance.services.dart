@@ -26,49 +26,59 @@ class AttendanceService {
     return await HttpService.get("$_baseUrl/GetRemarksCount", query: query);
   }
 
-  static Future<CRUDReturn> getAll({
-    String? date,
-    String? room,
-    int? studentNo,
-    Remarks? remarks,
-    int? schedId,
-    int? facultyNo,
-  }) async {
-    try {
-      Map<String, dynamic>? query = {};
-      if (date != null) query['date'] = date;
-      if (room != null) query['room'] = room;
-      if (studentNo != null) query['studentNo'] = studentNo.toString();
-      if (facultyNo != null) query['facultyNo'] = facultyNo.toString();
-      if (remarks != null) query['remarks'] = remarks;
-      if (schedId != null) query['schedId'] = schedId.toString();
+  static Future<CRUDReturn> getAttendances({
+  String? date,
+  String? room,
+  int? studentNo,
+  int? facultyNo,
+  Remarks? remarks,
+  int? subjectId,
+  int? schedId,
+  String? search,
+  DateTime? fromDate,
+  DateTime? toDate,
+  int page = 1,
+  int pageSize = 10,
+}) async {
+  try {
+    Map<String, dynamic>? query = {};
+    if (date != null) query['date'] = date;
+    if (room != null) query['room'] = room;
+    if (studentNo != null) query['studentNo'] = studentNo.toString();
+    if (facultyNo != null) query['facultyId'] = facultyNo.toString();
+    if (remarks != null) query['remarks'] = remarks.index.toString();
+    if (subjectId != null) query['subjectId'] = subjectId.toString();
+    if (schedId != null) query['schedId'] = schedId.toString();
+    if (search != null) query['search'] = search;
+    if (fromDate != null) query['fromDate'] = fromDate.toIso8601String();
+    if (toDate != null) query['toDate'] = toDate.toIso8601String();
+    query['page'] = page.toString();
+    query['pageSize'] = pageSize.toString();
 
-      print(query);
-      final response =
-          await HttpService.get('$_baseUrl/Attendance', query: query);
-      if (kDebugMode) Logger().i('${query} ${date != null}');
-      if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');
-          final jsonResponse = jsonDecode(response.body);
-          return CRUDReturn.fromJson(jsonResponse);
-        } else {
-          throw Exception("Empty response body");
-        }
+    final response = await HttpService.get('$_baseUrl/Attendance', query: query);
+    if (kDebugMode) Logger().i('${query} ${date != null}');
+    if (response.statusCode == 200) {
+      if (response.body.isNotEmpty) {
+        if (kDebugMode) Logger().i('${response.statusCode} ${response.body}');
+        final jsonResponse = jsonDecode(response.body);
+        return CRUDReturn.fromJson(jsonResponse);
       } else {
-        String errorMessage = "Something went wrong.";
-        if (response.body.isNotEmpty) {
-          final jsonResponse = jsonDecode(response.body);
-          errorMessage = jsonResponse['message'] ?? "Something went wrong.";
-        }
-        throw Exception(
-            "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
+        throw Exception("Empty response body");
       }
-    } catch (e, stactrace) {
-      if (kDebugMode) print('AttendanceService getAll $e $stactrace');
-      rethrow;
+    } else {
+      String errorMessage = "Something went wrong.";
+      if (response.body.isNotEmpty) {
+        final jsonResponse = jsonDecode(response.body);
+        errorMessage = jsonResponse['message'] ?? "Something went wrong.";
+      }
+      throw Exception(
+          "Request failed with status: ${response.statusCode}. Error message: $errorMessage");
     }
+  } catch (e, stactrace) {
+    if (kDebugMode) print('AttendanceService getAttendances $e $stactrace');
+    rethrow;
   }
+}
 
   static Future<http.Response> getAllSA({required int studentId}) async {
     return await HttpService.get("$_baseUrl/GetAllSA",
