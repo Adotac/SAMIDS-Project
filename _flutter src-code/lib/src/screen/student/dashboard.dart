@@ -479,7 +479,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
           isShadow: true,
           sideTitle: "Logs",
           sideTitleTrailer: totalLogs.toString(),
-          title: "Overview",
+          title: "${_sdController.config?.currentTerm ?? ''} Overview",
           child: Row(
             children: [
               circularData(
