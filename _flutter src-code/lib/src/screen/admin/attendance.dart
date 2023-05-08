@@ -137,7 +137,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
                 _dataColumn("Room"),
                 _dataColumn("Subject"),
                 _dataColumn("Date"),
-                _dataColumn("Day"),
+                // _dataColumn("Day"),
                 _dataColumn("Time In"),
                 _dataColumn("Time Out"),
                 _dataColumn("Remarks"),
@@ -174,7 +174,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
 
     return DataColumn(
       label: SizedBox(
-        width: 120,
+        width: 150,
         child: InkWell(
           onTap: () {
             _dataController.sortAttendance(title);

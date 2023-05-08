@@ -33,12 +33,13 @@ class AttendanceDataSourceFac extends DataTableSource {
         dataCell(attendance.student?.studentNo.toString() ?? 'No student ID'),
         dataCell(
             '${attendance.student?.firstName} ${attendance.student?.lastName}'),
-        dataCell(attendance.attendanceId.toString()),
+        // dataCell(attendance.attendanceId.toString()),
         dataCell(attendance.subjectSchedule?.room ?? 'No Room'),
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
         dataCell(_dataController.formatDate(attendance.actualTimeIn!)),
-        dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
+        // dataCell(attendance.subjectSchedule?.day ?? 'No Date'),
+
         dataCell(attendance.actualTimeIn != null
             ? _dataController.formatTime(attendance.actualTimeIn!)
             : 'No Time In'),
@@ -50,6 +51,27 @@ class AttendanceDataSourceFac extends DataTableSource {
         ),
       ],
     );
+  }
+
+  String _getDayOfWeek(DateTime dateTime) {
+    switch (dateTime.weekday) {
+      case DateTime.monday:
+        return 'Mon';
+      case DateTime.tuesday:
+        return 'Tue';
+      case DateTime.wednesday:
+        return 'Wed';
+      case DateTime.thursday:
+        return 'Thurs';
+      case DateTime.friday:
+        return 'Fri';
+      case DateTime.saturday:
+        return 'Sat';
+      case DateTime.sunday:
+        return 'Sun';
+      default:
+        return '';
+    }
   }
 
   Future<void> _showLoadingDialog(BuildContext context) async {

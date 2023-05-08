@@ -418,15 +418,6 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
   IconData getStatusIcon(Remarks? remarks) {
     return Icons.timer_outlined;
-    switch (remarks) {
-      case Remarks.onTime:
-      case Remarks.late:
-        return Icons.schedule_outlined;
-      case Remarks.cutting:
-        return Icons.cancel_outlined;
-      case Remarks.absent:
-        return Icons.highlight_off_outlined;
-    }
   }
 
   Widget _overviewCard(leadingFlex, [flexValue = 1]) {

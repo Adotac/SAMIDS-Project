@@ -192,7 +192,6 @@ class _StudentAttendanceState extends State<StudentAttendance>
               columns: [
                 _dataColumn("Subject"),
                 _dataColumn("Date"),
-                _dataColumn("Day"),
                 _dataColumn("Room"),
                 _dataColumn("Time in"),
                 _dataColumn('Time out'),

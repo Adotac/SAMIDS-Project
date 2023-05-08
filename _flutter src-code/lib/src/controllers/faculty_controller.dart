@@ -272,6 +272,117 @@ class FacultyController with ChangeNotifier {
     }
   }
 
+  DateTime? nearestDate(String daysOfWeek) {
+    List<String> days = daysOfWeek.split(', ');
+    Map<String, int> dayMapping = {
+      'Mon': DateTime.monday,
+      'Tue': DateTime.tuesday,
+      'Wed': DateTime.wednesday,
+      'Thurs': DateTime.thursday,
+      'Fri': DateTime.friday,
+      'Sat': DateTime.saturday,
+      'Sun': DateTime.sunday,
+    };
+
+    DateTime today = DateTime.now();
+    DateTime? nearestDate;
+    int minDifference = 7;
+
+    for (String day in days) {
+      int? dayNumber = dayMapping[day];
+
+      if (dayNumber != null) {
+        DateTime currentDay =
+            today.subtract(Duration(days: (today.weekday - dayNumber) % 7));
+        int dayDifference = (currentDay.isBefore(today) ? 7 : 0) +
+            currentDay.difference(today).inDays;
+
+        if (dayDifference < minDifference) {
+          nearestDate = currentDay;
+          minDifference = dayDifference;
+        }
+      }
+    }
+
+    return nearestDate;
+  }
+
+  Widget buildNearestDateRow(BuildContext context, String daysOfWeek) {
+    DateTime? nearestDateObj = nearestDate(daysOfWeek);
+    if (nearestDateObj == null) {
+      return const Text('No valid days provided');
+    }
+    String monthName = DateFormat('MMMM').format(nearestDateObj);
+    String day = DateFormat('d').format(nearestDateObj);
+    String weekday = DateFormat('EEEE').format(nearestDateObj);
+
+    return Row(
+      children: [
+        Text(
+          '$monthName, $day, ${nearestDateObj.year}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Text(' - '),
+        Text(
+          weekday,
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getNearestDate(String weekdays, context) {
+    List<String> weekdaysList = weekdays.split(', ');
+    List<DateTime> weekdaysDateTimeList = weekdaysList.map((weekday) {
+      try {
+        return DateTime.now().weekday < DateTime.parse(weekday).weekday
+            ? DateTime.parse(weekday)
+            : DateTime.parse(weekday).add(Duration(days: 7));
+      } catch (e) {
+        // return a default date if parsing fails
+        return DateTime.now();
+      }
+    }).toList();
+
+    DateTime now = DateTime.now();
+    Duration smallestDifference = weekdaysDateTimeList[0].difference(now);
+    DateTime nearestDate = weekdaysDateTimeList[0];
+
+    for (DateTime date in weekdaysDateTimeList) {
+      Duration difference = date.difference(now);
+      if (difference < smallestDifference) {
+        smallestDifference = difference;
+        nearestDate = date;
+      }
+    }
+
+    String monthName = DateFormat.MMMM().format(nearestDate);
+    String day = '${nearestDate.day}'.padLeft(2, '0');
+    String weekday = weekdaysList[weekdaysDateTimeList.indexOf(nearestDate)];
+
+    return Row(
+      children: [
+        Text(
+          '$monthName, $day, ${nearestDate.year}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const Text(' - '),
+        Text(
+          weekday,
+          style: TextStyle(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
   //create function to query to FacultyService getFacultyClasses
   Future<void> getFacultyClasses() async {
     try {
@@ -326,14 +437,12 @@ class FacultyController with ChangeNotifier {
       CRUDReturn response = date != null
           ? await AttendanceService.getAll(
               facultyNo: faculty.facultyId,
-              // studentNo: faculty.facultyNo,
-              // studentNo: 91204,
               date: date,
             )
           : await AttendanceService.getAll(
-              facultyNo: faculty.facultyId,
-              // studentNo: 91204,
+              facultyNo: faculty.facultyNo,
             );
+
       if (response.success) {
         await handEventJsonAttendanceAll(response);
 
@@ -362,18 +471,24 @@ class FacultyController with ChangeNotifier {
     return formattedDate;
   }
 
-  Color getStatusColor(Remarks remarks, BuildContext context) {
-    switch (remarks) {
-      case Remarks.onTime:
-        return Colors.green; // Modify with the desired color for onTime
-      case Remarks.late:
-        return Colors.orange; // Modify with the desired color for late
-      case Remarks.cutting:
-        return Colors
-            .yellow.shade700; // Modify with the desired color for cutting
-      case Remarks.absent:
-        return Colors.red
-            .withOpacity(0.5); // Modify with the desired color for absent
+  Color getStatusColor(Remarks? remarks, BuildContext context) {
+    if (remarks == null) {
+      return Theme.of(context).primaryColor;
+    } else {
+      switch (remarks) {
+        case Remarks.pending:
+          return Colors.grey;
+        case Remarks.onTime:
+          return Colors.green; // Modify with the desired color for onTime
+        case Remarks.late:
+          return Colors.orange; // Modify with the desired color for late
+        case Remarks.cutting:
+          return Colors
+              .yellow.shade700; // Modify with the desired color for cutting
+        case Remarks.absent:
+          return Colors.red
+              .withOpacity(0.5); // Modify with the desired color for absent
+      }
     }
   }
 
@@ -450,6 +565,10 @@ class FacultyController with ChangeNotifier {
     Color color;
     String text = '';
     switch (lowercaseStatus) {
+      case 'pending':
+        color = Colors.grey;
+        text = 'Pending';
+        break;
       case 'absent':
         color = Colors.red;
         text = 'Absent';
@@ -464,10 +583,6 @@ class FacultyController with ChangeNotifier {
         break;
       case 'late':
         color = Colors.orange;
-        text = 'Late';
-        break;
-      case 'pending':
-        color = Colors.yellow;
         text = 'Late';
         break;
       default:
@@ -500,7 +615,6 @@ class FacultyController with ChangeNotifier {
 
   void getRemarksCountBySchedId() {
     try {
-//final Map<int, Map<Remarks, int>> remarksBySchedId = {};
       for (var entry in attendanceBySchedId.entries) {
         int schedId = entry.key;
         List<Attendance> attendanceList = entry.value;
@@ -517,24 +631,8 @@ class FacultyController with ChangeNotifier {
         }
 
         remarksBySchedId[schedId] = remarksCount;
-
-        // print('Remarks count for schedId $schedId:');
-        // for (var entry in remarksCount.entries) {
-        //   Remarks remarks = entry.key;
-        //   int count = entry.value;
-
-        //   print('$remarks: $count');
-        // }
       }
 
-      // print('Remarks count by schedId:');
-      // remarksBySchedId.forEach((schedId, remarksCount) {
-      //   String output = 'schedId $schedId:';
-      //   remarksCount.forEach((remarks, count) {
-      //     output += ' $remarks: $count,';
-      //   });
-      //   print(output.substring(0, output.length - 1));
-      // });
       isRemarksCountBySchedId = true;
       notifyListeners();
     } catch (e, stacktrace) {

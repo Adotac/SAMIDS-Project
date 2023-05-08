@@ -160,7 +160,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
           name:
               '${attendance.student?.firstName} ${attendance.student?.lastName}',
           day: attendance.subjectSchedule?.day ?? 'No Day',
-          referenceNo: attendance.attendanceId.toString(),
+          // referenceNo: attendance.attendanceId.toString(),
           subject:
               attendance.subjectSchedule?.subject?.subjectName ?? 'No Subject',
           room: attendance.subjectSchedule?.room ?? 'No Room',
@@ -213,43 +213,50 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        _dataController.dateSelected == null
-                            ? _getCurrentYearTerm()
-                            : _displayDateFormat
-                                .format(_dataController.dateSelected!),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).textTheme.titleLarge?.color,
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: Text(
+                          _dataController.dateSelected == null
+                              ? _getCurrentYearTerm()
+                              : _displayDateFormat
+                                  .format(_dataController.dateSelected!),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Theme.of(context).textTheme.titleLarge?.color,
+                          ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.date_range),
-                        onPressed: () async {
-                          DateTime? selectedDate = await showDatePicker(
-                            selectableDayPredicate: (date) =>
-                                date.isBefore(DateTime.now()),
-                            context: context,
-                            initialDate:
-                                _dataController.dateSelected ?? DateTime.now(),
-                            firstDate: DateTime.now()
-                                .subtract(const Duration(days: 365)),
-                            lastDate:
-                                DateTime.now().add(const Duration(days: 365)),
-                          );
-                          if (selectedDate != null) {
-                            setState(() {
-                              _dataController.dateSelected = selectedDate;
-                              _dataController.getAttendanceAll(
-                                _dateFormat
-                                    .format(_dataController.dateSelected!),
-                              );
-                            });
-                          } else {
-                            _dataController.attendanceReset();
-                          }
-                        },
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: IconButton(
+                          icon: const Icon(Icons.date_range),
+                          onPressed: () async {
+                            DateTime? selectedDate = await showDatePicker(
+                              selectableDayPredicate: (date) =>
+                                  date.isBefore(DateTime.now()),
+                              context: context,
+                              initialDate: _dataController.dateSelected ??
+                                  DateTime.now(),
+                              firstDate: DateTime.now()
+                                  .subtract(const Duration(days: 365)),
+                              lastDate:
+                                  DateTime.now().add(const Duration(days: 365)),
+                            );
+                            if (selectedDate != null) {
+                              setState(() {
+                                _dataController.dateSelected = selectedDate;
+                                _dataController.getAttendanceAll(
+                                  _dateFormat
+                                      .format(_dataController.dateSelected!),
+                                );
+                              });
+                            } else {
+                              _dataController.attendanceReset();
+                            }
+                          },
+                        ),
                       ),
                       Spacer(),
                       TextButton(
@@ -275,9 +282,8 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
 
   String _getCurrentYearTerm() {
     String currentTerm = _dataController.config?.currentTerm ?? '';
-    String currentYear = _dataController.config?.currentYear ?? '';
 
-    return '$currentTerm - $currentYear';
+    return currentTerm;
   }
 
   Widget _dataTableAttendance(context) {
@@ -289,11 +295,11 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
       columns: [
         _dataColumn("Student ID"),
         _dataColumn("Name"),
-        _dataColumn("Reference ID"),
+        // _dataColumn("Reference ID"),
         _dataColumn("Room"),
         _dataColumn("Subject"),
         _dataColumn("Date"),
-        _dataColumn("Day"),
+
         _dataColumn("Time In"),
         _dataColumn("Time Out"),
         _dataColumn("Remarks"),
@@ -328,7 +334,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
 
     return DataColumn(
       label: SizedBox(
-        width: 100,
+        width: 150,
         child: InkWell(
           onTap: () {
             _dataController.sortAttendance(title);

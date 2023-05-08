@@ -321,6 +321,8 @@ class StudentController with ChangeNotifier {
       return Theme.of(context).primaryColor;
     } else {
       switch (remarks) {
+        case Remarks.pending:
+          return Colors.grey;
         case Remarks.onTime:
           return Colors.green; // Modify with the desired color for onTime
         case Remarks.late:
@@ -340,6 +342,10 @@ class StudentController with ChangeNotifier {
     Color color;
     String text = '';
     switch (lowercaseStatus) {
+      case 'pending':
+        color = Colors.grey;
+        text = 'Pending';
+        break;
       case 'absent':
         color = Colors.red;
         text = 'Absent';

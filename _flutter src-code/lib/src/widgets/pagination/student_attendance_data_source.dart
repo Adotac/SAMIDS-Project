@@ -31,7 +31,6 @@ class AttendanceDataSourceSt extends DataTableSource {
         dataCell(attendance.subjectSchedule?.subject?.subjectName ??
             'No subject name'),
         dataCell(sdController.formatDate(attendance.actualTimeIn!)),
-        dataCell(attendance.subjectSchedule?.day.toString() ?? 'No Date'),
         dataCell(
           attendance.subjectSchedule?.room.toString() ?? 'No room code',
         ),

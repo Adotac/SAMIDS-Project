@@ -43,6 +43,7 @@ class AttendanceService {
       if (remarks != null) query['remarks'] = remarks;
       if (schedId != null) query['schedId'] = schedId.toString();
 
+      print(query);
       final response =
           await HttpService.get('$_baseUrl/Attendance', query: query);
       if (kDebugMode) Logger().i('${query} ${date != null}');

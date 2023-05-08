@@ -3,7 +3,7 @@ import 'package:samids_web_app/src/model/enum_values.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
 import 'package:samids_web_app/src/model/subjectSchedule_model.dart';
 
-enum Remarks { onTime, late, cutting, absent }
+enum Remarks { pending, onTime, late, cutting, absent }
 
 class Attendance {
   int attendanceId;
@@ -13,7 +13,7 @@ class Attendance {
   DateTime? date;
   DateTime? actualTimeIn;
   DateTime? actualTimeOut;
-  Remarks? remarks;
+  Remarks remarks;
 
   Attendance({
     required this.attendanceId,
@@ -44,7 +44,7 @@ class Attendance {
       actualTimeOut: json['actualTimeOut'] != null
           ? DateTime.parse(json['actualTimeOut'])
           : null,
-      remarks: remarksValues.map[json['remarks']],
+      remarks: remarksValues.map[json['remarks']]!,
     );
   }
 
@@ -63,8 +63,9 @@ class Attendance {
 }
 
 final remarksValues = EnumValues({
-  0: Remarks.onTime,
-  1: Remarks.late,
-  2: Remarks.cutting,
-  3: Remarks.absent
+  0: Remarks.pending,
+  1: Remarks.onTime,
+  2: Remarks.late,
+  3: Remarks.cutting,
+  4: Remarks.absent
 });

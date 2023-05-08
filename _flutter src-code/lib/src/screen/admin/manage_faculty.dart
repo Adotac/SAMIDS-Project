@@ -249,7 +249,9 @@ class _ManageFacultyState extends State<ManageFaculty> {
       child: Column(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height * 0.52,
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height * 0.52,
+            ),
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),

@@ -530,18 +530,24 @@ class AdminController with ChangeNotifier {
     return formattedDate;
   }
 
-  Color getStatusColor(Remarks remarks, BuildContext context) {
-    switch (remarks) {
-      case Remarks.onTime:
-        return Colors.green; // Modify with the desired color for onTime
-      case Remarks.late:
-        return Colors.orange; // Modify with the desired color for late
-      case Remarks.cutting:
-        return Colors
-            .yellow.shade700; // Modify with the desired color for cutting
-      case Remarks.absent:
-        return Colors.red
-            .withOpacity(0.5); // Modify with the desired color for absent
+  Color getStatusColor(Remarks? remarks, BuildContext context) {
+    if (remarks == null) {
+      return Theme.of(context).primaryColor;
+    } else {
+      switch (remarks) {
+        case Remarks.pending:
+          return Colors.grey;
+        case Remarks.onTime:
+          return Colors.green; // Modify with the desired color for onTime
+        case Remarks.late:
+          return Colors.orange; // Modify with the desired color for late
+        case Remarks.cutting:
+          return Colors
+              .yellow.shade700; // Modify with the desired color for cutting
+        case Remarks.absent:
+          return Colors.red
+              .withOpacity(0.5); // Modify with the desired color for absent
+      }
     }
   }
 
@@ -550,6 +556,10 @@ class AdminController with ChangeNotifier {
     Color color;
     String text = '';
     switch (lowercaseStatus) {
+      case 'pending':
+        color = Colors.grey;
+        text = 'Pending';
+        break;
       case 'absent':
         color = Colors.red;
         text = 'Absent';

@@ -6,7 +6,7 @@ class AttendanceTileFac extends StatelessWidget {
   final String studentNo;
   final String subject;
   final String name;
-  final String referenceNo;
+  // final String referenceNo;
   final String date;
   final String day;
   final String room;
@@ -23,7 +23,7 @@ class AttendanceTileFac extends StatelessWidget {
     required this.timeOut,
     required this.remarks,
     required this.name,
-    required this.referenceNo,
+    // required this.referenceNo,
     required this.day,
     required this.studentNo,
   }) : super(key: key);
@@ -119,7 +119,7 @@ class AttendanceTileFac extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Reference No: $referenceNo'),
+            // Text('Reference No: $referenceNo'),
             Text('Name: $name'),
             Text('Room: $room'),
             Text('Date: $date'),
