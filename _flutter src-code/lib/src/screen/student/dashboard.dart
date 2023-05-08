@@ -73,83 +73,80 @@ class _StudentDashboardState extends State<StudentDashboard> {
     return AnimatedBuilder(
       animation: _sdController,
       builder: (context, child) {
-        return !_sdController.isAllAttendanceCollected
-            ? Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).primaryColor, // Customize the color
-                  ),
-                ),
-              )
-            : WebView(
-                studentController: _sdController,
-                appBarTitle: "Dashboard",
-                selectedWidgetMarker: 0,
-                body: Container(
-                  alignment: Alignment.topCenter,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                // StudentInfoCard(student: _sdController.student),
-                                Row(
-                                  children: [
-                                    Flexible(
-                                        flex: 1,
-                                        child: Card(
-                                          child: StudentInfoCard(
-                                            id: _sdController.student.studentNo,
-                                            year: _sdController
-                                                .student.year.index
-                                                .toString(),
-                                            course:
-                                                _sdController.student.course,
-                                            firstName:
-                                                _sdController.student.firstName,
-                                            lastName:
-                                                _sdController.student.lastName,
-                                          ),
-                                        )),
-                                    Flexible(
-                                      flex: 1,
-                                      child: _overviewCard(5),
+        // return !_sdController.isAllAttendanceCollected
+        //     ? Center(
+        //         child: CircularProgressIndicator(
+        //           strokeWidth: 4,
+        //           valueColor: AlwaysStoppedAnimation<Color>(
+        //             Theme.of(context).primaryColor, // Customize the color
+        //           ),
+        //         ),
+        //       )
+        //     :
+        return WebView(
+          studentController: _sdController,
+          appBarTitle: "Dashboard",
+          selectedWidgetMarker: 0,
+          body: Container(
+            alignment: Alignment.topCenter,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // StudentInfoCard(student: _sdController.student),
+                          Row(
+                            children: [
+                              Flexible(
+                                  flex: 1,
+                                  child: Card(
+                                    child: StudentInfoCard(
+                                      id: _sdController.student.studentNo,
+                                      year: _sdController.student.year.index
+                                          .toString(),
+                                      course: _sdController.student.course,
+                                      firstName:
+                                          _sdController.student.firstName,
+                                      lastName: _sdController.student.lastName,
                                     ),
-                                  ],
-                                ),
-
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: _webRecentLogsCard(
-                                        context,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: _myClassesCard(
-                                        context,
-                                      ),
-                                    ),
-                                    // _myClassesCard(context)
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                              ],
-                            ),
+                                  )),
+                              Flexible(
+                                flex: 1,
+                                child: _overviewCard(5),
+                              ),
+                            ],
                           ),
-                        ),
+
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: _webRecentLogsCard(
+                                  context,
+                                ),
+                              ),
+                              Expanded(
+                                child: _myClassesCard(
+                                  context,
+                                ),
+                              ),
+                              // _myClassesCard(context)
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              );
+              ],
+            ),
+          ),
+        );
       },
     );
   }

@@ -75,7 +75,7 @@ class AdminController with ChangeNotifier {
   DateTime? fromDate;
   DateTime? toDate;
   int page = 1;
-  int pageSize = 10;
+  int pageSize = 20;
 
   final Logger _logger = Logger();
 

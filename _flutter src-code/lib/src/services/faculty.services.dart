@@ -58,10 +58,10 @@ class FacultyService {
     try {
       final response =
           await HttpService.get('$_baseUrl/Faculty/classes/?facultyNo=$id');
-      if (kDebugMode) {
-        _logger
-            .i('getFacultiesClasses ${response.statusCode} ${response.body}');
-      }
+      // if (kDebugMode) {
+      //   _logger
+      //       .i('getFacultiesClasses ${response.statusCode} ${response.body}');
+      // }
       final jsonResponse = json.decode(response.body);
       return CRUDReturn.fromJson(jsonResponse);
     } catch (e, stacktrace) {

@@ -245,12 +245,23 @@ class _WebViewState extends State<WebView> {
         actions: [
           if (widget.appBarActionWidget != null)
             Center(child: widget.appBarActionWidget!),
-          IconButton(
-            icon: Icon(Icons.filter_list),
-            onPressed: () {
-              _showFilterDialog(context, adminController!);
-            },
-          ),
+          if (widget.appBarActionWidget != null)
+            IconButton(
+              icon: Icon(Icons.filter_list),
+              onPressed: () {
+                int userType = authController.loggedInUser?.type.index ?? -1;
+                switch (userType) {
+                  case 0:
+                    _showFilterDialog(context, studentController, userType);
+                    break;
+                  case 1:
+                    _showFilterDialog(context, facultyController, userType);
+                    break;
+                  default:
+                    _showFilterDialog(context, adminController!, userType);
+                }
+              },
+            ),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.2,
           ),
@@ -302,14 +313,13 @@ class _WebViewState extends State<WebView> {
   }
 }
 
-void _showFilterDialog(
-    BuildContext context, AdminController _dataController) async {
+void _showFilterDialog(BuildContext context, _dataController, int type) async {
   await showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
         content: SingleChildScrollView(
-          child: FilterForm(_dataController),
+          child: FilterForm(_dataController, type),
         ),
         actions: [
           TextButton(
@@ -325,8 +335,9 @@ void _showFilterDialog(
 }
 
 class FilterForm extends StatefulWidget {
-  final AdminController dataController;
-  FilterForm(this.dataController);
+  final dataController;
+  int type;
+  FilterForm(this.dataController, this.type, {super.key});
 
   @override
   _FilterFormState createState() => _FilterFormState();
@@ -357,7 +368,6 @@ class _FilterFormState extends State<FilterForm> {
               labelText: 'Date',
             ),
             initialValue: widget.dataController.date,
-            
             onSaved: (value) {
               _date = value;
               print('Date saved: $_date');
@@ -374,26 +384,32 @@ class _FilterFormState extends State<FilterForm> {
             onChanged: (value) => _room = value,
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Student No.',
+        Visibility(
+          visible: widget.type == 1 && widget.type == 0 ? true : false,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Student No.',
+              ),
+              initialValue: widget.dataController.studentNo?.toString(),
+              keyboardType: TextInputType.number,
+              onChanged: (value) => _studentNo = int.tryParse(value ?? ''),
             ),
-            initialValue: widget.dataController.studentNo?.toString(),
-            keyboardType: TextInputType.number,
-            onChanged: (value) => _studentNo = int.tryParse(value ?? ''),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Faculty No.',
+        Visibility(
+          visible: widget.type == 1 && widget.type == 0 ? true : false,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Faculty No.',
+              ),
+              initialValue: widget.dataController.facultyNo?.toString(),
+              keyboardType: TextInputType.number,
+              onChanged: (value) => _facultyNo = int.tryParse(value ?? ''),
             ),
-            initialValue: widget.dataController.facultyNo?.toString(),
-            keyboardType: TextInputType.number,
-            onChanged: (value) => _facultyNo = int.tryParse(value ?? ''),
           ),
         ),
         Padding(

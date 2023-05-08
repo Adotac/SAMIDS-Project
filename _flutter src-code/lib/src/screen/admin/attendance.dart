@@ -106,10 +106,10 @@ class _AdminAttendanceState extends State<AdminAttendance> {
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       scrollDirection: Axis.vertical,
       child: AnimatedBuilder(
-        animation: _dataController,
-        builder:(context, child){
-          return  _dataTableAttendance(context);
-        }),
+          animation: _dataController,
+          builder: (context, child) {
+            return _dataTableAttendance(context);
+          }),
     );
   }
 
@@ -164,7 +164,7 @@ class _AdminAttendanceState extends State<AdminAttendance> {
   // AttendanceDataSource _createAttendanceDataSource() {
   //   return AttendanceDataSource(
   //     _dataController.allAttendanceList,
-  //     _dataController,
+  //     _dataController,p
   //   );
   // }
 
@@ -228,9 +228,8 @@ class _AdminAttendanceState extends State<AdminAttendance> {
         },
         onSubmitted: (value) {
           // Call filterAttendance with the search query entered by the user
-         _dataController.setParams(search: value);
-         //_dataController.getAttendanceAll();
-
+          _dataController.setParams(search: value);
+          //_dataController.getAttendanceAll();
         },
         controller: _textEditingController,
         decoration: const InputDecoration(

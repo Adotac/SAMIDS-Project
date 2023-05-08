@@ -54,6 +54,18 @@ class FacultyController with ChangeNotifier {
   bool isAllAttendanceCollected = false;
   bool isRemarksCountListLoading = true;
 
+  DateTime? date;
+  String? room;
+  int? studentNo;
+  int? facultyNo;
+  Remarks? remarks;
+  int? subjectId;
+  int? schedId;
+  String? search;
+  DateTime? fromDate;
+  DateTime? toDate;
+  int page = 1;
+  int pageSize = 20;
   List<Map<String, Map<Remarks, int>>> remarksCountList = [];
   int maxRemarksCount = 0;
 
@@ -117,24 +129,6 @@ class FacultyController with ChangeNotifier {
   //     }
   //   } catch (e, stacktrace) {
   //     print('attendanceReset $e $stacktrace');
-  //   }
-  // }
-
-  // Future<void> getAttendanceBySchedId(int schedId) async {
-  //   try {
-  //     CRUDReturn response = await AttendanceService.getAll(
-  //       schedId: schedId,
-  //       // studentNo: faculty.facultyNo,
-  //       // studentNo: 91204,
-  //     );
-  //     if (response.success) {
-  //       handleEventJsonAttendanceBySchedId(response, schedId);
-
-  //       dateSelected = null;
-  //       notifyListeners();
-  //     }
-  //   } catch (e, stacktrace) {
-  //     print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
   //   }
   // }
 
@@ -413,36 +407,36 @@ class FacultyController with ChangeNotifier {
     }
   }
 
-  Future<void> getAttendanceAll(String? date) async {
-    try {
-      // if (isAllAttendanceCollected && date == null) return;
-      CRUDReturn response = date != null
-          ? await AttendanceService.getAttendances(
-              facultyNo: faculty.facultyNo,
-              date: date,
-            )
-          : await AttendanceService.getAttendances(
-              facultyNo: faculty.facultyNo,
-            );
+  // Future<void> getAttendanceAll(String? date) async {
+  //   try {
+  //     // if (isAllAttendanceCollected && date == null) return;
+  //     CRUDReturn response = date != null
+  //         ? await AttendanceService.getAttendances(
+  //             facultyNo: faculty.facultyNo,
+  //             date: date,
+  //           )
+  //         : await AttendanceService.getAttendances(
+  //             facultyNo: faculty.facultyNo,
+  //           );
 
-      if (response.success) {
-        await handEventJsonAttendanceAll(response);
+  //     if (response.success) {
+  //       await handEventJsonAttendanceAll(response);
 
-        if (graphAttendanceList.isEmpty) {
-          // graphAttendanceList = allAttendanceList;
-          print('graphAttendanceList');
-        }
-        getRemarksCount();
-        getRemarksCountForPercentiles();
-        isAllAttendanceCollected = true;
-        filteredAttendanceList = allAttendanceList;
-        notifyListeners();
-      }
-    } catch (e, stacktrace) {
-      isAllAttendanceCollected = true;
-      print('getAttendanceAll getAll $e $stacktrace');
-    }
-  }
+  //       if (graphAttendanceList.isEmpty) {
+  //         // graphAttendanceList = allAttendanceList;
+  //         print('graphAttendanceList');
+  //       }
+  //       getRemarksCount();
+  //       getRemarksCountForPercentiles();
+  //       isAllAttendanceCollected = true;
+  //       filteredAttendanceList = allAttendanceList;
+  //       notifyListeners();
+  //     }
+  //   } catch (e, stacktrace) {
+  //     isAllAttendanceCollected = true;
+  //     print('getAttendanceAll getAll $e $stacktrace');
+  //   }
+  // }
 
   String formatTime(DateTime dateTime) {
     final formattedTime = DateFormat('hh:mm a').format(dateTime);
@@ -668,7 +662,7 @@ class FacultyController with ChangeNotifier {
   }
 
   Future<void> downloadData(context) async {
-    if (filteredAttendanceList.isEmpty) {
+    if (allAttendanceList.isEmpty) {
       showDialog(
         context: context,
         builder: (context) {
@@ -705,7 +699,7 @@ class FacultyController with ChangeNotifier {
       ],
     ];
 
-    for (Attendance attendance in filteredAttendanceList) {
+    for (Attendance attendance in allAttendanceList) {
       List<dynamic> row = [
         attendance.student?.studentNo ?? '',
         '${attendance.student?.firstName ?? ''} ${attendance.student?.lastName ?? ''}',
@@ -1163,5 +1157,65 @@ class FacultyController with ChangeNotifier {
       remarkCountList.add(count.toDouble());
     }
     return remarkCountList;
+  }
+
+  Future<void> getAttendanceAll() async {
+    try {
+      //if (isAllAttendanceCollected) return;
+      print([faculty.facultyNo, "faculty.facultyNo"]);
+      CRUDReturn response = await AttendanceService.getAttendances(
+        date: date != null ? date!.toIso8601String() : null,
+        room: room,
+        studentNo: studentNo,
+        facultyNo: faculty.facultyNo,
+        remarks: remarks,
+        subjectId: subjectId,
+        schedId: schedId,
+        search: search,
+        fromDate: fromDate,
+        toDate: toDate,
+        page: page,
+        pageSize: pageSize,
+      );
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        //isAllAttendanceCollected = true;
+        notifyListeners();
+      } else {
+        _logger.i('adminController else ${response.data}');
+      }
+    } catch (e, stacktrace) {
+      _logger.i('adminController getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  setParams({
+    DateTime? date,
+    String? room,
+    int? studentNo,
+    int? facultyNo,
+    Remarks? remarks,
+    int? subjectId,
+    int? schedId,
+    String? search,
+    DateTime? fromDate,
+    DateTime? toDate,
+    int? page,
+    int? pageSize,
+  }) {
+    this.date = date;
+    this.room = room;
+    this.studentNo = studentNo;
+    this.facultyNo = faculty.facultyNo;
+    this.remarks = remarks;
+    this.subjectId = subjectId;
+    this.schedId = schedId;
+    this.search = search;
+    this.fromDate = fromDate;
+    this.toDate = toDate;
+    this.page = page ?? this.page;
+    this.pageSize = pageSize ?? this.pageSize;
+    getAttendanceAll();
+    notifyListeners();
   }
 }
