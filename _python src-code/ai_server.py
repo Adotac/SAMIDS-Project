@@ -14,6 +14,14 @@ from ImagePredictor import ImagePredictor
 from mqtt_client import MQTTClient
 from Logger import logger
 
+Remarks = {
+        0: "Pending",
+        1: "OnTime", 
+        2: "Late", 
+        3: "Cutting", 
+        4: "Absent" 
+}
+
 backend_url = "https://localhost:7170"
 
 headers = {
@@ -26,7 +34,12 @@ app = FastAPI()
 mqtt = MQTTClient()
 mqtt.start_loop()
 
-predictor = ImagePredictor()
+# svm_path = './j-notebooks/svm-rbf_classifier-95-rand-200.pkl'
+svm_path = './models/svm_classifier-400-rand.pkl'
+# svm_path = './models/svm_classifier - 93.pkl'
+
+
+predictor = ImagePredictor(svm_path=svm_path)
 
 results = defaultdict(str)
 
@@ -146,13 +159,22 @@ async def add_attendance(std_id: int, room_id: str, tap_time: str, rfid: str):
 
         print(data)
         if response.status_code == 200 and data["success"]:
-            rfidData["message"] = "Attendance Verified!"
+            if int(data['data']) is not ValueError:
+                rfidData["message"] = f"Attendance { Remarks.get( data['data'] ) }"
+            elif 404 in data['data']:
+                rfidData["message"] = f"Error 404"
+
+            
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
-            logger.info(f"Attendance recorded", extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
+            logger.info(f"{ rfidData['message'] }", extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
 
         else:
-            rfidData["message"] = "Attendance Failed!"
+            if 404 in data['data'] or response.status_code == 404:
+                rfidData["message"] = f"Error 404"
+            else:
+                rfidData["message"] = "Attendance Failed!"
+    
             rfidData["displayFlag"] = True
             print(rfidData)
             print("Error: " + str(response.status_code) + " | Can't add attendance")

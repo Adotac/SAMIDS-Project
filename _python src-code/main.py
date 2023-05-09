@@ -149,21 +149,21 @@ def main():
         ip_entry.grid(row=0, column=1, padx=5, pady=5)
         ip_entry.insert(0, "192.168.43.245")
 
-        model_path_label = tk.Label(check_face_dialog, text="Model Path:")
-        model_path_label.grid(row=1, column=0, sticky="e", padx=5, pady=5)
-        model_path_entry = tk.Entry(check_face_dialog, width=40)
-        model_path_entry.grid(row=1, column=1, padx=5, pady=5)
-        model_path_button = tk.Button(check_face_dialog, text="Browse",
-                                      command=lambda: browse_directory(model_path_entry))
-        model_path_button.grid(row=1, column=2, padx=5, pady=5)
+        # model_path_label = tk.Label(check_face_dialog, text="Model Path:")
+        # model_path_label.grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        # model_path_entry = tk.Entry(check_face_dialog, width=40)
+        # model_path_entry.grid(row=1, column=1, padx=5, pady=5)
+        # model_path_button = tk.Button(check_face_dialog, text="Browse",
+        #                               command=lambda: browse_directory(model_path_entry))
+        # model_path_button.grid(row=1, column=2, padx=5, pady=5)
 
-        facenet_path_label = tk.Label(check_face_dialog, text="FaceNet Pretrained Model:")
-        facenet_path_label.grid(row=2, column=0, sticky="e", padx=5, pady=5)
-        facenet_path_entry = tk.Entry(check_face_dialog, width=40)
-        facenet_path_entry.grid(row=2, column=1, padx=5, pady=5)
-        facenet_path_button = tk.Button(check_face_dialog, text="Browse",
-                                        command=lambda: browse_directory(facenet_path_entry))
-        facenet_path_button.grid(row=2, column=2, padx=5, pady=5)
+        # facenet_path_label = tk.Label(check_face_dialog, text="FaceNet Pretrained Model:")
+        # facenet_path_label.grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        # facenet_path_entry = tk.Entry(check_face_dialog, width=40)
+        # facenet_path_entry.grid(row=2, column=1, padx=5, pady=5)
+        # facenet_path_button = tk.Button(check_face_dialog, text="Browse",
+        #                                 command=lambda: browse_directory(facenet_path_entry))
+        # facenet_path_button.grid(row=2, column=2, padx=5, pady=5)
 
         upload_image_button = tk.Button(check_face_dialog, text="Upload Image",
                                         command=checkImage)  # Replace with your upload_image function

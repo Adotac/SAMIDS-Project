@@ -10,7 +10,8 @@ from collections import OrderedDict
 from CustomAugment import RandomBrightnessContrast
 
 # Define the path to the trained SVM model
-svm_path = './j-notebooks/svm-rbf_classifier.pkl'
+# svm_path = './j-notebooks/svm-rbf_classifier-95-rand-200.pkl'
+svm_path = './j-notebooks/sgd_classifier-92-rand-200.pkl'
 
 # Load the SVM model from the pickle file
 with open(svm_path, "rb") as f:
@@ -29,9 +30,10 @@ resnet.eval()
 
 # Define the transformations to apply to the input image
 data_transforms = transforms.Compose([
-    RandomBrightnessContrast(brightness_range=(0.7, 8), contrast_range=(0.6, 1)),
+    RandomBrightnessContrast(brightness_range=(0.5, 1), contrast_range=(0.5, 1)),
+    # transforms.ColorJitter(saturation=0.1, hue=0.1),
     transforms.Resize((160, 160)),
-    transforms.Grayscale(3),
+    # transforms.Grayscale(3),
     transforms.ToTensor(),
 
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
