@@ -12,6 +12,15 @@ import requests
 from collections import defaultdict
 from ImagePredictor import ImagePredictor
 from mqtt_client import MQTTClient
+from Logger import logger
+
+Remarks = {
+        0: "Pending",
+        1: "OnTime", 
+        2: "Late", 
+        3: "Cutting", 
+        4: "Absent" 
+}
 
 backend_url = "https://localhost:7170"
 
@@ -25,7 +34,12 @@ app = FastAPI()
 mqtt = MQTTClient()
 mqtt.start_loop()
 
-predictor = ImagePredictor()
+# svm_path = './j-notebooks/svm-rbf_classifier-95-rand-200.pkl'
+svm_path = './models/svm_classifier-400-rand.pkl'
+# svm_path = './models/svm_classifier - 93.pkl'
+
+
+predictor = ImagePredictor(svm_path=svm_path)
 
 results = defaultdict(str)
 
@@ -34,6 +48,7 @@ class ESP32Data(BaseModel):
     ip_address: str
     rfid_string: str
     device_id: str
+    taptime: str
 
 
 rfidData = {
@@ -68,14 +83,15 @@ async def log_attendance(background_tasks: BackgroundTasks, data: ESP32Data):
     ip_address = data.ip_address
     rfid_string = data.rfid_string
     device_id = data.device_id
+    tap_time = data.taptime
     # print(data)
 
-    background_tasks.add_task(process_image, background_tasks, ip_address, rfid_string, device_id)
+    background_tasks.add_task(process_image, background_tasks, ip_address, rfid_string, device_id, tap_time)
 
     return {"status": "success", "message": "image processed"}
 
 
-async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid_string: str, device_id: str):
+async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid_string: str, device_id: str, tap_time: str):
     url = f'http://{ip_address}/800x600.jpg'
     cap = cv2.VideoCapture(url)
 
@@ -89,6 +105,7 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
         results[ip_address] = label_name
 
         tag = results[ip_address].split("-")[0]
+        student_id= 0
 
         try:
             response = requests.get(backend_url + f"/api/Student?rfid={tag}", headers=headers, verify=False)
@@ -96,11 +113,14 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
                 data = response.json()
                 input_rfid = str(data["data"][0]["rfid"])
                 print(input_rfid + " | " + rfid_string)
-
+                student_id= int(data["data"][0]["studentNo"])
+                
                 if rfid_string == input_rfid:
                     print("Add attendance here")
-                    background_tasks.add_task(add_attendance, std_id=int(data["data"][0]["studentNo"]),
-                                              room_id=device_id)
+                    background_tasks.add_task(add_attendance, std_id=student_id,
+                                              room_id=device_id,
+                                              tap_time=tap_time,
+                                              rfid=rfid_string)
                 else:
                     raise ValueError("Rfid data doesn't match")
             else:
@@ -109,6 +129,8 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
                 mqtt.publish(device_id=device_id, message=json.dumps(rfidData))
                 print("Error: " + str(response.status_code) + " | " + tag)
                 print(response.text)
+                logger.error(f"Server Error: {str(response.status_code)}", extra={'user_id': student_id, 'rfid': rfid_string, 'tap_time':tap_time, 'room':device_id})
+
 
             del results[ip_address]
         except Exception as e:
@@ -116,11 +138,12 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=device_id, message=json.dumps(rfidData))
             print(f"An error occurred: {str(e)}")
+            logger.error(f"An error occured: {str(e)}", extra={'user_id': student_id, 'rfid': rfid_string, 'tap_time':tap_time, 'room':device_id})
 
     cap.release()
 
 
-async def add_attendance(std_id: int, room_id: str):
+async def add_attendance(std_id: int, room_id: str, tap_time: str, rfid: str):
     try:
         # Define the data you want to send as a dictionary
         data = {
@@ -136,16 +159,32 @@ async def add_attendance(std_id: int, room_id: str):
 
         print(data)
         if response.status_code == 200 and data["success"]:
-            rfidData["message"] = "Attendance Verified!"
+            if int(data['data']) is not ValueError:
+                rfidData["message"] = f"Attendance { Remarks.get( data['data'] ) }"
+            elif 404 in data['data']:
+                rfidData["message"] = f"Error 404"
+
+            
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
+            logger.info(f"{ rfidData['message'] }", extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
+
         else:
-            rfidData["message"] = "Attendance Failed!"
+            if 404 in data['data'] or response.status_code == 404:
+                rfidData["message"] = f"Error 404"
+            else:
+                rfidData["message"] = "Attendance Failed!"
+    
             rfidData["displayFlag"] = True
             print(rfidData)
             print("Error: " + str(response.status_code) + " | Can't add attendance")
             print(response.text)
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
+            logger.info(f"Attendance failed to record, Error Code: {str(response.status_code)}", 
+                        extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
+
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        logger.error(f"An error occured = {str(e)}", 
+            extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})

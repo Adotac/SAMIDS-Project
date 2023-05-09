@@ -10,6 +10,10 @@ const String deviceId = String(deviceNumber + "_CAM");
 const String subtopic = String("mqtt/attendance/" + deviceNumber); // publish to be read by deviceCAM
 const String camtopic = String("mqtt/DEVICE/" + deviceId); // publish to send device state
 
+// Replace the following with your desired timezone offset (in seconds)
+const int timeZoneOffsetSeconds = 8 * 60 * 60; // 8 hours (in seconds)
+
+
 bool deviceFlag = false;
 bool retrySend = false;
 
@@ -37,6 +41,9 @@ espcam_message myData;
 #include "camera_pins.h"
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", timeZoneOffsetSeconds);
 
 esp32cam::Resolution initialResolution;
 WebServer server(80);
@@ -184,6 +191,7 @@ void setup() {
   Serial.print("http://");
   Serial.println(WiFi.localIP());
 
+  timeClient.begin();
   addRequestHandlers();
   server.begin();
 }
@@ -191,8 +199,7 @@ void setup() {
 int retCtr = 0;
 void loop() {
   static uint32_t prev_ms = millis();
-  // sendHttpRequest();
-
+  timeClient.update();
 
   client.loop(); // important
 
@@ -208,6 +215,7 @@ void loop() {
   }
   else if (retCtr > 0){
     publishMessage(client, camtopic, espcamToJson(myData, "Retrying...", false, false, true));
+    retrySend = false;
     retCtr = 0;
   }
 
@@ -216,7 +224,7 @@ void loop() {
   if (millis() > prev_ms + 30000)
   {
     prev_ms = millis();
-    Serial.println("No Message");
+    // Serial.println("No Message");
   }
   delay(2000);
 }
@@ -225,11 +233,13 @@ void sendRequest() {
   if (WiFi.status() == WL_CONNECTED) {
     String ipAddress = WiFi.localIP().toString();
     String rfidString = rfid;
+    String formattedTime = timeClient.getFormattedTime();
 
     DynamicJsonDocument jsonData(1024);
     jsonData["ip_address"] = ipAddress;
     jsonData["rfid_string"] = rfidString;
     jsonData["device_id"] = deviceNumber;
+    jsonData["taptime"] = formattedTime;
     String jsonString;
     serializeJson(jsonData, jsonString);
 

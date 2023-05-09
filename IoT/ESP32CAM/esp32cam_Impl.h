@@ -16,6 +16,9 @@
 #include <HTTPClient.h>
 #include <PicoMQTT.h>
 
+#include <WiFiUdp.h>
+#include <NTPClient.h>
+
 #include "soc/soc.h" // Disable brownout problems
 #include "soc/rtc_cntl_reg.h" // Disable brownout problems
 #include "driver/rtc_io.h"

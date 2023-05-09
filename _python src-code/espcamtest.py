@@ -1,17 +1,18 @@
 import cv2
+from ImagePredictor import ImagePredictor
 
-url = 'http://192.168.43.245/240x240.mjpeg'
-cap = cv2.VideoCapture(url)
+ip = '192.168.43.245'
+# Define the path to the trained SVM model
 
-while True:
-    ret, frame = cap.read()
-    if ret:
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(0):
-            break
-    else:
-        print("no frames")
-        break
+# svm_path = './j-notebooks/svm-rbf_classifier-95-rand-200.pkl'
+# svm_path = './j-notebooks/svm-rbf_classifier-90-all-200.pkl'
+# svm_path = './j-notebooks/sgd_classifier-92-rand-200.pkl'
+# svm_path = './j-notebooks/svm-rbf_classifier-90r-over.pkl'
 
-cap.release()
-cv2.destroyAllWindows()
+# svm_path = './models/sgd_classifier-92-rand.pkl'
+svm_path = './models/svm_classifier-400-rand.pkl'
+# svm_path = './models/svm_classifier - 93.pkl'
+
+predictor = ImagePredictor(svm_path=svm_path)
+
+predictor.predict_display(ip=ip)

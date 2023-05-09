@@ -6,7 +6,13 @@ import cv2
 import pickle
 import mediapipe as mp
 from collections import OrderedDict
+
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import numpy as np
 import os
+
+from CustomAugment import RandomBrightnessContrast
 
 class ImagePredictor:
     def __init__(self, svm_path='svm_classifier-main.pkl', weights_path='./models/facenet-vggface2.pt'):
@@ -15,11 +21,15 @@ class ImagePredictor:
 
         self.data_transforms = transforms.Compose([
             # Add any custom augmentations here
+            RandomBrightnessContrast(brightness_range=(0.8, 1.2), contrast_range=(0.8, 1.2)),
+            transforms.ColorJitter(saturation=0.1, hue=0.1),
             transforms.Resize((160, 160)),
-            transforms.Grayscale(3),
+            # transforms.Grayscale(3),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
+
+        self.rotation = 90 # need to rotate due to esp32cam is rotated 90 degrees, set to 0 if your camera has correct rotation
 
         self.resnet = InceptionResnetV1()
         state_dict = torch.load(weights_path)
@@ -32,9 +42,12 @@ class ImagePredictor:
             self.loaded_clf, self.loaded_le, self.loaded_name_list = pickle.load(f)
 
     def predict_label(self, frame):
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
+        # img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(frame)
+        img = img.rotate(self.rotation)
         img = self.data_transforms(img)
+        # tensorShow(img);
+
         img = img.unsqueeze(0)
 
         with torch.no_grad():
@@ -47,8 +60,8 @@ class ImagePredictor:
 
     def predict_display(self, ip):
         # Initialize Mediapipe face detection module
-        url = f'http://{ip}/240x240.jpg'
-        # url = f'http://{ip}/320x240.jpg'
+        # url = f'http://{ip}/240x240.jpg'
+        url = f'http://{ip}/320x240.jpg'
         # url = f'http://{ip}/800x600.jpg'
         face_detection = mp.solutions.face_detection.FaceDetection()
         cap = cv2.VideoCapture(url)
@@ -63,7 +76,7 @@ class ImagePredictor:
 
                 # Convert the frame to RGB format
                 img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
+    
                 # Detect faces using Mediapipe
                 results = face_detection.process(img)
 
@@ -89,10 +102,30 @@ class ImagePredictor:
                         print(f'The predicted label of the image is: {label_name}')
                 cv2.imshow("Captured Frame", frame)
 
-                # Exit the program
-                if cv2.waitKey(0):
+                # Exit the program if 'q' is pressed
+                if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
         cv2.destroyAllWindows()
         cap.release()
 
+
+def tensorShow(img):
+
+    # Convert the tensor to NumPy array
+    img_np = img.numpy()
+
+    # If the tensor has shape (channels, height, width), transpose it to (height, width, channels)
+    if img_np.shape[0] == 3 or img_np.shape[0] == 1:
+        img_np = img_np.transpose((1, 2, 0))
+
+    # Convert the image to the correct color space (if necessary)
+    img_np = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+
+    # Display the image
+    cv2.imshow("Augmented Frame", img_np)
+
+    # Break the loop if the 'q' key is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        return
+            

@@ -11,12 +11,14 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.utils import shuffle
 from torchvision import datasets
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from facenet_pytorch import InceptionResnetV1
 
-from CustomAugment import RandomFlip, RandomRotation, RandomBrightnessContrast, Normalize
+from CustomAugment import RandomFlip, RandomRotation, RandomBrightnessContrast
+from CustomAugment import Normalize, RandomGaussianNoise, RandomAugmentation
 import mediapipe as mp
 
 
@@ -26,13 +28,15 @@ class FaceRecognition:
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.face_detection = mp.solutions.face_detection.FaceDetection(model_selection=0, min_detection_confidence=0.6)
         self.weights_path = './models/facenet-vggface2.pt'
+        self.dataset_path = '/dataset/videos_cropped'
+        # self.start_time = time.time()
 
     def elapsedTime(self, start_time):
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"\nElapsed time: {elapsed_time:.2f} seconds")
 
-    def collate_np(self, batch, class_to_idx):
+    def collate_np(batch, class_to_idx):
         images, labels = zip(*batch)
         target_size = (160, 160)
         images_np = [cv2.resize(np.array(img), target_size) for img in images]
@@ -44,39 +48,54 @@ class FaceRecognition:
 
         print(f'Running on device: {self.device}')
 
-        resnet = InceptionResnetV1()
+        resnet = InceptionResnetV1().to(self.device) # can only use cpu on my machine :<
 
         state_dict = torch.load(self.weights_path)
         filtered_state_dict = OrderedDict((k, v) for k, v in state_dict.items() if k not in ['logits.weight', 'logits.bias'])
         resnet.load_state_dict(filtered_state_dict, strict=False)
-
+        
         resnet.eval()
 
         path = './dataset/videos_cropped'
 
+        # data_transforms = transforms.Compose([
+        #     RandomBrightnessContrast(brightness_range=(0.5, 1.5), contrast_range=(0.5, 1.5)),
+        #     RandomGaussianNoise(mean=0.0, std_range=(0.1, 0.3)),
+
+        #     transforms.ColorJitter(saturation=0.1, hue=0.1),
+        #     RandomRotation(angles=(-20, -1, 0, 1, 20)),
+        #     RandomFlip(p=0.5),
+
+        #     transforms.Resize((160, 160)),
+        #     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        # ])
+
         data_transforms = transforms.Compose([
-            RandomRotation(angles=(-10, -5, 0, 5, 10)),
-            RandomFlip(p=0.5),
-            RandomBrightnessContrast(brightness_range=(0.8, 1.5), contrast_range=(0.6, 1.5)),
+            RandomAugmentation(),
+            transforms.ColorJitter(saturation=0.1, hue=0.1),
             transforms.Resize((160, 160)),
             Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
+
         if os.path.exists(path):
             dataset = datasets.ImageFolder(path, transform=data_transforms)
+
+            idx_to_class = {i: c for c, i in dataset.class_to_idx.items()}
+
+            workers = 0 if os.name == 'nt' else 4
+            loader = DataLoader(dataset,
+                                batch_size=32,
+                                shuffle=True,
+                                num_workers=workers,
+                                collate_fn=lambda batch: self.collate_np(batch, dataset.class_to_idx)
+                                )
+
+            total_images = len(dataset)
+            print(f"Total images: {total_images}")
         else:
             print("Path doesn't exist")
             return
-
-        idx_to_class = {i: c for c, i in dataset.class_to_idx.items()}
-
-        workers = 0 if os.name == 'nt' else 4
-        loader = DataLoader(dataset,
-                            batch_size=32,
-                            shuffle=True,
-                            num_workers=workers,
-                            collate_fn=lambda batch: self.collate_np(batch, dataset.class_to_idx)
-                            )
 
         face_list = []  # list of cropped faces from photos folder
         name_list = []  # list of names corrospoing to cropped photos
@@ -118,11 +137,8 @@ class FaceRecognition:
                         # Convert the NumPy array to a PyTorch tensor
                         face_image = torch.from_numpy(face_image).permute(2, 0, 1).float()
 
-                        # print(f'Face detected with probability: {prob.item():.4f}')
                         face_list.append(face_image)
                         name_list.append(label)  # names are stored in a list
-                        # elapsedTime(start_time)
-                        # print(idx_to_class[label])
                         print(str(j), end='')
                     else:
                         print('.', end='')
@@ -152,40 +168,58 @@ class FaceRecognition:
             face_resized = transforms.ToTensor()(face_pil_resized)  # Convert the resized PIL image back to a tensor
             face_list_resized.append(face_resized)
 
-        # print(face_list)
         if len(face_list_resized) > 0:
             aligned = torch.stack(face_list_resized)
-            # Continue with the rest of the code
+            aligned = aligned.to(self.device)
+            del face_list_resized
+
+            names = np.array(name_list)
+
+            # Disable gradient calculation during inference
+            with torch.no_grad():
+                # Calculate the embeddings for the aligned faces
+                embeddings = resnet(aligned).detach().cpu()
+
+                # Encode the labels
+                le = LabelEncoder()
+                y = le.fit_transform(names)
+
         else:
             print("No faces were found in the dataset. Please check the input images.")
             return
 
         names = np.array(name_list)
 
-        # Disable gradient calculation during inference
-        with torch.no_grad():
-            # Calculate the embeddings for the aligned faces
-            embeddings = resnet(aligned).detach().cpu()
-
-        # Encode the labels
-        le = LabelEncoder()
-        y = le.fit_transform(names)
-
-        print("Training SVM...")
+        # Define hyperparameters
+        C = 1.0  # SVM regularization parameter
+        gamma = 'scale'  # RBF kernel width parameter
+        print("Training SVM with RBF kernel...")
         self.elapsedTime(start_time)
+        # Train an SVM with RBF kernel using Mini-batch Gradient Descent
+        # Initialize the SVM classifier
+        clf = SVC(C=C, kernel='rbf', gamma=gamma)
+
         # Split the dataset into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(embeddings, y, test_size=0.2, random_state=42)
 
-        # Train an SVM classifier
-        clf = SVC(kernel='linear', probability=True)
+        # Shuffle the training data
+        X_train, y_train = shuffle(X_train, y_train, random_state=42)
+
+        # Train the classifier on the mini-batch
         clf.fit(X_train, y_train)
 
+        # Evaluate the classifier on the test set
+        y_pred = clf.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f"Accuracy: {accuracy:.2f}")
+        self.elapsedTime(start_time)
+
         # Save the trained model and the name list as a pickle file
-        with open("svm_classifier.pkl", "wb") as f:
+        with open(f"svm_classifier-{int(accuracy*100)}.pkl", "wb") as f:
             pickle.dump((clf, le, name_list), f)
 
         # Load the trained model and the name list from the pickle file
-        with open("svm_classifier.pkl", "rb") as f:
+        with open(f"svm_classifier-{int(accuracy*100)}.pkl", "rb") as f:
             loaded_clf, loaded_le, loaded_name_list = pickle.load(f)
 
         # Evaluate the classifier
@@ -194,9 +228,6 @@ class FaceRecognition:
         print(f"Accuracy: {accuracy:.2f}")
         self.elapsedTime(start_time)
 
-        #
-        # embedding_list = loaded_clf[0]
-        # name_list = loaded_clf[1]
 
 if __name__ == '__main__':
     face_recognition = FaceRecognition()

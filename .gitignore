@@ -1,9 +1,13 @@
 !.gitignore
 .idea
 /dataset
+/documentation
 
 *.gz
 *.zip
 *.rar
 *.tgz
 *.tar
+*.mp4
+*.mov
+*.mkv
