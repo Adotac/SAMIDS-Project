@@ -4,7 +4,8 @@
 /__pycache__
 /demo/__pycache__
 /dataset
-/models
+/models/*.pt
+/models/*.dat
 /videodata
 
 /demo/custom/images/*
