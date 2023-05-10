@@ -84,7 +84,7 @@ class FacultyController with ChangeNotifier {
   Config? config;
   void startStream(context) {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      getFacultyClasses();
+      // getFacultyClasses();
       notifyListeners();
     });
   }
@@ -179,10 +179,27 @@ class FacultyController with ChangeNotifier {
     notifyListeners();
   }
 
+  handEventJsonAttendanceSchedId(CRUDReturn result, schedId) {
+    if (attendanceBySchedId[schedId]!.isNotEmpty) {
+      attendanceBySchedId[schedId]!.clear();
+    }
+
+    for (Map<String, dynamic> map in result.data) {
+      attendanceBySchedId[schedId]!.add(Attendance.fromJson(map));
+    }
+
+    notifyListeners();
+  }
+
   void handleEventJsonAttendanceBySchedId(CRUDReturn result, int schedId) {
     try {
       print('handleEventJsonAttendanceBySchedId');
       attendanceBySchedId.putIfAbsent(schedId, () => []);
+
+      // Clear the list if it is not empty
+      if (attendanceBySchedId[schedId]?.isNotEmpty == true) {
+        attendanceBySchedId[schedId]?.clear();
+      }
 
       for (Map<String, dynamic> map in result.data) {
         attendanceBySchedId[schedId]?.add(Attendance.fromJson(map));
@@ -289,6 +306,33 @@ class FacultyController with ChangeNotifier {
     DateTime? nearestDate;
     int minDifference = 7;
 
+    int todayDayOfWeek = today.weekday;
+
+    DateTime date_one = today.subtract(Duration(days: 1));
+    DateTime date_two = today.subtract(Duration(days: 2));
+    DateTime date_three = today.subtract(Duration(days: 3));
+    DateTime date_four = today.subtract(Duration(days: 4));
+    DateTime date_five = today.subtract(Duration(days: 5));
+
+    print(days.contains(getDayName(todayDayOfWeek)));
+    if (days.contains(getDayName(todayDayOfWeek))) {
+      // Today's day of the week is included in the input string
+      return today;
+    } else if (days.contains(getDayName(date_one.weekday))) {
+      return date_one;
+    } else if (days.contains(getDayName(date_two.weekday))) {
+      return date_two;
+    } else if (days.contains(getDayName(date_three.weekday))) {
+      return date_three;
+    } else if (days.contains(getDayName(date_four.weekday))) {
+      return date_four;
+    } else if (days.contains(getDayName(date_five.weekday))) {
+      return date_five;
+    }
+
+    for (int i = 0; i < days.length; i++) {
+      print(days[i]);
+    }
     for (String day in days) {
       int? dayNumber = dayMapping[day];
 
@@ -308,8 +352,31 @@ class FacultyController with ChangeNotifier {
     return nearestDate;
   }
 
+  String getDayName(int dayOfWeek) {
+    switch (dayOfWeek) {
+      case DateTime.monday:
+        return 'Mon';
+      case DateTime.tuesday:
+        return 'Tue';
+      case DateTime.wednesday:
+        return 'Wed';
+      case DateTime.thursday:
+        return 'Thu';
+      case DateTime.friday:
+        return 'Fri';
+      case DateTime.saturday:
+        return 'Sat';
+      case DateTime.sunday:
+        return 'Sun';
+      default:
+        return '';
+    }
+  }
+
   Widget buildNearestDateRow(BuildContext context, String daysOfWeek) {
     DateTime? nearestDateObj = nearestDate(daysOfWeek);
+    dateSelected = nearestDateObj;
+    notifyListeners();
     if (nearestDateObj == null) {
       return const Text('No valid days provided');
     }
@@ -336,13 +403,22 @@ class FacultyController with ChangeNotifier {
     );
   }
 
+  getBtnName(String daysOfWeek) {
+    final DateFormat dateFormat = DateFormat('MMMM d');
+
+    btnName = dateFormat.format(nearestDate(daysOfWeek)!);
+    notifyListeners();
+  }
+
   Future<void> getAttendanceBySchedId(int schedId, DateTime date) async {
     try {
-      print([1, schedId]);
       final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+
       CRUDReturn response = await AttendanceService.getAttendances(
         schedId: schedId,
-        //Remove me
+        date: dateFormat.format(date),
+
+        // Remove me
         // date: dateFormat.format(date),
         // studentNo: faculty.facultyNo,
         // studentNo: 91204,
@@ -356,6 +432,56 @@ class FacultyController with ChangeNotifier {
     } catch (e, stacktrace) {
       print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
     }
+  }
+
+  Future<void> getSchedId(int schedId, DateTime date) async {
+    try {
+      final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+
+      CRUDReturn response = await AttendanceService.getAttendances(
+        schedId: schedId,
+        date: dateFormat.format(date),
+        remarks: remarks,
+        // Remove me
+        // date: dateFormat.format(date),
+        // studentNo: faculty.facultyNo,
+        // studentNo: 91204,
+      );
+      if (response.success) {
+        handleEventSchedIdd(response, schedId);
+
+        dateSelected = null;
+        notifyListeners();
+      }
+    } catch (e, stacktrace) {
+      print('getAttendanceBySchedId getAttendanceAll $e $stacktrace');
+    }
+  }
+
+  List<Attendance> tempAttList = [];
+
+  void handleEventSchedIdd(CRUDReturn result, int schedId) {
+    try {
+      print('handleEventJsonAttendanceBySchedId');
+
+      // Clear the list if it is not empty
+      if (tempAttList.isNotEmpty == true) {
+        tempAttList.clear();
+      }
+
+      for (Map<String, dynamic> map in result.data) {
+        tempAttList.add(Attendance.fromJson(map));
+      }
+
+      notifyListeners();
+    } catch (e, stacktrace) {
+      print('handleEventJsonAttendanceBySchedId $e $stacktrace');
+    }
+  }
+
+  setDate(value) {
+    dateSelected = value;
+    notifyListeners();
   }
 
   //create function to query to FacultyService getFacultyClasses
@@ -1189,6 +1315,34 @@ class FacultyController with ChangeNotifier {
     }
   }
 
+  Future<void> getAttendanceSchedId(schedId) async {
+    try {
+      CRUDReturn response = await AttendanceService.getAttendances(
+        date: date != null ? date!.toIso8601String() : null,
+        room: room,
+        studentNo: studentNo,
+        facultyNo: faculty.facultyNo,
+        remarks: remarks,
+        subjectId: subjectId,
+        schedId: schedId,
+        search: search,
+        fromDate: fromDate,
+        toDate: toDate,
+        page: page,
+        pageSize: pageSize,
+      );
+      if (response.success) {
+        await handEventJsonAttendanceAll(response);
+        //isAllAttendanceCollected = true;
+        notifyListeners();
+      } else {
+        _logger.i('adminController else ${response.data}');
+      }
+    } catch (e, stacktrace) {
+      _logger.i('adminController getAttendanceAll $e $stacktrace');
+    }
+  }
+
   setParams({
     DateTime? date,
     String? room,
@@ -1202,6 +1356,7 @@ class FacultyController with ChangeNotifier {
     DateTime? toDate,
     int? page,
     int? pageSize,
+    bool isDashboard = false,
   }) {
     this.date = date;
     this.room = room;
@@ -1215,7 +1370,15 @@ class FacultyController with ChangeNotifier {
     this.toDate = toDate;
     this.page = page ?? this.page;
     this.pageSize = pageSize ?? this.pageSize;
-    getAttendanceAll();
-    notifyListeners();
+
+    if (isDashboard) {
+      print("adasdasdasd");
+      getSchedId(schedId!, date!);
+      notifyListeners();
+    } else {
+      print("dgdfgdfg");
+      getAttendanceAll();
+      notifyListeners();
+    }
   }
 }

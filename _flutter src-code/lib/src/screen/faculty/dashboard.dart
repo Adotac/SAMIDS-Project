@@ -14,6 +14,7 @@ import '../../model/attendance_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../model/student_model.dart';
+import '../../widgets/attendance/attendance_filter_form.dart';
 import '../../widgets/card_small.dart';
 import '../../widgets/card_small_mobile.dart';
 import '../../widgets/data_number.dart';
@@ -44,6 +45,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
   @override
   void initState() {
     _dataController.getConfig();
+    _dataController.getFacultyClasses();
     _dataController.startStream(context);
     _dataController.getAttendanceAll();
     // _dataController.getFacultyClasses();
@@ -384,8 +386,9 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
     );
   }
 
-  void _showAttendanceDialog(
-      BuildContext context, int subjectId, String title, int schedId) {
+  final DateFormat dateFormat = DateFormat('MMMM d');
+  void _showAttendanceDialog(BuildContext context, int subjectId, String title,
+      int schedId, String day) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -399,11 +402,20 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                   Text('$title - Attendance List'),
                   Row(
                     children: [
+                      Visibility(
+                        visible: _dataController.tempAttList.isNotEmpty,
+                        child: Text(
+                          dateFormat.format(_dataController.dateSelected!),
+                        ),
+                      ),
+                      SizedBox(width: 4.0),
                       TextButton(
                           onPressed: () async {
-                            _dataController.filterTodayAttendance(schedId);
+                            // _dataController.filterTodayAttendance(schedId);
+                            _showFilterDialog(
+                                context, _dataController, 1, schedId);
                           },
-                          child: Text(_dataController.btnName)),
+                          child: Text("Filter")),
                       SizedBox(width: 4.0),
                       TextButton(
                           onPressed: () async {
@@ -438,10 +450,15 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                         label: Text('Remarks'),
                       ),
                     ],
-                    rows: _dataController.attendanceBySchedId[schedId]!
-                        .map((attendance) =>
-                            _buildAttendanceList(context, attendance))
-                        .toList(),
+                    rows: _dataController.tempAttList.isNotEmpty
+                        ? _dataController.tempAttList
+                            .map((attendance) =>
+                                _buildAttendanceList(context, attendance))
+                            .toList()
+                        : _dataController.attendanceBySchedId[schedId]!
+                            .map((attendance) =>
+                                _buildAttendanceList(context, attendance))
+                            .toList(),
                   ),
                 ),
               ),
@@ -449,7 +466,7 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
           },
         );
       },
-    );
+    ).then((value) => {_dataController.tempAttList.clear()});
   }
 
   String getTimeStartEnd(SubjectSchedule? subjectSchedule) {
@@ -843,7 +860,8 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
                             subjectSchedule.schedId,
                             subjectSchedule.subject?.subjectName ??
                                 'No Subject',
-                            subjectSchedule.schedId);
+                            subjectSchedule.schedId,
+                            subjectSchedule.day);
                       },
                       child: Text('Attendance List'),
                     ),
@@ -1037,6 +1055,96 @@ class _FacultyDashboardState extends State<FacultyDashboard> {
         },
       ),
     ];
+  }
+
+  void _showFilterDialog(
+      BuildContext context, _dataController, int type, int schedId) async {
+    Remarks? _selectedRemarks;
+    DateTime? _date;
+    String? _room;
+    int? _studentNo;
+    int? _facultyNo;
+    Remarks? _remarks;
+    int? _subjectId;
+    int? _schedId;
+    DateTime? _fromDate;
+    DateTime? _toDate;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Form fields go here
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DateTimeFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Date',
+                    ),
+                    initialValue: widget.dataController.date,
+                    onSaved: (value) {
+                      _date = value;
+                      // _dataController.setDate(value!);
+                      print('Date saved: $_date');
+                    },
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField<Remarks>(
+                    decoration: InputDecoration(
+                      labelText: 'Remarks',
+                    ),
+                    value: widget.dataController.remarks,
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text('Select Remarks'),
+                      ),
+                      ...Remarks.values.map((remarks) {
+                        return DropdownMenuItem<Remarks>(
+                          value: remarks,
+                          child: Text(remarks.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _remarks = value;
+                      });
+                    },
+                    onSaved: (value) => _remarks = value,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Call setParams with the appropriate values
+                    widget.dataController.setParams(
+                      date: _dataController.dateSelected,
+                      room: _room,
+                      studentNo: _studentNo,
+                      facultyNo: _facultyNo,
+                      remarks: _remarks,
+                      subjectId: _subjectId,
+                      schedId: schedId,
+                      fromDate: _fromDate,
+                      toDate: _toDate,
+                      isDashboard: true,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Apply'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // List<Widget> _buildOverviewCard(Map<String, dynamic> attendance, BuildContext context, double totalLogs) {

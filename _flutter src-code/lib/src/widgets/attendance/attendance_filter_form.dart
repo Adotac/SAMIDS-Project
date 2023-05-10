@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/model/attendance_model.dart';
 import 'package:samids_web_app/src/model/attendance_search_params.dart';
 
-
 class FilterForm extends StatefulWidget {
   final AttendanceSearchParams searchParams;
 
@@ -31,7 +30,8 @@ class _FilterFormState extends State<FilterForm> {
                   labelText: 'Date',
                 ),
                 initialValue: widget.searchParams.date,
-                onSaved: (value) => value!= null ? widget.searchParams.date = value : null,
+                onSaved: (value) =>
+                    value != null ? widget.searchParams.date = value : null,
               ),
             ),
             Padding(
@@ -41,7 +41,8 @@ class _FilterFormState extends State<FilterForm> {
                   labelText: 'Room',
                 ),
                 initialValue: widget.searchParams.room,
-                onSaved: (value) => value!= null ? widget.searchParams.room = value: null,
+                onSaved: (value) =>
+                    value != null ? widget.searchParams.room = value : null,
               ),
             ),
             Padding(
@@ -52,7 +53,9 @@ class _FilterFormState extends State<FilterForm> {
                 ),
                 initialValue: widget.searchParams.studentNo?.toString(),
                 keyboardType: TextInputType.number,
-                onSaved: (value) => value!= null ?widget.searchParams.studentNo = int.tryParse(value ?? '') : null,
+                onSaved: (value) => value != null
+                    ? widget.searchParams.studentNo = int.tryParse(value ?? '')
+                    : null,
               ),
             ),
             Padding(
@@ -63,7 +66,9 @@ class _FilterFormState extends State<FilterForm> {
                 ),
                 initialValue: widget.searchParams.facultyNo?.toString(),
                 keyboardType: TextInputType.number,
-                onSaved: (value) => value != null ? widget.searchParams.facultyNo = int.tryParse(value ?? '') : null,
+                onSaved: (value) => value != null
+                    ? widget.searchParams.facultyNo = int.tryParse(value ?? '')
+                    : null,
               ),
             ),
             Padding(
@@ -84,7 +89,8 @@ class _FilterFormState extends State<FilterForm> {
                     _selectedRemarks = value;
                   });
                 },
-                onSaved: (value) => value != null ? widget.searchParams.remarks = value : null,
+                onSaved: (value) =>
+                    value != null ? widget.searchParams.remarks = value : null,
               ),
             ),
             Padding(
@@ -95,7 +101,9 @@ class _FilterFormState extends State<FilterForm> {
                 ),
                 initialValue: widget.searchParams.subjectId?.toString(),
                 keyboardType: TextInputType.number,
-                onSaved: (value) => value!= null ? widget.searchParams.subjectId = int.tryParse(value ?? '') : null,
+                onSaved: (value) => value != null
+                    ? widget.searchParams.subjectId = int.tryParse(value ?? '')
+                    : null,
               ),
             ),
             Padding(
@@ -106,7 +114,9 @@ class _FilterFormState extends State<FilterForm> {
                 ),
                 initialValue: widget.searchParams.schedId?.toString(),
                 keyboardType: TextInputType.number,
-                onSaved: (value) => value!= null ? widget.searchParams.schedId = int.tryParse(value ?? '') : null,
+                onSaved: (value) => value != null
+                    ? widget.searchParams.schedId = int.tryParse(value ?? '')
+                    : null,
               ),
             ),
             Padding(
@@ -116,7 +126,8 @@ class _FilterFormState extends State<FilterForm> {
                   labelText: 'From Date',
                 ),
                 initialValue: widget.searchParams.fromDate,
-                onSaved: (value) => value != null ? widget.searchParams.fromDate = value : null,
+                onSaved: (value) =>
+                    value != null ? widget.searchParams.fromDate = value : null,
               ),
             ),
             Padding(
@@ -126,7 +137,8 @@ class _FilterFormState extends State<FilterForm> {
                   labelText: 'To Date',
                 ),
                 initialValue: widget.searchParams.toDate,
-                onSaved: (value) => value != null ? widget.searchParams.toDate = value : null,
+                onSaved: (value) =>
+                    value != null ? widget.searchParams.toDate = value : null,
               ),
             ),
           ],
@@ -155,7 +167,7 @@ class DateTimeFormField extends FormField<DateTime> {
                   context: state.context,
                   initialDate: state.value ?? DateTime.now(),
                   firstDate: DateTime(1900),
-                  lastDate: DateTime(2100),
+                  lastDate: DateTime.now(),
                 );
                 if (picked != null && picked != state.value) {
                   state.didChange(picked);
@@ -167,7 +179,8 @@ class DateTimeFormField extends FormField<DateTime> {
                 }
               },
               child: InputDecorator(
-                decoration: decoration.copyWith(errorText: state.hasError ? state.errorText : null),
+                decoration: decoration.copyWith(
+                    errorText: state.hasError ? state.errorText : null),
                 child: Text(state.value != null ? state.value.toString() : ''),
               ),
             );

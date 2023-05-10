@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _usernameController = TextEditingController();
     // _usernameController.text = '0000';
 
-    _usernameController.text = '100004';
+    _usernameController.text = '200001';
 
     //200005 faculty
     //35526 admin
@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController = TextEditingController();
     // _passwordController.text = 'admin';
     // _passwordController.text = '200005';
-    _passwordController.text = '100004';
+    _passwordController.text = '200001';
     // _onLogin(context);
     super.initState();
   }
