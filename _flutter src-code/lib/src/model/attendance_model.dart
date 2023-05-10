@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:samids_web_app/src/model/device_model.dart';
 import 'package:samids_web_app/src/model/enum_values.dart';
 import 'package:samids_web_app/src/model/student_model.dart';
@@ -14,38 +16,38 @@ class Attendance {
   DateTime? actualTimeIn;
   DateTime? actualTimeOut;
   Remarks remarks;
-
-  Attendance({
-    required this.attendanceId,
-    this.student,
-    this.subjectSchedule,
-    this.device,
-    this.date,
-    this.actualTimeIn,
-    this.actualTimeOut,
-    required this.remarks,
-  });
+  Uint8List? bytes;
+  Attendance(
+      {required this.attendanceId,
+      this.student,
+      this.subjectSchedule,
+      this.device,
+      this.date,
+      this.actualTimeIn,
+      this.actualTimeOut,
+      required this.remarks,
+      this.bytes});
 
   get subject => null;
 
   static Attendance fromJson(Map<String, dynamic> json) {
     return Attendance(
-      attendanceId: json['attendanceId'],
-      student:
-          json['student'] != null ? Student.fromJson(json['student']) : null,
-      subjectSchedule: json['subjectSchedule'] != null
-          ? SubjectSchedule.fromJson(json['subjectSchedule'])
-          : null,
-      device: json['device'] != null ? Device.fromJson(json['device']) : null,
-      date: json['date'] != null ? DateTime.parse(json['date']) : null,
-      actualTimeIn: json['actualTimeIn'] != null
-          ? DateTime.parse(json['actualTimeIn'])
-          : null,
-      actualTimeOut: json['actualTimeOut'] != null
-          ? DateTime.parse(json['actualTimeOut'])
-          : null,
-      remarks: remarksValues.map[json['remarks']]!,
-    );
+        attendanceId: json['attendanceId'],
+        student:
+            json['student'] != null ? Student.fromJson(json['student']) : null,
+        subjectSchedule: json['subjectSchedule'] != null
+            ? SubjectSchedule.fromJson(json['subjectSchedule'])
+            : null,
+        device: json['device'] != null ? Device.fromJson(json['device']) : null,
+        date: json['date'] != null ? DateTime.parse(json['date']) : null,
+        actualTimeIn: json['actualTimeIn'] != null
+            ? DateTime.parse(json['actualTimeIn'])
+            : null,
+        actualTimeOut: json['actualTimeOut'] != null
+            ? DateTime.parse(json['actualTimeOut'])
+            : null,
+        remarks: remarksValues.map[json['remarks']]!,
+        bytes: json['bytes']);
   }
 
   Map<String, dynamic> toJson() {

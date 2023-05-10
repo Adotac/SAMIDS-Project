@@ -241,6 +241,7 @@ class _FacultyAttendanceState extends State<FacultyAttendance> {
                 _dataColumn("Time In"),
                 _dataColumn("Time Out"),
                 _dataColumn("Remarks"),
+                _dataColumn("Action"),
               ],
               showFirstLastButtons: true,
               rowsPerPage: _dataController.pageSize,

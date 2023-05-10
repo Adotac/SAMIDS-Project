@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:samids_web_app/src/controllers/faculty_controller.dart';
 import 'package:samids_web_app/src/controllers/student_controller.dart';
@@ -47,8 +49,39 @@ class AttendanceDataSourceFac extends DataTableSource {
             ? _dataController.formatTime(attendance.actualTimeOut!)
             : 'No Time Out'),
         DataCell(
-          _dataController.getStatusText(attendance.remarks?.name ?? 'Pending'),
+          GestureDetector(
+              onTap: () => attendance.bytes == null
+                  ? Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text("No image available"),
+                    )
+                  : Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Image.memory(attendance.bytes ?? Uint8List(0)),
+                    ),
+              child: _dataController
+                  .getStatusText(attendance.remarks?.name ?? 'Pending')),
         ),
+
+        DataCell(IconButton(
+          icon: Icon(Icons.image_outlined),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(
+                child: attendance.bytes == null
+                    ? Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text("No image available"),
+                      )
+                    : Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: Image.memory(attendance.bytes ?? Uint8List(0)),
+                      ),
+              ),
+            );
+          },
+        ))
       ],
     );
   }
