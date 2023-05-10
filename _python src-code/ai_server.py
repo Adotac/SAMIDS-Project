@@ -35,7 +35,8 @@ mqtt = MQTTClient()
 mqtt.start_loop()
 
 # svm_path = './j-notebooks/svm-rbf_classifier-95-rand-200.pkl'
-svm_path = './models/svm_classifier-400-rand.pkl'
+# svm_path = './models/svm_classifier-400-rand.pkl'
+svm_path = './models/svm-rbf_classifier.pkl'
 # svm_path = './models/svm_classifier - 93.pkl'
 
 
