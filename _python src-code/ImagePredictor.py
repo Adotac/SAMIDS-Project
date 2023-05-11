@@ -29,7 +29,7 @@ class ImagePredictor:
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
-        self.rotation = 0 # need to rotate due to esp32cam is rotated 90 degrees, set to 0 if your camera has correct rotation
+        self.rotation = 90 # need to rotate due to esp32cam is rotated 90 degrees, set to 0 if your camera has correct rotation
 
         self.resnet = InceptionResnetV1()
         state_dict = torch.load(weights_path)

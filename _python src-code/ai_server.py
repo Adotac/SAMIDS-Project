@@ -195,13 +195,18 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
             else:
                 rfidData["message"] = f"Shouldn't be here"
 
+            # Decode the base64 string to bytes
+            image_data = base64.b64decode(frame)
+
             # Convert the bytes to a numpy array
-            image_np = np.frombuffer(frame, dtype=np.uint8)
+            image_np = np.frombuffer(image_data, dtype=np.uint8)
+
             # Read the image using cv2.imdecode()
             image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
 
+
             # Save the image to a file
-            cv2.imwrite(f'/bin/{str(std_id)}.jpg', image)
+            cv2.imwrite(f'./bin/{str(std_id)}.jpg', image)
 
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
@@ -247,13 +252,17 @@ async def save_failattendance(std_id:int, rfid: str, frame: any):
     if response.status_code == 200 and data["success"]:
         print("Negative image saved!")
 
+        # Decode the base64 string to bytes
+        image_data = base64.b64decode(frame)
+
         # Convert the bytes to a numpy array
-        image_np = np.frombuffer(frame, dtype=np.uint8)
+        image_np = np.frombuffer(image_data, dtype=np.uint8)
+
         # Read the image using cv2.imdecode()
         image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
 
         # Save the image to a file
-        cv2.imwrite(f'/bin/{str(std_id)}.jpg', image)
+        cv2.imwrite(f'./bin/{str(std_id)}.jpg', image)
     else:   
         print(rfidData)
         print("Error: " + str(response.status_code) + " | Can't add attendance")

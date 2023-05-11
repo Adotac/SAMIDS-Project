@@ -10,7 +10,7 @@
 attendance_log.csv
 /demo/custom/images/*
 !demo/custom/images/person/
-
+/bin
 
 *.gz
 *.zip

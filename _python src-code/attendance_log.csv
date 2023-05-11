@@ -376,3 +376,13 @@ timestamp,user_id,level,message,rfid,tap_time,room
 2023-05-11 17:14:22,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:15,101
 2023-05-11 17:14:29,100007,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:22,101
 2023-05-11 17:14:35,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:28,101
+2023-05-11 17:29:47,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,17:29:38,101
+2023-05-11 17:30:06,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,17:30:00,101
+2023-05-11 17:30:12,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:30:07,101
+2023-05-11 17:36:12,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,17:36:05,101
+2023-05-11 17:36:24,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,17:36:18,101
+2023-05-11 17:36:31,100006,INFO,"Attendance failed to record, Error Code: 200",187255239165,17:36:25,101
+2023-05-11 17:41:09,100006,INFO,"Attendance failed to record, Error Code: 200",187255239165,17:41:04,101
+2023-05-11 17:41:52,100006,INFO,"Attendance failed to record, Error Code: 200",187255239165,17:41:47,101
+2023-05-11 17:42:38,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,17:42:32,101
+2023-05-11 17:42:44,100006,INFO,"Attendance failed to record, Error Code: 200",187255239165,17:42:39,101
