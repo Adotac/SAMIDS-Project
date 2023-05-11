@@ -192,6 +192,8 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
                 rfidData["message"] = f"Attendance { Remarks.get( data['data']['remarks'] ) }"
             elif "404" in data['data']:
                 rfidData["message"] = f"Error 404"
+            else:
+                rfidData["message"] = f"Shouldn't be here"
 
             # Convert the bytes to a numpy array
             image_np = np.frombuffer(frame, dtype=np.uint8)
@@ -199,7 +201,7 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
             image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
 
             # Save the image to a file
-            # cv2.imwrite(f'/bin/{data["data"][]}.jpg', image)
+            cv2.imwrite(f'/bin/{str(std_id)}.jpg', image)
 
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
@@ -211,6 +213,7 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
             else:
                 rfidData["message"] = "Attendance Failed!"
                 background_tasks.add_task(save_failattendance, 
+                            std_id=std_id,
                             rfid=rfid,
                             frame=frame)
     
@@ -228,7 +231,7 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
         logger.error(f"An error occured = {str(e)}", 
             extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
 
-async def save_failattendance(rfid: str, frame: any):
+async def save_failattendance(std_id:int, rfid: str, frame: any):
     #files = {"image": ("image.jpg", frame)}
 
     body = {
@@ -250,7 +253,7 @@ async def save_failattendance(rfid: str, frame: any):
         image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
 
         # Save the image to a file
-        cv2.imwrite('/bin/schedId_schedNamw_date.jpg', image)
+        cv2.imwrite(f'/bin/{str(std_id)}.jpg', image)
     else:   
         print(rfidData)
         print("Error: " + str(response.status_code) + " | Can't add attendance")
