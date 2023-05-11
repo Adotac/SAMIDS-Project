@@ -366,3 +366,13 @@ timestamp,user_id,level,message,rfid,tap_time,room
 2023-05-11 16:08:00,100002,ERROR,An error occured: Rfid data doesn't match,187255239165,16:07:53,101
 2023-05-11 16:08:06,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,16:07:59,101
 2023-05-11 16:08:13,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,16:08:06,101
+2023-05-11 17:12:33,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,17:12:25,101
+2023-05-11 17:12:39,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:12:32,101
+2023-05-11 17:12:46,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:12:39,101
+2023-05-11 17:12:53,100007,ERROR,An error occured: Rfid data doesn't match,187255239165,17:12:45,101
+2023-05-11 17:13:54,100001,ERROR,An error occured: Rfid data doesn't match,187255239165,17:13:46,101
+2023-05-11 17:14:03,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:13:56,101
+2023-05-11 17:14:13,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:06,101
+2023-05-11 17:14:22,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:15,101
+2023-05-11 17:14:29,100007,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:22,101
+2023-05-11 17:14:35,100004,ERROR,An error occured: Rfid data doesn't match,187255239165,17:14:28,101
