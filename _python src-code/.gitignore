@@ -7,7 +7,7 @@
 /models/*.pt
 /models/*.dat
 /videodata
-
+attendance_log.csv
 /demo/custom/images/*
 !demo/custom/images/person/
 
@@ -17,3 +17,4 @@
 *.rar
 *.tgz
 *.tar
+
