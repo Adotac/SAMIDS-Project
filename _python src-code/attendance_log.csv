@@ -257,3 +257,91 @@ timestamp,user_id,level,message,rfid,tap_time,room
 2023-05-11 13:41:02,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:41:01,101
 2023-05-11 13:41:04,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:41:04,101
 2023-05-11 13:41:07,100005,INFO,"Attendance failed to record, Error Code: 200",49207117161,13:41:06,101
+2023-05-11 13:44:43,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:44:42,101
+2023-05-11 13:44:53,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:44:52,101
+2023-05-11 13:44:55,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:44:55,101
+2023-05-11 13:45:00,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:44:59,101
+2023-05-11 13:45:04,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:04,101
+2023-05-11 13:45:09,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:08,101
+2023-05-11 13:45:11,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:11,101
+2023-05-11 13:45:16,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:15,101
+2023-05-11 13:45:20,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:20,101
+2023-05-11 13:45:23,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:22,101
+2023-05-11 13:45:25,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:25,101
+2023-05-11 13:45:34,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:33,101
+2023-05-11 13:45:38,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:38,101
+2023-05-11 13:45:43,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:42,101
+2023-05-11 13:45:46,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:45,101
+2023-05-11 13:45:48,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:48,101
+2023-05-11 13:45:51,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:50,101
+2023-05-11 13:46:08,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:55,101
+2023-05-11 13:46:18,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:46:03,101
+2023-05-11 13:46:27,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,13:45:55,101
+2023-05-11 13:46:29,100007,ERROR,An error occured: Rfid data doesn't match,49207117161,13:46:22,101
+2023-05-11 13:46:31,100007,ERROR,An error occured: Rfid data doesn't match,49207117161,13:46:12,101
+2023-05-11 13:46:42,100005,INFO,"Attendance failed to record, Error Code: 200",49207117161,13:46:41,101
+2023-05-11 13:49:55,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:49:55,101
+2023-05-11 13:50:22,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:50:22,101
+2023-05-11 13:50:27,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:50:27,101
+2023-05-11 13:50:30,100005,INFO,"Attendance failed to record, Error Code: 200",49207117161,13:50:29,101
+2023-05-11 13:52:40,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:52:40,101
+2023-05-11 13:52:45,100005,ERROR,An error occured = Expecting value: line 1 column 1 (char 0),49207117161,13:52:44,101
+2023-05-11 13:54:26,100005,ERROR,An error occured = 'dict' object has no attribute 'dumps',49207117161,13:54:25,101
+2023-05-11 13:55:47,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,13:55:46,101
+2023-05-11 13:55:51,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:55:51,101
+2023-05-11 13:55:56,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:55:55,101
+2023-05-11 13:56:07,100005,ERROR,An error occured = 'data',49207117161,13:56:06,101
+2023-05-11 13:58:44,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:58:43,101
+2023-05-11 13:58:46,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:58:45,101
+2023-05-11 13:58:48,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,13:58:48,101
+2023-05-11 13:58:51,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,13:58:50,101
+2023-05-11 13:58:54,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,13:58:53,101
+2023-05-11 13:58:56,100005,ERROR,An error occured = Object of type set is not JSON serializable,49207117161,13:58:55,101
+2023-05-11 14:03:55,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:03:54,101
+2023-05-11 14:03:59,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:03:59,101
+2023-05-11 14:04:04,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:03,101
+2023-05-11 14:04:08,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:08,101
+2023-05-11 14:04:11,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:10,101
+2023-05-11 14:04:13,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:13,101
+2023-05-11 14:04:16,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:15,101
+2023-05-11 14:04:23,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:22,101
+2023-05-11 14:04:27,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:27,101
+2023-05-11 14:04:32,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:31,101
+2023-05-11 14:04:40,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:40,101
+2023-05-11 14:04:49,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:49,101
+2023-05-11 14:04:58,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:04:57,101
+2023-05-11 14:05:03,100005,ERROR,An error occured = Expecting value: line 1 column 1 (char 0),49207117161,14:05:02,101
+2023-05-11 14:06:17,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:06:17,101
+2023-05-11 14:06:31,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:06:31,101
+2023-05-11 14:06:36,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:06:36,101
+2023-05-11 14:06:40,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:06:40,101
+2023-05-11 14:06:43,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:06:43,101
+2023-05-11 14:06:46,100005,ERROR,An error occured = Expecting value: line 1 column 1 (char 0),49207117161,14:06:45,101
+2023-05-11 14:10:12,100005,ERROR,"An error occured: HTTPSConnectionPool(host='localhost', port=7170): Max retries exceeded with url: /api/Student?rfid=49207117161 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000262A5E45CF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))",49207117161,14:10:07,101
+2023-05-11 14:10:30,100003,ERROR,"An error occured: HTTPSConnectionPool(host='localhost', port=7170): Max retries exceeded with url: /api/Student?rfid=49207117161 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000262A5E465C0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))",49207117161,14:10:26,101
+2023-05-11 14:17:04,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,14:17:04,101
+2023-05-11 14:17:09,100005,ERROR,An error occured = Expecting value: line 1 column 1 (char 0),49207117161,14:17:08,101
+2023-05-11 14:19:30,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:19:29,101
+2023-05-11 14:19:34,100005,ERROR,An error occured = Expecting value: line 1 column 1 (char 0),49207117161,14:19:33,101
+2023-05-11 14:24:38,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:24:37,101
+2023-05-11 14:24:42,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:24:41,101
+2023-05-11 14:24:46,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:24:46,101
+2023-05-11 14:24:49,100005,ERROR,An error occured = Expecting value: line 1 column 1 (char 0),49207117161,14:24:48,101
+2023-05-11 14:24:52,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:24:52,101
+2023-05-11 14:28:31,100006,ERROR,An error occured: Rfid data doesn't match,49207117161,14:28:31,101
+2023-05-11 14:28:35,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:28:35,101
+2023-05-11 14:28:38,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:28:38,101
+2023-05-11 14:28:41,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:28:40,101
+2023-05-11 14:28:45,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:28:45,101
+2023-05-11 14:28:48,100005,INFO,"Attendance failed to record, Error Code: 200",49207117161,14:28:47,101
+2023-05-11 14:31:03,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:02,101
+2023-05-11 14:31:07,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:06,101
+2023-05-11 14:31:12,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:11,101
+2023-05-11 14:31:15,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:14,101
+2023-05-11 14:31:17,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:16,101
+2023-05-11 14:31:20,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:19,101
+2023-05-11 14:31:22,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:21,101
+2023-05-11 14:31:43,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:30,101
+2023-05-11 14:31:53,100003,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:37,101
+2023-05-11 14:32:56,100001,ERROR,An error occured: Rfid data doesn't match,49207117161,14:31:47,101
+2023-05-11 14:32:58,100005,INFO,"Attendance failed to record, Error Code: 200",49207117161,14:31:57,101

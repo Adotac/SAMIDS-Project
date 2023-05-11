@@ -27,8 +27,8 @@ Remarks = {
 backend_url = "https://localhost:7170"
 
 headers = {
-    'Cache-Control': 'no-cache',
-    'Content-Type': 'application/json'
+    'Cache-Control': 'no-cache'
+    #'Content-Type': 'application/json'
 }
 headers2 = {
     'Cache-Control': 'no-cache',
@@ -170,19 +170,24 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
     
     try:
         # Define the data you want to send as a dictionary
-        params = {
+        body = {
             "studentNo": std_id,
-            "room": str("BCL " + room_id)
+            "room": str("BCL " + room_id),
+            "imageString": frame
         }
         # Prepare the image data as part of the multipart request
         files = {"image": ("image.jpg", frame)}
 
+        jsondata = {
+             'ImageString':frame
+        }
+
         # Convert dictionary to JSON string
-        json_str = json.dumps(params)
+        json_str = json.dumps(body)
         print(json_str)
         # print(frame)
         print("Entering")
-        response = requests.post(backend_url + f"/api/Attendance", params=params, json = frame, headers=headers, verify=False)
+        response = requests.post(backend_url + "/api/Attendance", json=body, headers=headers, verify=False)
         data = response.json()
         print('I am here')
         print(data)
@@ -205,7 +210,7 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
                 rfidData["message"] = "Attendance Failed!"
                 background_tasks.add_task(save_failattendance, 
                             rfid=rfid,
-                            frame=frame)
+                            frame=body)
     
             rfidData["displayFlag"] = True
             print(rfidData)
@@ -222,11 +227,11 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
             extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
 
 async def save_failattendance(rfid: str, frame: any):
-    files = {"image": ("image.jpg", frame)}
+    #files = {"image": ("image.jpg", frame)}
     params = {
         'rfid': rfid,
     }
-    response = requests.post(backend_url + f"/api/Attendance/upload-image", params=params, data = frame, dheaders=headers, verify=False)
+    response = requests.post(backend_url + "/api/Attendance/upload-image", json=frame, headers=headers, verify=False)
     data = response.json()
     print("failed attendance image")
     print(data)
