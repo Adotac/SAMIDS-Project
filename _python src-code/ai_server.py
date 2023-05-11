@@ -4,7 +4,7 @@ import cv2
 import time
 import json
 import base64
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 from fastapi import FastAPI, BackgroundTasks, Path, Query
 from pydantic import BaseModel
@@ -27,10 +27,14 @@ Remarks = {
 backend_url = "https://localhost:7170"
 
 headers = {
-    # "Authorization": str(os.getenv('API-TOKEN')),
-    "Content-Type": "application/json",
-    'X-Custom-Header': 'value'
+    'Cache-Control': 'no-cache',
+    'Content-Type': 'application/json'
 }
+headers2 = {
+    'Cache-Control': 'no-cache',
+    'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+}
+
 
 
 app = FastAPI()
@@ -117,9 +121,9 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
 
         # Encode the image into JPEG format
         _, buffer = cv2.imencode('.jpg', frame)
-
+        image_data_base64 = base64.b64encode(buffer).decode('utf-8')
         # Convert the buffer to bytes
-        jpg_as_text = buffer.tobytes()
+        #jpg_as_text = buffer.tobytes()
 
 
         try:
@@ -140,7 +144,7 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
                                               room_id=device_id,
                                               tap_time=tap_time,
                                               rfid=rfid_string,
-                                              frame=jpg_as_text)
+                                              frame=image_data_base64)
                 else:
                     raise ValueError("Rfid data doesn't match")
             else:
@@ -166,21 +170,21 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
     
     try:
         # Define the data you want to send as a dictionary
-        data = {
+        params = {
             "studentNo": std_id,
-            "room": str("BCL " + room_id),
+            "room": str("BCL " + room_id)
         }
         # Prepare the image data as part of the multipart request
-        files = {"image": ("image.jpg", frame, 'image/jpeg')}
+        files = {"image": ("image.jpg", frame)}
 
         # Convert dictionary to JSON string
-        json_str = json.dumps(data)
+        json_str = json.dumps(params)
         print(json_str)
         # print(frame)
-
-        response = requests.post(backend_url + f"/api/Attendance?studentNo={std_id}&room={'BCL' + room_id}", files=files, headers=headers, verify=False)
+        print("Entering")
+        response = requests.post(backend_url + f"/api/Attendance", params=params, json = frame, headers=headers, verify=False)
         data = response.json()
-
+        print('I am here')
         print(data)
         print("jpeg file now parsed")
         if response.status_code == 200 and data["success"]:
@@ -219,8 +223,10 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
 
 async def save_failattendance(rfid: str, frame: any):
     files = {"image": ("image.jpg", frame)}
-
-    response = requests.post(backend_url + f"/api/Attendance/upload-image?rfid={rfid}", files=files, headers=headers, verify=False)
+    params = {
+        'rfid': rfid,
+    }
+    response = requests.post(backend_url + f"/api/Attendance/upload-image", params=params, data = frame, dheaders=headers, verify=False)
     data = response.json()
     print("failed attendance image")
     print(data)
