@@ -3,6 +3,7 @@ import os
 import cv2
 import time
 import json
+import base64
 from dotenv import load_dotenv
 
 from fastapi import FastAPI, BackgroundTasks, Path, Query
@@ -13,6 +14,7 @@ from collections import defaultdict
 from ImagePredictor import ImagePredictor
 from mqtt_client import MQTTClient
 from Logger import logger
+
 
 Remarks = {
         0: "Pending",
@@ -26,8 +28,10 @@ backend_url = "https://localhost:7170"
 
 headers = {
     # "Authorization": str(os.getenv('API-TOKEN')),
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    'X-Custom-Header': 'value'
 }
+
 
 app = FastAPI()
 
@@ -36,13 +40,15 @@ mqtt.start_loop()
 
 # svm_path = './j-notebooks/svm-rbf_classifier-95-rand-200.pkl'
 # svm_path = './models/svm_classifier-400-rand.pkl'
-svm_path = './models/svm-rbf_classifier.pkl'
+# svm_path = './j-notebooks/svm-rbf_classifier.pkl'
+svm_path = './j-notebooks/sgdr_new_92.pkl'
 # svm_path = './models/svm_classifier - 93.pkl'
 
 
 predictor = ImagePredictor(svm_path=svm_path)
 
-results = defaultdict(str)
+
+# results = defaultdict(str)
 
 
 class ESP32Data(BaseModel):
@@ -67,6 +73,8 @@ def elapsedTime(start_time):
 
     # Print the elapsed time in seconds
     print(f"\nElapsed time: {elapsed_time:.2f} seconds")
+
+    
 
 
 @app.get("/")
@@ -97,43 +105,52 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
     cap = cv2.VideoCapture(url)
 
     ret, frame = cap.read()
+    cap.release()
 
     if not ret:
         print("Camera failed")
     else:
         label_name = predictor.predict_label(frame)
         print(f'The predicted label of the image is: {label_name}')
-        results[ip_address] = label_name
+ 
+        student_id = label_name.split("-")[0]
 
-        tag = results[ip_address].split("-")[0]
-        student_id= 0
+        # Encode the image into JPEG format
+        _, buffer = cv2.imencode('.jpg', frame)
+
+        # Convert the buffer to bytes
+        jpg_as_text = buffer.tobytes()
+
 
         try:
-            response = requests.get(backend_url + f"/api/Student?rfid={tag}", headers=headers, verify=False)
+            response = requests.get(backend_url + f"/api/Student?rfid={rfid_string}", headers=headers, verify=False)
             if response.status_code == 200:
                 data = response.json()
                 input_rfid = str(data["data"][0]["rfid"])
-                print(input_rfid + " | " + rfid_string)
-                student_id= int(data["data"][0]["studentNo"])
+                input_student= int(data["data"][0]["studentNo"])
+
+                print(str(input_student) + " | " + str(student_id))
+
                 
-                if rfid_string == input_rfid:
+                if str(student_id) == str(input_student):
                     print("Add attendance here")
-                    background_tasks.add_task(add_attendance, std_id=student_id,
+                    background_tasks.add_task(add_attendance, 
+                                              background_tasks,
+                                              std_id=student_id,
                                               room_id=device_id,
                                               tap_time=tap_time,
-                                              rfid=rfid_string)
+                                              rfid=rfid_string,
+                                              frame=jpg_as_text)
                 else:
                     raise ValueError("Rfid data doesn't match")
             else:
                 rfidData["message"] = "Server Error:" + str(response.status_code)
                 rfidData["displayFlag"] = True
                 mqtt.publish(device_id=device_id, message=json.dumps(rfidData))
-                print("Error: " + str(response.status_code) + " | " + tag)
+                print("Error: " + str(response.status_code) + " | " + rfid_string)
                 print(response.text)
                 logger.error(f"Server Error: {str(response.status_code)}", extra={'user_id': student_id, 'rfid': rfid_string, 'tap_time':tap_time, 'room':device_id})
 
-
-            del results[ip_address]
         except Exception as e:
             rfidData["message"] = "RFID not-match!"
             rfidData["displayFlag"] = True
@@ -141,40 +158,50 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
             print(f"An error occurred: {str(e)}")
             logger.error(f"An error occured: {str(e)}", extra={'user_id': student_id, 'rfid': rfid_string, 'tap_time':tap_time, 'room':device_id})
 
-    cap.release()
+    
 
 
-async def add_attendance(std_id: int, room_id: str, tap_time: str, rfid: str):
+async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id: str, tap_time: str, rfid: str, frame:any):
+    # Define your query parameters
+    
     try:
         # Define the data you want to send as a dictionary
         data = {
             "studentNo": std_id,
             "room": str("BCL " + room_id),
         }
+        # Prepare the image data as part of the multipart request
+        files = {"image": ("image.jpg", frame, 'image/jpeg')}
 
         # Convert dictionary to JSON string
         json_str = json.dumps(data)
         print(json_str)
-        response = requests.post(backend_url + f"/api/Attendance", json=data, headers=headers, verify=False)
+        # print(frame)
+
+        response = requests.post(backend_url + f"/api/Attendance?studentNo={std_id}&room={'BCL' + room_id}", files=files, headers=headers, verify=False)
         data = response.json()
 
         print(data)
+        print("jpeg file now parsed")
         if response.status_code == 200 and data["success"]:
             if int(data['data']) is not ValueError:
                 rfidData["message"] = f"Attendance { Remarks.get( data['data'] ) }"
-            elif 404 in data['data']:
+            elif "404" in data['data']:
                 rfidData["message"] = f"Error 404"
 
-            
+
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
             logger.info(f"{ rfidData['message'] }", extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
 
         else:
-            if 404 in data['data'] or response.status_code == 404:
+            if "404" in data['data'] or response.status_code == 404:
                 rfidData["message"] = f"Error 404"
             else:
                 rfidData["message"] = "Attendance Failed!"
+                background_tasks.add_task(save_failattendance, 
+                            rfid=rfid,
+                            frame=frame)
     
             rfidData["displayFlag"] = True
             print(rfidData)
@@ -189,3 +216,17 @@ async def add_attendance(std_id: int, room_id: str, tap_time: str, rfid: str):
         print(f"An error occurred: {str(e)}")
         logger.error(f"An error occured = {str(e)}", 
             extra={'user_id': std_id, 'rfid': rfid, 'tap_time':tap_time, 'room':room_id})
+
+async def save_failattendance(rfid: str, frame: any):
+    files = {"image": ("image.jpg", frame)}
+
+    response = requests.post(backend_url + f"/api/Attendance/upload-image?rfid={rfid}", files=files, headers=headers, verify=False)
+    data = response.json()
+    print("failed attendance image")
+    print(data)
+    if response.status_code == 200 and data["success"]:
+        print("Negative image saved!")
+    else:   
+        print(rfidData)
+        print("Error: " + str(response.status_code) + " | Can't add attendance")
+        print(response.text)
