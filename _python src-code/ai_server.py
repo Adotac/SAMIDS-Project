@@ -4,6 +4,7 @@ import cv2
 import time
 import json
 import base64
+import numpy as np
 #from dotenv import load_dotenv
 
 from fastapi import FastAPI, BackgroundTasks, Path, Query
@@ -130,7 +131,7 @@ async def process_image(background_tasks: BackgroundTasks, ip_address: str, rfid
             response = requests.get(backend_url + f"/api/Student?rfid={rfid_string}", headers=headers, verify=False)
             if response.status_code == 200:
                 data = response.json()
-                input_rfid = str(data["data"][0]["rfid"])
+                # input_rfid = str(data["data"][0]["rfid"])
                 input_student= int(data["data"][0]["studentNo"])
 
                 print(str(input_student) + " | " + str(student_id))
@@ -175,12 +176,6 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
             "room": str("BCL " + room_id),
             "imageString": frame
         }
-        # Prepare the image data as part of the multipart request
-        files = {"image": ("image.jpg", frame)}
-
-        jsondata = {
-             'ImageString':frame
-        }
 
         # Convert dictionary to JSON string
         json_str = json.dumps(body)
@@ -194,10 +189,17 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
         print("jpeg file now parsed")
         if response.status_code == 200 and data["success"]:
             if int(data['data']) is not ValueError:
-                rfidData["message"] = f"Attendance { Remarks.get( data['data'] ) }"
+                rfidData["message"] = f"Attendance { Remarks.get( data['data']['remarks'] ) }"
             elif "404" in data['data']:
                 rfidData["message"] = f"Error 404"
 
+            # Convert the bytes to a numpy array
+            image_np = np.frombuffer(frame, dtype=np.uint8)
+            # Read the image using cv2.imdecode()
+            image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
+
+            # Save the image to a file
+            # cv2.imwrite(f'/bin/{data["data"][]}.jpg', image)
 
             rfidData["displayFlag"] = True
             mqtt.publish(device_id=room_id, message=json.dumps(rfidData))
@@ -228,9 +230,7 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
 
 async def save_failattendance(rfid: str, frame: any):
     #files = {"image": ("image.jpg", frame)}
-    params = {
-        'rfid': rfid,
-    }
+
     body = {
         "imageString": frame,
         "rfid": int(rfid)
@@ -243,6 +243,14 @@ async def save_failattendance(rfid: str, frame: any):
     print(data)
     if response.status_code == 200 and data["success"]:
         print("Negative image saved!")
+
+        # Convert the bytes to a numpy array
+        image_np = np.frombuffer(frame, dtype=np.uint8)
+        # Read the image using cv2.imdecode()
+        image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
+
+        # Save the image to a file
+        cv2.imwrite('/bin/schedId_schedNamw_date.jpg', image)
     else:   
         print(rfidData)
         print("Error: " + str(response.status_code) + " | Can't add attendance")

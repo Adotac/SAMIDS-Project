@@ -360,3 +360,9 @@ timestamp,user_id,level,message,rfid,tap_time,room
 2023-05-11 14:46:16,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:46:15,101
 2023-05-11 14:46:19,100002,ERROR,An error occured: Rfid data doesn't match,49207117161,14:46:18,101
 2023-05-11 14:46:24,100005,INFO,"Attendance failed to record, Error Code: 200",49207117161,14:46:22,101
+2023-05-11 14:50:28,100002,ERROR,An error occured: Rfid data doesn't match,187255239165,14:50:25,101
+2023-05-11 14:50:34,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,14:50:32,101
+2023-05-11 16:07:54,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,16:07:46,101
+2023-05-11 16:08:00,100002,ERROR,An error occured: Rfid data doesn't match,187255239165,16:07:53,101
+2023-05-11 16:08:06,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,16:07:59,101
+2023-05-11 16:08:13,100005,ERROR,An error occured: Rfid data doesn't match,187255239165,16:08:06,101

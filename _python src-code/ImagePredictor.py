@@ -39,7 +39,7 @@ class ImagePredictor:
         self.resnet.eval()
 
         with open(svm_path, "rb") as f:
-            self.loaded_clf, self.loaded_le, self.loaded_name_list = pickle.load(f)
+            self.loaded_clf, self.loaded_le, self.loaded_name_list, _,_,_,_ = pickle.load(f)
 
     def predict_label(self, frame):
         # img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
