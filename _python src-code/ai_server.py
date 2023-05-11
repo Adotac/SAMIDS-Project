@@ -210,7 +210,7 @@ async def add_attendance(background_tasks: BackgroundTasks, std_id: int, room_id
                 rfidData["message"] = "Attendance Failed!"
                 background_tasks.add_task(save_failattendance, 
                             rfid=rfid,
-                            frame=body)
+                            frame=frame)
     
             rfidData["displayFlag"] = True
             print(rfidData)
@@ -231,7 +231,13 @@ async def save_failattendance(rfid: str, frame: any):
     params = {
         'rfid': rfid,
     }
-    response = requests.post(backend_url + "/api/Attendance/upload-image", json=frame, headers=headers, verify=False)
+    body = {
+        "imageString": frame,
+        "rfid": int(rfid)
+    }
+    json_str = json.dumps(body)
+    print(json_str)
+    response = requests.post(backend_url + "/api/Attendance/upload-image", json=body, headers=headers, verify=False)
     data = response.json()
     print("failed attendance image")
     print(data)
